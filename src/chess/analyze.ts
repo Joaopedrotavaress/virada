@@ -47,7 +47,7 @@ export function terminalEval(terminal: TerminalState, fen: string): Eval {
   return { kind: 'mate', moves: 0, winner: opposite(mated) }
 }
 
-function hashText(text: string): string {
+export function hashText(text: string): string {
   let hash = 5381
   for (let index = 0; index < text.length; index += 1) hash = ((hash * 33) ^ text.charCodeAt(index)) >>> 0
   return hash.toString(36)
