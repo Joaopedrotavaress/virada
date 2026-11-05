@@ -5,6 +5,8 @@ import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../dat
 import { useInstall } from '../pwa'
 import { navigate } from '../route'
 import type { ActiveGame } from '../storage'
+import { Logo } from './Logo'
+import { OPERA_FEN, OPERA_MATED, OPERA_MOVES, Placa, RevelationBoard } from './Revelation'
 import { TodayCard } from './TodayCard'
 import { viewRecord } from './Games'
 
@@ -69,7 +71,7 @@ function UserForm({ username, onChange, onSubmit, autoFocus = false }: { usernam
           aria-describedby="ajuda-usuario"
           className={`${inputClass} min-h-12 min-w-0 flex-1 px-3 text-base`}
         />
-        <button type="submit" className="min-h-12 shrink-0 rounded-md bg-ink px-6 font-semibold text-bg">
+        <button type="submit" className="min-h-12 shrink-0 rounded-md bg-action px-6 font-semibold text-on-action">
           Buscar partidas
         </button>
       </div>
@@ -103,7 +105,7 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
         aria-describedby={error ? 'erro-pgn' : 'ajuda-pgn'}
         aria-invalid={Boolean(error)}
         placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."
-        className={`${inputClass} font-book block resize-y p-3 text-base leading-relaxed`}
+        className={`${inputClass} block resize-y p-3 text-base leading-relaxed`}
       />
       {error ? (
         <p id="erro-pgn" role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
@@ -122,7 +124,7 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
             <label
               key={option.value}
               className={`flex min-h-11 cursor-pointer flex-col items-center justify-center px-1 py-1.5 text-center has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${
-                depth === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink'
+                depth === option.value ? 'bg-action text-on-action' : 'bg-surface text-ink'
               }`}
             >
               <input type="radio" name="profundidade" value={option.value} checked={depth === option.value} onChange={() => onDepthChange(option.value)} className="sr-only" />
@@ -155,7 +157,7 @@ function RecentGames({ records, onOpen }: { records: GameRecord[]; onOpen: (reco
           <li key={record.key} className="flex items-stretch">
             <button type="button" onClick={() => onOpen(record)} className="min-w-0 flex-1 py-3 pr-2 text-left hover:bg-sunken">
               <span className="block truncate font-semibold">{view.title}</span>
-              {record.opening && <span className="font-book block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
+              {record.opening && <span className="block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
               <span className="tabular mt-0.5 block truncate text-sm text-muted">
                 {[record.outcome ? OUTCOME_LABEL[record.outcome] : record.result === '*' ? '' : record.result, new Date(record.playedAt).toLocaleDateString('pt-BR'), record.digest ? (view.accuracy !== null ? `precisão ${view.accuracy.toFixed(0)}%` : '') : 'toque para analisar'].filter(Boolean).join(', ')}
               </span>
@@ -184,6 +186,7 @@ export function Home(props: HomeProps) {
   const pgnForm = <PgnForm {...props} />
   const footer = (
     <footer className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+      <p className="font-display w-full text-xl font-bold text-ink">Feito com carinho no Brasil</p>
       <a
         href="#/dados"
         onClick={(event) => {
@@ -209,7 +212,7 @@ export function Home(props: HomeProps) {
   )
   const installSection = installMode !== 'none' && (
     <section className="mt-10 border-t border-line pt-6">
-      <h2 className="font-book text-xl font-semibold">Use como um app</h2>
+      <h2 className="font-display text-xl font-semibold">Use como um app</h2>
       {installMode === 'prompt' ? (
         <>
           <p className="mt-1 max-w-prose text-muted">Instalado, ele abre direto da tela inicial e funciona sem internet.</p>
@@ -225,47 +228,68 @@ export function Home(props: HomeProps) {
 
   if (!returning) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 pt-8 pb-12 lg:pt-16">
-        <header className="mb-8 flex items-start gap-4 sm:gap-6">
-          <span aria-hidden="true" className="font-book -mt-2 text-6xl leading-none font-bold text-(--text-inaccuracy) sm:-mt-3 sm:text-8xl">
-            ?!
-          </span>
+      <div className="mx-auto w-full max-w-6xl pb-12 lg:px-6 lg:pt-8">
+        <div className="lg:grid lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
           <div>
-            <h1 className="font-book text-3xl leading-tight font-semibold sm:text-5xl">Onde a sua partida virou?</h1>
-            <p className="mt-3 max-w-prose text-base text-muted">Cole o PGN e o Stockfish revisa cada lance aqui no seu navegador. Grátis, sem cadastro, e nada sai do seu aparelho.</p>
+            <div className="px-5 py-2.5 lg:hidden">
+              <Logo />
+            </div>
+            <div className="px-5 lg:px-0">
+              <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" matedSquare={OPERA_MATED} />
+            </div>
+            <div className="mt-3 overflow-hidden">
+              <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={3300} />
+            </div>
           </div>
-        </header>
-        <div className="mb-8">
-          <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} />
+          <main className="min-w-0 px-5 pt-5 lg:px-0 lg:pt-0">
+            <h1 className="font-display text-4xl leading-none font-extrabold lg:text-6xl">Toda partida tem um ponto de virada. Ache o seu.</h1>
+            <p className="mt-3 max-w-prose text-base text-muted">O Stockfish revisa cada lance aqui no seu aparelho, explica o erro em português e transforma em treino. Grátis, sem cadastro, e nada sai do seu aparelho.</p>
+            <div className="mt-5 mb-8">
+              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} />
+            </div>
+            {pgnForm}
+            <section className="mt-10 border-t border-line pt-6">
+              <h2 className="font-display text-2xl font-bold">Prefere jogar agora?</h2>
+              <p className="mt-1 max-w-prose text-muted">Tem doze adversários, cada um com seu jeito, e o treinador do seu lado avisando dos erros. Depois, é só revisar.</p>
+              <button type="button" onClick={() => navigate('#/jogar')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
+                Jogar contra um bot
+              </button>
+            </section>
+            {installSection}
+            {footer}
+          </main>
         </div>
-        {pgnForm}
-        <section className="mt-10 border-t border-line pt-6">
-          <h2 className="font-book text-xl font-semibold">Prefere jogar agora?</h2>
-          <p className="mt-1 max-w-prose text-muted">Enfrente um bot do seu nível, com o treinador avisando dos erros durante a partida. Depois, é só revisar.</p>
-          <button type="button" onClick={() => navigate('#/jogar')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
-            Jogar contra um bot
-          </button>
-        </section>
-        {installSection}
-        {footer}
       </div>
     )
   }
 
+  const latest = records.find((record) => record.digest && record.digest.errors.length > 0)
+  const latestError = latest?.digest?.errors.reduce((worst, error) => (error.loss > worst.loss ? error : worst))
+  const latestOpponent = latest && (latest.userColor === 'b' ? latest.white : latest.black)
+
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-5 pb-10 lg:pt-10">
+    <div className="mx-auto w-full max-w-5xl px-4 pt-3 pb-10 lg:pt-10">
+      <div className="mb-2 lg:hidden">
+        <Logo />
+      </div>
       <div className="grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <main className="min-w-0">
-          <h1 className="font-book text-3xl leading-tight font-semibold lg:text-4xl">{username.trim() ? `Olá, ${username.trim()}` : 'O que vamos fazer hoje?'}</h1>
+          <h1 className="font-display text-4xl leading-none font-extrabold lg:text-5xl">{username.trim() ? `E aí, ${username.trim()}?` : 'O que vamos fazer hoje?'}</h1>
+
+          {latest && latestError && (
+            <button type="button" onClick={() => props.onOpen(latest)} className="-mx-4 mt-4 block w-[calc(100%+2rem)] overflow-hidden text-left sm:mx-0 sm:w-full">
+              <Placa number={latestError.moveNumber} title={`Foi aqui que virou contra ${latestOpponent}.`} note="Sua última partida analisada. Toque para rever." animate={false} />
+            </button>
+          )}
 
           {activeGame && (
-            <section aria-label="Partida em andamento" className="mt-4 rounded-md bg-ink p-4 text-bg">
+            <section aria-label="Partida em andamento" className="mt-4 rounded-md bg-action p-4 text-on-action">
               <p className="font-semibold">Você tem uma partida em andamento{activeBot ? ` contra ${activeBot.name}` : ''}.</p>
               <div className="mt-2 flex gap-2">
-                <button type="button" onClick={() => navigate('#/jogo')} className="min-h-11 flex-1 rounded-md bg-bg px-4 font-semibold text-ink sm:flex-none">
+                <button type="button" onClick={() => navigate('#/jogo')} className="min-h-11 flex-1 rounded-md bg-on-action px-4 font-semibold text-action sm:flex-none">
                   Continuar
                 </button>
-                <button type="button" onClick={props.onAbandonGame} className="min-h-11 flex-1 rounded-md border border-bg/40 px-4 font-semibold sm:flex-none">
+                <button type="button" onClick={props.onAbandonGame} className="min-h-11 flex-1 rounded-md border border-on-action/40 px-4 font-semibold sm:flex-none">
                   Abandonar
                 </button>
               </div>
@@ -273,7 +297,7 @@ export function Home(props: HomeProps) {
           )}
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <button type="button" onClick={() => navigate('#/partidas')} className="min-h-14 rounded-md bg-ink px-5 text-left font-semibold text-bg">
+            <button type="button" onClick={() => navigate('#/partidas')} className="min-h-14 rounded-md bg-action px-5 text-left font-semibold text-on-action">
               Ver minhas partidas
             </button>
             <button type="button" onClick={() => navigate('#/jogar')} className="min-h-14 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
@@ -311,7 +335,7 @@ export function Home(props: HomeProps) {
         </main>
 
         <aside className="min-w-0">
-          <h2 className="font-book text-xl font-semibold">Partidas recentes</h2>
+          <h2 className="font-display text-xl font-semibold">Partidas recentes</h2>
           {recent.length === 0 ? (
             <p className="mt-2 max-w-prose text-sm text-muted">As partidas que você analisar ou jogar aqui ficam guardadas neste aparelho, para abrir de novo sem esperar.</p>
           ) : (
