@@ -14,6 +14,7 @@ import { Home } from './components/Home'
 import { Shell } from './components/Shell'
 import { Training } from './training/Training'
 import { type GameRecord, addUnanalyzed, allRecords, colorOfUser, getAnalysis, initLibrary, recordKeyOf, saveAnalyzed, useAllRecords } from './data/library'
+import { startLocalBackend } from './data/localBackend'
 import { analysisQueue } from './data/queue'
 import { EngineAbortError, getEngine } from './engine/stockfish'
 import { gamePath, goBack, navigate, useRoute } from './route'
@@ -125,7 +126,9 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    void initLibrary(username).then(() => analysisQueue.resume())
+    void initLibrary(username)
+      .then(() => startLocalBackend())
+      .then(() => analysisQueue.resume())
     // Só uma vez, ao abrir o app.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -265,7 +268,7 @@ export default function App() {
   }
 
   if (route.name === 'game') {
-    return <GameRoute gameKey={route.key} username={username} notice={notice} onAnalyze={(record) => openRecord(record, true)} onPlayFrom={playFrom} />
+    return <GameRoute gameKey={route.key} username={username} notice={notice} onAnalyze={(record) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace: true })} onPlayFrom={playFrom} />
   }
 
   if (route.name === 'bot-game') {
