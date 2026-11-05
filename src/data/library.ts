@@ -147,6 +147,8 @@ export function openingFromPgn(book: BookData, pgn: string): OpeningInfo | null 
 
 export interface SaveMeta {
   pgn: string
+  /** A chave que a partida já tem na biblioteca. */
+  key?: string
   userColor: Color | null
   source?: GameRecord['source']
   owner?: string
@@ -155,7 +157,7 @@ export interface SaveMeta {
 
 function baseRecord(game: ParsedGame, meta: SaveMeta, now: number): GameRecord {
   return {
-    key: recordKeyOf(game),
+    key: meta.key ?? recordKeyOf(game),
     pgn: meta.pgn,
     white: game.white,
     black: game.black,
