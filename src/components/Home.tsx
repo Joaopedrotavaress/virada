@@ -5,6 +5,7 @@ import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../dat
 import { useInstall } from '../pwa'
 import { navigate } from '../route'
 import type { ActiveGame } from '../storage'
+import { Icon } from './Icons'
 import { Logo } from './Logo'
 import { OPERA_FEN, OPERA_MATED, OPERA_MOVES, Placa, RevelationBoard } from './Revelation'
 import { TodayCard } from './TodayCard'
@@ -38,7 +39,7 @@ const inputClass =
 
 const OUTCOME_LABEL = { win: 'vitória', loss: 'derrota', draw: 'empate' }
 
-function UserForm({ username, onChange, onSubmit, autoFocus = false }: { username: string; onChange: (name: string) => void; onSubmit: () => void; autoFocus?: boolean }) {
+function UserForm({ username, onChange, onSubmit, autoFocus = false, submitLabel = 'Buscar partidas' }: { username: string; onChange: (name: string) => void; onSubmit: () => void; autoFocus?: boolean; submitLabel?: string }) {
   const [needsUser, setNeedsUser] = useState(false)
   return (
     <form
@@ -54,7 +55,7 @@ function UserForm({ username, onChange, onSubmit, autoFocus = false }: { usernam
       <label htmlFor="usuario" className="mb-1.5 block text-sm font-semibold">
         Seu usuário do chess.com
       </label>
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex gap-2">
         <input
           id="usuario"
           type="text"
@@ -71,8 +72,8 @@ function UserForm({ username, onChange, onSubmit, autoFocus = false }: { usernam
           aria-describedby="ajuda-usuario"
           className={`${inputClass} min-h-12 min-w-0 flex-1 px-3 text-base`}
         />
-        <button type="submit" className="min-h-12 shrink-0 rounded-md bg-action px-6 font-semibold text-on-action">
-          Buscar partidas
+        <button type="submit" className="min-h-12 shrink-0 rounded-md bg-action px-4 font-semibold text-on-action sm:px-6">
+          {submitLabel}
         </button>
       </div>
       <p id="ajuda-usuario" role={needsUser ? 'alert' : undefined} className={`mt-2 text-sm ${needsUser ? 'font-medium text-(--text-blunder)' : 'text-muted'}`}>
@@ -124,7 +125,7 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
             <label
               key={option.value}
               className={`flex min-h-11 cursor-pointer flex-col items-center justify-center px-1 py-1.5 text-center has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${
-                depth === option.value ? 'bg-action text-on-action' : 'bg-surface text-ink'
+                depth === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink'
               }`}
             >
               <input type="radio" name="profundidade" value={option.value} checked={depth === option.value} onChange={() => onDepthChange(option.value)} className="sr-only" />
@@ -163,7 +164,7 @@ function RecentGames({ records, onOpen }: { records: GameRecord[]; onOpen: (reco
               </span>
             </button>
             <button type="button" onClick={() => void removeRecord(record.key)} aria-label={`Apagar a partida contra ${view.title}`} className="flex w-11 shrink-0 items-center justify-center text-xl text-muted hover:bg-sunken hover:text-ink">
-              ×
+              <Icon name="close" />
             </button>
           </li>
         )
@@ -228,25 +229,35 @@ export function Home(props: HomeProps) {
 
   if (!returning) {
     return (
-      <div className="mx-auto w-full max-w-6xl pb-12 lg:px-6 lg:pt-8">
-        <div className="lg:grid lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
-          <div>
+      <div className="mx-auto w-full max-w-5xl pb-12 lg:px-4 lg:pt-8">
+        <div className="lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
+          {/* Um toque termina a animação na hora. */}
+          <div onClick={(event) => event.currentTarget.getAnimations({ subtree: true }).forEach((animation) => animation.finish())}>
             <div className="px-5 py-2.5 lg:hidden">
               <Logo />
             </div>
-            <div className="px-5 lg:px-0">
+            <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
               <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" matedSquare={OPERA_MATED} />
             </div>
             <div className="mt-3 overflow-hidden">
               <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={3300} />
             </div>
           </div>
-          <main className="min-w-0 px-5 pt-5 lg:px-0 lg:pt-0">
-            <h1 className="font-display text-4xl leading-none font-extrabold lg:text-6xl">Toda partida tem um ponto de virada. Ache o seu.</h1>
-            <p className="mt-3 max-w-prose text-base text-muted">O Stockfish revisa cada lance aqui no seu aparelho, explica o erro em português e transforma em treino. Grátis, sem cadastro, e nada sai do seu aparelho.</p>
-            <div className="mt-5 mb-8">
-              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} />
+          <main className="flex min-w-0 flex-col px-5 pt-4 lg:px-0 lg:pt-0">
+            <div className="order-1 lg:order-2 lg:mt-5">
+              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} submitLabel="Achar a virada" />
             </div>
+            <div className="order-2 mt-6 lg:order-1 lg:mt-0">
+              <h1 className="font-display text-4xl leading-none font-extrabold lg:text-6xl">
+                Toda partida tem
+                <br />
+                um ponto de virada.
+                <br />
+                Ache o seu.
+              </h1>
+              <p className="mt-3 max-w-prose text-base text-muted">O Stockfish analisa cada lance no seu aparelho. O Virada explica o erro em português e transforma em treino. Grátis, sem cadastro.</p>
+            </div>
+            <div className="order-3 mt-8">
             {pgnForm}
             <section className="mt-10 border-t border-line pt-6">
               <h2 className="font-display text-2xl font-bold">Prefere jogar agora?</h2>
@@ -257,6 +268,7 @@ export function Home(props: HomeProps) {
             </section>
             {installSection}
             {footer}
+            </div>
           </main>
         </div>
       </div>
@@ -297,10 +309,10 @@ export function Home(props: HomeProps) {
           )}
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <button type="button" onClick={() => navigate('#/partidas')} className="min-h-14 rounded-md bg-action px-5 text-left font-semibold text-on-action">
+            <button type="button" onClick={() => navigate('#/partidas')} className={`min-h-14 rounded-md px-5 font-semibold ${latest ? 'border border-line hover:bg-sunken' : 'bg-action text-on-action'}`}>
               Ver minhas partidas
             </button>
-            <button type="button" onClick={() => navigate('#/jogar')} className="min-h-14 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
+            <button type="button" onClick={() => navigate('#/jogar')} className="min-h-14 rounded-md border border-line px-5 font-semibold hover:bg-sunken">
               Jogar contra um bot
             </button>
           </div>
