@@ -135,7 +135,7 @@ export function ReviewBar({ status, ply, total, moments, moves, speed, hasNext, 
     <div role="group" aria-label="Controles da revisão" className="rounded-md bg-surface px-2.5 pt-3 pb-1.5">
       {/* Trilha da partida: cada marca é uma parada, e dá para ir direto a ela. */}
       <div className="relative mx-2 h-1.5 rounded-full bg-sunken">
-        <div className="absolute inset-y-0 left-0 rounded-full bg-action" style={{ width: `${position}%` }} />
+        <div className="absolute inset-y-0 left-0 rounded-full bg-ink" style={{ width: `${position}%` }} />
         {moments.map((moment) => {
           const move = moves[moment.ply - 1]
           return (

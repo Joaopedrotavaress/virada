@@ -60,7 +60,7 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
       <div className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</div>
 
       {queue.running && (
-        <p role="status" className="fixed inset-x-2 bottom-[4.75rem] z-10 truncate rounded-md bg-action px-3 py-1.5 text-sm text-on-action lg:right-4 lg:bottom-4 lg:left-auto lg:w-80">
+        <p role="status" className="fixed inset-x-2 bottom-[4.75rem] z-10 truncate rounded-md bg-ink px-3 py-1.5 text-sm text-bg lg:right-4 lg:bottom-4 lg:left-auto lg:w-80">
           Analisando em segundo plano: faltam {queue.remaining}
         </p>
       )}

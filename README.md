@@ -1,72 +1,109 @@
+<div align="center">
+
+<img src="docs/virada-logo.svg" width="96" height="96" alt="Símbolo do Virada: um V feito de casas de tabuleiro, com a casa da ponta em amarelo">
+
 # Virada
 
-Toda partida tem um ponto de virada. Ache o seu.
+**Toda partida tem um ponto de virada. Ache o seu.**
 
-Analisa suas partidas do chess.com e joga contra bots com treinador, com o Stockfish rodando 100% no aparelho. Grátis, sem servidor e sem API paga. Funciona no celular e no computador, instala como app e roda sem internet.
+Um treinador de xadrez grátis, em português, que analisa suas partidas do chess.com com o Stockfish rodando no seu próprio aparelho.
+
+Sem cadastro. Sem assinatura. Sem servidor. Seus dados ficam com você.
+
+<img src="docs/revelacao.gif" width="300" alt="Animação: o tabuleiro surge da sombra, Morphy entrega a dama em b8, dá mate com a torre em d8, e uma placa amarela sobe com o número 17">
+
+</div>
+
+## Por que existe
+
+Você acabou de perder. Ainda está com o celular na mão e só quer saber uma coisa: **onde foi que a partida virou?**
+
+O Virada acha esse lance, explica em português o que aconteceu, como um amigo de clube que joga melhor que você, e transforma o seu erro em exercício. Da próxima vez, você reconhece a posição.
 
 ## O que ele faz
 
-- **Análise:** classifica cada lance, explica o erro em português (peça pendurada, garfo, cravada, material, mate) e mostra as 3 melhores linhas.
-- **Revisão guiada:** resumo com os principais pontos e reprodução automática em quatro velocidades, com parada nos momentos decisivos.
-- **Treino:** "Tentar de novo" volta ao erro para você achar o lance; arrastar qualquer peça testa outro lance com feedback na hora.
-- **Bots:** 12 níveis, de ~400 à força total, com dica, "qual a ameaça?", barra de avaliação, aviso de erro, relógio opcional e início de qualquer posição. A partida sobrevive a recarregar a página.
-- **Tabuleiro:** peças capturadas e placar de material ao lado de cada jogador, na análise e no jogo.
-- **Partidas:** tudo num lugar só, do chess.com, contra bots e coladas, com busca, filtros, notas e marcadores. Análise em lote que continua depois de fechar o app.
-- **Progresso:** rating, precisão, aproveitamento e erros graves por período e ritmo, e o que se repete nos seus erros.
-- **Treino:** seus piores erros viram exercícios com repetição espaçada, numa sessão diária, com sequência de dias.
-- **Puzzles:** puzzle do dia e 22 temas, em quatro dificuldades, sem internet.
-- **Guia:** catálogo com 3.865 linhas de aberturas, 41 aberturas explicadas com planos e armadilhas, repertório com prática lance a lance e 21 lições de mates, táticas e finais.
-- **Relógio:** tempo gasto em cada lance, gráfico e frases sobre como você usou o tempo.
-- **Aberturas:** nome da abertura e lances de livro, que não contam para a precisão.
+| | |
+|---|---|
+| **Acha a virada** | Classifica cada lance, marca o ponto em que a partida mudou de lado e mostra isso com uma animação na sua própria posição. |
+| **Explica de verdade** | Peça sem defesa, garfo, cravada, mate perdido: o erro é explicado em português, com as linhas do Stockfish. |
+| **Revisão guiada** | Passa pela partida sozinho, em quatro velocidades, e para nos momentos decisivos. |
+| **Treina os seus erros** | Seus piores lances viram exercícios com repetição espaçada, numa sessão diária com sequência de dias. |
+| **Doze adversários** | Do Tio Beto ("Essa torre eu nem queria mesmo.") ao Stockfish sem limites, com treinador ao lado, dica, relógio opcional e início de qualquer posição. |
+| **Guia de aberturas** | 3.865 linhas no catálogo, 41 aberturas explicadas com planos e armadilhas, repertório e prática lance a lance. |
+| **Lições e puzzles** | 21 lições de mates, táticas e finais, puzzle do dia e 22 temas em quatro dificuldades. |
+| **Seu progresso** | Rating, precisão e erros por período e ritmo, e o que se repete: "6 dos 9 erros graves foram garfos no meio-jogo". |
+| **Sem internet** | Instala como app e continua funcionando offline, inclusive a análise. |
 
-## Rodar no computador
+## Telas
+
+<div align="center">
+<img src="docs/telas/inicio.png" width="200" alt="Tela inicial com a placa amarela mostrando o lance em que a última partida virou">
+<img src="docs/telas/analise.png" width="200" alt="Análise de uma partida com tabuleiro, barra de avaliação e comentários do treinador">
+<img src="docs/telas/bots.png" width="200" alt="Lista de bots com nome, frase e avatar de cada personagem">
+<img src="docs/telas/exercicio.png" width="200" alt="Exercício a partir de um erro de partida">
+</div>
+
+<div align="center">
+<img src="docs/telas/computador.png" width="820" alt="Análise de uma partida no computador, com tabuleiro, comentários, gráfico com o ponto de virada em amarelo e resumo">
+</div>
+
+## Como rodar
+
+Você precisa do [Node.js](https://nodejs.org) 22.13 ou mais novo.
 
 ```bash
-npm install && npm run dev
+git clone https://github.com/Joaopedrotavaress/virada.git
+cd virada
+npm install
+npm run dev
 ```
 
-O `npm install` copia o Stockfish para `public/engine` e gera a base de aberturas em `src/chess/openings.generated.json`.
+O `npm install` copia o Stockfish para `public/engine` e gera a base de aberturas.
 
-Para abrir no celular durante o desenvolvimento, com os dois na mesma rede: `npm run dev -- --host`.
+Para abrir no celular durante o desenvolvimento, com os dois na mesma rede:
 
-Testes, que usam o motor de verdade: `npm test`. Eles também conferem cada lance do guia com as regras e com o Stockfish.
+```bash
+npm run dev -- --host
+```
 
-## Backend local (opcional)
+Para rodar os testes, que usam o motor de verdade e conferem cada lance do guia com as regras e com o Stockfish:
 
-No seu computador, e só nele:
+```bash
+npm test
+```
+
+## Publicar
+
+Na Vercel, importe o repositório, mantenha o que ela detectar (Vite, `npm run build`, pasta `dist`) e clique em **Deploy**. Não há variável de ambiente nem servidor para configurar.
+
+## Opcionais
+
+**Computador local.** O comando abaixo abre o mesmo app em `http://127.0.0.1:4300`, com uma cópia dos dados num SQLite e a análise em lote usando o motor completo. Só este computador tem acesso, e o site publicado não depende disso.
 
 ```bash
 npm run local
 ```
 
-Isso abre o mesmo app em `http://127.0.0.1:4300`, com uma cópia dos dados num SQLite em `data-local/` e a análise em lote usando o motor completo do Stockfish. Requer Node 22.13 ou mais novo, e não instala nada além do que o projeto já tem. O servidor só aceita conexões deste computador.
+**Entre aparelhos.** Na tela Seus dados, dá para salvar um backup em arquivo ou sincronizar por um gist secreto com um token seu do GitHub. Um gist secreto não é criptografado: quem tiver o link consegue ler.
 
-O site publicado não depende disso: ele nem chega a procurar o backend fora de `localhost`. Com o backend desligado, tudo continua funcionando com os dados do navegador.
+## Por dentro
 
-## Publicar na Vercel
+React, TypeScript, Vite e Tailwind. O Stockfish roda em WebAssembly num Web Worker, os dados ficam no IndexedDB e o app funciona como PWA. A identidade visual está em [DESIGN.md](DESIGN.md).
 
-1. Envie esta pasta para um repositório no GitHub.
-2. Na Vercel, clique em **Add New > Project** e importe o repositório.
-3. Mantenha o que ela detectar (framework Vite, comando `npm run build`, pasta `dist`) e clique em **Deploy**.
+## O que é bom saber
 
-Ou, direto do terminal, sem GitHub: `npx vercel --prod`.
+- **Força dos bots:** os números são aproximados e servem para comparar os níveis. Não foram medidos contra jogadores.
+- **Textos do guia:** cada lance citado foi conferido pelas regras e pelo Stockfish, mas as explicações de plano não foram revisadas por um jogador forte. Se achar um erro, abra uma issue.
+- **Profundidade:** a análise Rápida pode deixar passar táticas longas.
 
-Não há variáveis de ambiente nem headers para configurar: o motor é single-thread e dispensa COOP/COEP. O app precisa de HTTPS para instalar e funcionar offline, o que a Vercel já oferece.
+## Créditos
 
-## Bom saber
+Feito sobre o trabalho aberto de muita gente: [Stockfish.js](https://github.com/nmrugg/stockfish.js), [chess.js](https://github.com/jhlywa/chess.js), [react-chessboard](https://github.com/Clariity/react-chessboard) e as bases abertas de aberturas e puzzles do [Lichess](https://lichess.org). A lista completa está em [CREDITS.md](CREDITS.md).
 
-- **Seus dados:** ficam no navegador, sem limite de quantidade além do espaço do aparelho. O que você analisa no celular não aparece no computador, a não ser por backup ou gist.
-- **Levar para outro aparelho:** na tela Seus dados, salve um backup em arquivo, ou ligue a sincronização por gist secreto com um token seu do GitHub. No gist, vão partidas, notas e treino; as análises são refeitas. Um gist secreto não é criptografado: quem tiver o link consegue ler.
-- **Textos do guia:** escritos para este app. Cada lance citado foi conferido pelas regras e pelo Stockfish, mas as explicações estratégicas não foram revisadas por um jogador forte.
-- **Profundidade:** a Rápida (12) pode errar em táticas longas. Na partida de exemplo, ela marca o sacrifício 15. Bxd7+ como erro; a partir da Normal (15), como melhor lance.
-- **Força dos bots:** os números são aproximados e servem para comparar os níveis. Eles não foram medidos contra jogadores.
-- **Instalar:** no Android e no Chrome, use o botão "Instalar app" da tela inicial. No iPhone, abra no Safari e use Compartilhar > Adicionar à Tela de Início.
+Licença [GPL-3.0](LICENSE).
 
-## Licenças e dados
+<div align="center">
 
-- **Stockfish.js** é GPLv3: o app publica a licença em `/engine/LICENSE.txt` e indica o código-fonte do motor no rodapé. Se você distribuir uma versão com o motor alterado, a GPL exige publicar essas alterações.
-- **Aberturas:** base [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings), domínio público (CC0), guardada em `data/openings`. Para atualizar, troque os arquivos `.tsv` e rode `node scripts/build-openings.mjs`. Os nomes das famílias principais são traduzidos nesse script; as variantes menos comuns ficam com o nome original.
-- **Partidas do chess.com** vêm da API pública, sem chave, e ficam só no seu aparelho.
-- **Puzzles:** recorte da base aberta do Lichess (CC0), guardado em `src/puzzles/puzzles.json`. Para refazer o recorte: `npm install --no-save fzstd && node scripts/build-puzzles.mjs`.
-- **Banco de finais:** o serviço do Lichess responde posições com até 7 peças. Sem internet, a informação só não aparece.
-- O projeto é **GPL-3.0**. Veja `LICENSE` e `CREDITS.md`.
+**Feito com carinho no Brasil.**
+
+</div>

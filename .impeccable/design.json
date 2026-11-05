@@ -1,0 +1,1357 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-05T19:56:22.615Z",
+  "title": "Design System: Virada",
+  "extensions": {
+    "colorMeta": {
+      "action": {
+        "role": "primary",
+        "displayName": "Amarelo Placa",
+        "canonical": "#ffd100",
+        "tonalRamp": [
+          "#100b00",
+          "#2d2300",
+          "#514101",
+          "#776104",
+          "#a08308",
+          "#cca702",
+          "#eacc67",
+          "#fbeec6"
+        ]
+      },
+      "on-action": {
+        "role": "primary",
+        "displayName": "Preto Placa",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242426",
+          "#424245",
+          "#636366",
+          "#868689",
+          "#aaaaad",
+          "#cdcdd0",
+          "#eeeeef"
+        ]
+      },
+      "night-bg": {
+        "role": "neutral",
+        "displayName": "Breu",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Carvão",
+        "canonical": "#17171b",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "night-sunken": {
+        "role": "neutral",
+        "displayName": "Grafite",
+        "canonical": "#26262c",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Giz",
+        "canonical": "#eeeef1",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Giz Apagado",
+        "canonical": "#a9a9b1",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Fio Noturno",
+        "canonical": "#34343b",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-bg": {
+        "role": "neutral",
+        "displayName": "Cinza Dia",
+        "canonical": "#e6e6ea",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-surface": {
+        "role": "neutral",
+        "displayName": "Papel Frio",
+        "canonical": "#f7f7f8",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-sunken": {
+        "role": "neutral",
+        "displayName": "Cinza Rebaixado",
+        "canonical": "#d8d8de",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-ink": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-muted": {
+        "role": "neutral",
+        "displayName": "Tinta Apagada",
+        "canonical": "#4c4c55",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "day-line": {
+        "role": "neutral",
+        "displayName": "Fio Diurno",
+        "canonical": "#bcbcc4",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-0": {
+        "role": "neutral",
+        "displayName": "Zona 0",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-1": {
+        "role": "neutral",
+        "displayName": "Zona 1",
+        "canonical": "#17171b",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-2": {
+        "role": "neutral",
+        "displayName": "Zona 2",
+        "canonical": "#26262c",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-3": {
+        "role": "neutral",
+        "displayName": "Zona 3",
+        "canonical": "#3a3a41",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-4": {
+        "role": "neutral",
+        "displayName": "Zona 4",
+        "canonical": "#4e4e57",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-5": {
+        "role": "neutral",
+        "displayName": "Zona 5",
+        "canonical": "#6a6a73",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-6": {
+        "role": "neutral",
+        "displayName": "Zona 6",
+        "canonical": "#868690",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-7": {
+        "role": "neutral",
+        "displayName": "Zona 7",
+        "canonical": "#a6a6ae",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-8": {
+        "role": "neutral",
+        "displayName": "Zona 8",
+        "canonical": "#b9b9c0",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-9": {
+        "role": "neutral",
+        "displayName": "Zona 9",
+        "canonical": "#d8d8de",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "zone-10": {
+        "role": "neutral",
+        "displayName": "Zona 10",
+        "canonical": "#f4f4f6",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-dark": {
+        "role": "neutral",
+        "displayName": "Casa Escura",
+        "canonical": "#6a6a73",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-light": {
+        "role": "neutral",
+        "displayName": "Casa Clara",
+        "canonical": "#b9b9c0",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-notation-on-dark": {
+        "role": "neutral",
+        "displayName": "Coordenada sobre Casa Escura",
+        "canonical": "#d8d8de",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-notation-on-light": {
+        "role": "neutral",
+        "displayName": "Coordenada sobre Casa Clara",
+        "canonical": "#3a3a41",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-last": {
+        "role": "neutral",
+        "displayName": "Último Lance",
+        "canonical": "rgb(255 255 255 / 0.32)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-from": {
+        "role": "neutral",
+        "displayName": "Origem da Dica",
+        "canonical": "rgb(255 255 255 / 0.32)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-select": {
+        "role": "neutral",
+        "displayName": "Peça Selecionada",
+        "canonical": "rgb(255 255 255 / 0.5)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-hint": {
+        "role": "neutral",
+        "displayName": "Lance Possível",
+        "canonical": "rgb(11 11 13 / 0.55)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "board-mated": {
+        "role": "tertiary",
+        "displayName": "Vermelho Mate",
+        "canonical": "#c81e3a",
+        "tonalRamp": [
+          "#1e0003",
+          "#4a000d",
+          "#80001d",
+          "#ba012f",
+          "#e64151",
+          "#ff7d81",
+          "#feb9b8",
+          "#ffe9e8"
+        ]
+      },
+      "arrow-best": {
+        "role": "tertiary",
+        "displayName": "Seta do Melhor Lance",
+        "canonical": "#0e8a7d",
+        "tonalRamp": [
+          "#000f0c",
+          "#022b26",
+          "#024e46",
+          "#007368",
+          "#2a998c",
+          "#58bfb1",
+          "#9addd2",
+          "#daf5f0"
+        ]
+      },
+      "arrow-threat": {
+        "role": "tertiary",
+        "displayName": "Seta da Ameaça",
+        "canonical": "#d12d2d",
+        "tonalRamp": [
+          "#1f0001",
+          "#4b0004",
+          "#81010c",
+          "#bb0818",
+          "#e6433f",
+          "#ff7f74",
+          "#febab2",
+          "#fee9e6"
+        ]
+      },
+      "fill-book": {
+        "role": "neutral",
+        "displayName": "Selo Livro",
+        "canonical": "#868690",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "fill-best": {
+        "role": "neutral",
+        "displayName": "Selo Melhor",
+        "canonical": "#f4f4f6",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "fill-excellent": {
+        "role": "neutral",
+        "displayName": "Selo Excelente",
+        "canonical": "#3a3a41",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "fill-good": {
+        "role": "neutral",
+        "displayName": "Selo Boa",
+        "canonical": "#6a6a73",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "fill-inaccuracy": {
+        "role": "secondary",
+        "displayName": "Selo Imprecisão",
+        "canonical": "#c28a00",
+        "tonalRamp": [
+          "#120900",
+          "#312101",
+          "#583d03",
+          "#825b01",
+          "#ae7c06",
+          "#d99f2e",
+          "#f0c783",
+          "#feecd0"
+        ]
+      },
+      "fill-mistake": {
+        "role": "secondary",
+        "displayName": "Selo Erro",
+        "canonical": "#bd5206",
+        "tonalRamp": [
+          "#190500",
+          "#3f1600",
+          "#6d2c02",
+          "#a04302",
+          "#d45e12",
+          "#fe8444",
+          "#febd9e",
+          "#feeae0"
+        ]
+      },
+      "fill-blunder": {
+        "role": "secondary",
+        "displayName": "Selo Erro Grave",
+        "canonical": "#a30f2e",
+        "tonalRamp": [
+          "#1f0003",
+          "#4a000e",
+          "#800020",
+          "#b12439",
+          "#dc4e5b",
+          "#ff7d83",
+          "#ffb9b9",
+          "#ffe8e8"
+        ]
+      },
+      "fill-miss": {
+        "role": "secondary",
+        "displayName": "Selo Chance Perdida",
+        "canonical": "#8446dc",
+        "tonalRamp": [
+          "#110028",
+          "#2f005d",
+          "#54029d",
+          "#7634cb",
+          "#995ef4",
+          "#b793ff",
+          "#d4c3fe",
+          "#f0ebff"
+        ]
+      },
+      "on-fill": {
+        "role": "neutral",
+        "displayName": "Sinal Claro",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "on-fill-best": {
+        "role": "neutral",
+        "displayName": "Sinal do Melhor",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "on-fill-inaccuracy": {
+        "role": "neutral",
+        "displayName": "Sinal da Imprecisão",
+        "canonical": "#0b0b0d",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "text-inaccuracy-day": {
+        "role": "secondary",
+        "displayName": "Texto Imprecisão, Dia",
+        "canonical": "#7a5a00",
+        "tonalRamp": [
+          "#110a00",
+          "#302101",
+          "#563e00",
+          "#7e5e07",
+          "#a28137",
+          "#c8a65d",
+          "#e3cb9a",
+          "#f8edd8"
+        ]
+      },
+      "text-inaccuracy-night": {
+        "role": "secondary",
+        "displayName": "Texto Imprecisão, Noite",
+        "canonical": "#e6ae3a",
+        "tonalRamp": [
+          "#120900",
+          "#312101",
+          "#573d00",
+          "#805c03",
+          "#ac7d07",
+          "#d8a027",
+          "#efc881",
+          "#fdeccf"
+        ]
+      },
+      "text-mistake-day": {
+        "role": "secondary",
+        "displayName": "Texto Erro, Dia",
+        "canonical": "#ab4805",
+        "tonalRamp": [
+          "#190500",
+          "#3f1500",
+          "#6e2b02",
+          "#a14303",
+          "#cb652f",
+          "#f58b56",
+          "#ffbc9d",
+          "#feeae0"
+        ]
+      },
+      "text-mistake-night": {
+        "role": "secondary",
+        "displayName": "Texto Erro, Noite",
+        "canonical": "#f5944c",
+        "tonalRamp": [
+          "#170600",
+          "#3b1a01",
+          "#673201",
+          "#974c02",
+          "#c76a18",
+          "#f08f47",
+          "#febe93",
+          "#feeadd"
+        ]
+      },
+      "text-blunder-day": {
+        "role": "secondary",
+        "displayName": "Texto Erro Grave, Dia",
+        "canonical": "#a30f2e",
+        "tonalRamp": [
+          "#1f0003",
+          "#4a000e",
+          "#800020",
+          "#b12439",
+          "#dc4e5b",
+          "#ff7d83",
+          "#ffb9b9",
+          "#ffe8e8"
+        ]
+      },
+      "text-blunder-night": {
+        "role": "secondary",
+        "displayName": "Texto Erro Grave, Noite",
+        "canonical": "#f97f8c",
+        "tonalRamp": [
+          "#1e0004",
+          "#4a0113",
+          "#7e0428",
+          "#a73547",
+          "#d05a69",
+          "#fa808d",
+          "#ffb8bd",
+          "#ffe8e9"
+        ]
+      },
+      "text-miss-day": {
+        "role": "secondary",
+        "displayName": "Texto Chance Perdida, Dia",
+        "canonical": "#6c34bd",
+        "tonalRamp": [
+          "#100029",
+          "#2e015e",
+          "#52089d",
+          "#723cc5",
+          "#9563ee",
+          "#b594ff",
+          "#d3c3fe",
+          "#f0ebff"
+        ]
+      },
+      "text-miss-night": {
+        "role": "secondary",
+        "displayName": "Texto Chance Perdida, Noite",
+        "canonical": "#bb99f7",
+        "tonalRamp": [
+          "#120027",
+          "#30025a",
+          "#4f2a7e",
+          "#704da4",
+          "#9371cb",
+          "#b896f4",
+          "#d6c2fe",
+          "#f1ebfe"
+        ]
+      },
+      "positive-day": {
+        "role": "tertiary",
+        "displayName": "Positivo, Dia",
+        "canonical": "#1f7a33",
+        "tonalRamp": [
+          "#001002",
+          "#002d0a",
+          "#03511a",
+          "#1a7730",
+          "#459c53",
+          "#6cc277",
+          "#a5dfaa",
+          "#def6df"
+        ]
+      },
+      "positive-night": {
+        "role": "tertiary",
+        "displayName": "Positivo, Noite",
+        "canonical": "#68d278",
+        "tonalRamp": [
+          "#001002",
+          "#012d0b",
+          "#01511a",
+          "#017829",
+          "#309f47",
+          "#5bc56c",
+          "#9ce2a3",
+          "#daf8dc"
+        ]
+      },
+      "share-white": {
+        "role": "neutral",
+        "displayName": "Parte das Brancas",
+        "canonical": "#f4f4f6",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "share-black": {
+        "role": "neutral",
+        "displayName": "Parte das Pretas",
+        "canonical": "#26262c",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
+      "share-mid": {
+        "role": "neutral",
+        "displayName": "Meio da Avaliação",
+        "canonical": "#868690",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "numeral": {
+        "displayName": "Número da placa",
+        "purpose": "O número do lance na placa grande."
+      },
+      "numeral-compact": {
+        "displayName": "Número da placa compacta",
+        "purpose": "O número do lance no resumo da revisão guiada."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título da tela inicial; cresce para 3.75rem ou 3rem na tela larga."
+      },
+      "placa-title": {
+        "displayName": "Título da placa",
+        "purpose": "A frase ao lado do número."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de tela."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de seção e enunciados de exercício."
+      },
+      "wordmark": {
+        "displayName": "Logotipo",
+        "purpose": "O nome Virada ao lado do símbolo."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido, com largura de leitura de 65ch."
+      },
+      "body-strong": {
+        "displayName": "Body forte",
+        "purpose": "Texto de botões."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Rótulos de campo e opções."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Rótulos da navegação inferior."
+      },
+      "board-notation": {
+        "displayName": "Coordenadas",
+        "purpose": "Letras e números do tabuleiro."
+      }
+    },
+    "shadows": [
+      {
+        "name": "dica-grafico",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Caixinha flutuante dos gráficos."
+      },
+      {
+        "name": "aviso-atualizacao",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Aviso flutuante de nova versão."
+      },
+      {
+        "name": "halo-peca-capturada",
+        "value": "drop-shadow(0 0 1px #f4f4f6)",
+        "purpose": "Filtro só no tema da noite, para peças pretas capturadas não sumirem no fundo."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-revelacao",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Assentar o tabuleiro, subir a placa, ondas da Revelação e do acerto."
+      },
+      {
+        "name": "ease-lance",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Peça em movimento na Revelação."
+      },
+      {
+        "name": "revelacao-casa",
+        "value": "650ms ease-out, atraso de 150ms + 85ms por casa de distância",
+        "purpose": "Casas acendem a partir da casa-chave; opacidade de 0 a 1, brilho de 0.2 a 1.6 e de volta a 1."
+      },
+      {
+        "name": "revelacao-tabuleiro",
+        "value": "900ms, atraso de 700ms, de rotate(-1.6deg) scale(0.97) a none",
+        "purpose": "O tabuleiro assenta."
+      },
+      {
+        "name": "revelacao-peca",
+        "value": "280ms, atraso da casa + 200ms",
+        "purpose": "Peças surgem."
+      },
+      {
+        "name": "revelacao-lance",
+        "value": "400ms (300ms o último), pausa de 300ms, início em 1250ms, escala 1.2 a 60%",
+        "purpose": "Os lances acontecem."
+      },
+      {
+        "name": "revelacao-marca",
+        "value": "160ms, no começo do último lance",
+        "purpose": "Origem, casa amarela e rei em mate aparecem."
+      },
+      {
+        "name": "revelacao-onda",
+        "value": "750ms, escala de 1 a 4.5, opacidade de 1 a 0",
+        "purpose": "Onda amarela no impacto."
+      },
+      {
+        "name": "revelacao-impacto",
+        "value": "320ms ease-out, translate de 0 a 5px e de volta",
+        "purpose": "O tabuleiro desce e volta no impacto."
+      },
+      {
+        "name": "placa-sobe",
+        "value": "550ms, de translateY(110vh) a none, 350ms depois do impacto",
+        "purpose": "A placa entrega a resposta."
+      },
+      {
+        "name": "revelacao-saida",
+        "value": "7000ms; 5000ms com menos movimento",
+        "purpose": "A tela final abre a análise sozinha; um toque pula."
+      },
+      {
+        "name": "acerto-onda",
+        "value": "800ms, escala de 1 a 5, opacidade de 1 a 0",
+        "purpose": "Onda amarela do acerto de exercício."
+      },
+      {
+        "name": "acerto-casa",
+        "value": "900ms ease-out, opacidade até 0.85 entre 15% e 60%",
+        "purpose": "Flash amarelo em multiplicação na casa do lance."
+      },
+      {
+        "name": "seta-achou",
+        "value": "900ms ease-out, 2 vezes",
+        "purpose": "Seta do melhor lance pulsa ao aparecer."
+      },
+      {
+        "name": "peca-jogo",
+        "value": "140ms; 0 com menos movimento",
+        "purpose": "Peças no tabuleiro de jogo."
+      },
+      {
+        "name": "barra-avaliacao",
+        "value": "200ms ease-out",
+        "purpose": "Barra de avaliação muda de altura."
+      },
+      {
+        "name": "barra-analise",
+        "value": "150ms",
+        "purpose": "Barra de progresso da análise."
+      },
+      {
+        "name": "menos-movimento",
+        "value": "transition-duration e animation-duration: 0.01ms !important",
+        "purpose": "Regra global para prefers-reduced-motion: reduce. A Revelação não roda e mostra o estado final."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Símbolo e logotipo",
+      "kind": "custom",
+      "description": "O V de casas de tabuleiro com a casa amarela, seguido do nome em Barlow Condensed 800.",
+      "html": "<span class=\"ds-logo\"><svg viewBox=\"0 0 64 64\" width=\"28\" height=\"28\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" rx=\"4\" fill=\"var(--zone-0)\"/><rect x=\"7.0\" y=\"7.0\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-5)\"/><rect x=\"7.0\" y=\"17.4\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-5)\"/><rect x=\"17.4\" y=\"27.8\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-6)\"/><rect x=\"17.4\" y=\"38.2\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-6)\"/><rect x=\"38.2\" y=\"38.2\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-9)\"/><rect x=\"38.2\" y=\"27.8\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-9)\"/><rect x=\"48.6\" y=\"17.4\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-10)\"/><rect x=\"48.6\" y=\"7.0\" width=\"9.6\" height=\"9.6\" fill=\"var(--zone-10)\"/><rect x=\"27.8\" y=\"48.6\" width=\"9.6\" height=\"9.6\" fill=\"var(--action)\"/></svg>Virada</span>",
+      "css": ".ds-logo{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow Condensed','Figtree Variable',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:.025em;color:var(--ink)}"
+    },
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A próxima ação da tela: amarelo chapado. Não muda ao passar o ponteiro.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Achar a virada</button>",
+      "css": ".ds-btn-primary{min-height:48px;padding:0 20px;border:0;border-radius:3px;background:var(--action);color:var(--on-action);font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif;font-size:1rem;font-weight:600;cursor:pointer}.ds-btn-primary:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação alternativa, com borda de 1px e fundo rebaixado ao passar o ponteiro.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Jogar contra um bot</button>",
+      "css": ".ds-btn-secondary{min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--ink);font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif;font-size:1rem;font-weight:600;cursor:pointer}.ds-btn-secondary:hover{background:var(--sunken)}.ds-btn-secondary:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo do usuário: superfície, borda de 1px e contorno de 2px no foco.",
+      "html": "<label class=\"ds-field\"><span>Seu usuário do chess.com</span><input type=\"text\" spellcheck=\"false\"/></label>",
+      "css": ".ds-field{display:block;font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif;color:var(--ink)}.ds-field span{display:block;margin-bottom:6px;font-size:.875rem;font-weight:600}.ds-field input{width:100%;min-height:48px;padding:0 12px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink);font-size:1rem;caret-color:var(--action)}.ds-field input:focus-visible{outline:2px solid var(--ink);outline-offset:1px}"
+    },
+    {
+      "name": "Navegação inferior",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Cinco seções fixas no celular; a atual leva o traço amarelo de 3px.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Seções\"><a href=\"#\" class=\"ds-nav-item is-current\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 3 2 12h3v8h5v-6h4v6h5v-8h3z\"/></svg>Início</a><a href=\"#\" class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M4 5h16v2H4zm0 6h16v2H4zm0 6h16v2H4z\"/></svg>Partidas</a><a href=\"#\" class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12m0 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6\"/></svg>Treino</a><a href=\"#\" class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M6 2h13v20H6a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3m0 15a1 1 0 0 0 0 4h11v-4zm2-11v2h8V6zm0 4v2h6v-2z\"/></svg>Guia</a><a href=\"#\" class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M4 20V10h3v10zm6.5 0V4h3v16zM17 20v-7h3v7z\"/></svg>Progresso</a></nav>",
+      "css": ".ds-nav{display:flex;border-top:1px solid var(--line);background:var(--bg);padding:0 4px;font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif}.ds-nav-item{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-top:3px solid transparent;color:var(--muted);font-size:.75rem;font-weight:600;text-decoration:none}.ds-nav-item:hover{color:var(--ink)}.ds-nav-item.is-current{border-top-color:var(--action);color:var(--ink)}.ds-nav-item:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}"
+    },
+    {
+      "name": "Placa",
+      "kind": "custom",
+      "refersTo": "placa",
+      "description": "A resposta do app: bloco amarelo sem canto, com número gigante, frase e nota.",
+      "html": "<div class=\"ds-placa\"><div class=\"ds-placa-num\">17</div><div><p class=\"ds-placa-title\">Entregou a dama e deu mate.</p><p class=\"ds-placa-note\">Morphy, Paris, 1858</p></div></div>",
+      "css": ".ds-placa{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--action);color:var(--on-action)}.ds-placa-num{flex-shrink:0;font-family:'Barlow Condensed','Figtree Variable',sans-serif;font-size:6.5rem;font-weight:800;line-height:.85;letter-spacing:-.05em;font-variant-numeric:tabular-nums}.ds-placa-title{margin:0;font-family:'Barlow Condensed','Figtree Variable',sans-serif;font-size:1.75rem;font-weight:800;line-height:1}.ds-placa-note{margin:6px 0 0;font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif;font-size:.875rem;font-weight:600}"
+    },
+    {
+      "name": "Selos de classificação",
+      "kind": "custom",
+      "description": "Selos em SVG: cor fixa nos dois temas e sinal que garante a leitura sem cor. Aqui, cinco dos oito.",
+      "html": "<div class=\"ds-badges\"><svg class=\"ds-badge\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Melhor\"><rect x=\"4\" y=\"4\" width=\"92\" height=\"92\" rx=\"6\" fill=\"var(--fill-best)\" stroke=\"var(--zone-0)\" stroke-width=\"5\"/><g transform=\"translate(20 20) scale(2.5)\" fill=\"var(--on-fill-best)\"><path d=\"M12 2.5 14.9 9l7.1.7-5.4 4.7 1.6 7L12 17.7 5.8 21.4l1.6-7L2 9.7 9.1 9z\"/></g></svg><svg class=\"ds-badge\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Excelente\"><rect x=\"4\" y=\"4\" width=\"92\" height=\"92\" rx=\"6\" fill=\"var(--fill-excellent)\" stroke=\"var(--zone-0)\" stroke-width=\"5\"/><text x=\"50\" y=\"52\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"'Figtree Variable',sans-serif\" font-weight=\"800\" font-size=\"60\" fill=\"var(--on-fill)\">!</text></svg><svg class=\"ds-badge\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Imprecisão\"><rect x=\"4\" y=\"4\" width=\"92\" height=\"92\" rx=\"6\" fill=\"var(--fill-inaccuracy)\" stroke=\"var(--zone-0)\" stroke-width=\"5\"/><text x=\"50\" y=\"52\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"'Figtree Variable',sans-serif\" font-weight=\"800\" font-size=\"50\" fill=\"var(--on-fill-inaccuracy)\">?!</text></svg><svg class=\"ds-badge\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Erro\"><rect x=\"4\" y=\"4\" width=\"92\" height=\"92\" rx=\"6\" fill=\"var(--fill-mistake)\" stroke=\"var(--zone-0)\" stroke-width=\"5\"/><text x=\"50\" y=\"52\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"'Figtree Variable',sans-serif\" font-weight=\"800\" font-size=\"60\" fill=\"var(--on-fill)\">?</text></svg><svg class=\"ds-badge\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Erro grave\"><rect x=\"4\" y=\"4\" width=\"92\" height=\"92\" rx=\"6\" fill=\"var(--fill-blunder)\" stroke=\"var(--zone-0)\" stroke-width=\"5\"/><text x=\"50\" y=\"52\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"'Figtree Variable',sans-serif\" font-weight=\"800\" font-size=\"50\" fill=\"var(--on-fill)\">??</text></svg></div>",
+      "css": ".ds-badges{display:flex;gap:8px}.ds-badge{width:32px;height:32px;flex-shrink:0}"
+    },
+    {
+      "name": "Grupo segmentado",
+      "kind": "chip",
+      "refersTo": "choice-selected",
+      "description": "Opções coladas; a escolhida inverte texto e fundo, sem amarelo.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\" aria-label=\"Sua cor\"><button type=\"button\" role=\"radio\" aria-checked=\"true\" class=\"is-on\">Brancas</button><button type=\"button\" role=\"radio\" aria-checked=\"false\">Sorteio</button><button type=\"button\" role=\"radio\" aria-checked=\"false\">Pretas</button></div>",
+      "css": ".ds-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;overflow:hidden;border:1px solid var(--line);border-radius:3px;background:var(--line);font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif}.ds-seg button{min-height:44px;border:0;background:var(--surface);color:var(--ink);font-size:.875rem;font-weight:600;cursor:pointer}.ds-seg button.is-on{background:var(--ink);color:var(--bg)}.ds-seg button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}"
+    },
+    {
+      "name": "Lista de bots",
+      "kind": "card",
+      "refersTo": "bot-row",
+      "description": "Retrato em casas de tabuleiro, nome, descrição, bordão e força; a linha escolhida inverte.",
+      "html": "<div class=\"ds-bots\"><div class=\"ds-bot\"><svg viewBox=\"-1 -1 10 10\" width=\"40\" height=\"40\" aria-hidden=\"true\" shape-rendering=\"crispEdges\" style=\"flex-shrink:0;border-radius:2px\"><rect x=\"-1\" y=\"-1\" width=\"10\" height=\"10\" fill=\"var(--zone-3)\"/><rect x=\"2\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"6\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"3\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"6\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"6\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"3\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"4\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"5\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"6\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"2\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"3\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"4\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"5\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"6\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/></svg><span class=\"ds-bot-text\"><b>Tio Beto</b><span>Deixa peças de graça com frequência.</span><em>“Essa torre eu nem queria mesmo.”</em></span><span class=\"ds-bot-rating\">~400</span></div><div class=\"ds-bot is-on\"><svg viewBox=\"-1 -1 10 10\" width=\"40\" height=\"40\" aria-hidden=\"true\" shape-rendering=\"crispEdges\" style=\"flex-shrink:0;border-radius:2px\"><rect x=\"-1\" y=\"-1\" width=\"10\" height=\"10\" fill=\"var(--zone-3)\"/><rect x=\"1\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"2\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"3\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"4\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"5\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"6\" y=\"0\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"0\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"1\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"2\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"3\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"4\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"5\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"6\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"7\" y=\"1\" width=\"1\" height=\"1\" fill=\"var(--zone-5)\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"6\" y=\"2\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"3\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"6\" y=\"3\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"6\" y=\"4\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"4\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"5\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"6\" y=\"5\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"2\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"3\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"4\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"5\" y=\"6\" width=\"1\" height=\"1\" fill=\"var(--zone-8)\"/><rect x=\"1\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"2\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"3\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"4\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"5\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/><rect x=\"6\" y=\"7\" width=\"1\" height=\"1\" fill=\"var(--zone-0)\"/></svg><span class=\"ds-bot-text\"><b>Seu Zé da Praça</b><span>Conhece o básico, mas erra táticas simples.</span><em>“Mais uma, que essa foi aquecimento.”</em></span><span class=\"ds-bot-rating\">~800</span></div></div>",
+      "css": ".ds-bots{overflow:hidden;border-radius:3px;background:var(--surface);color:var(--ink);font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif}.ds-bot{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 12px;border-top:1px solid var(--line);cursor:pointer}.ds-bot:first-child{border-top:0}.ds-bot:hover{background:var(--sunken)}.ds-bot.is-on,.ds-bot.is-on:hover{background:var(--ink);color:var(--bg)}.ds-bot-text{min-width:0;flex:1}.ds-bot-text>*{display:block;font-size:.875rem}.ds-bot-text b{font-family:'Barlow Condensed','Figtree Variable',sans-serif;font-size:1.125rem;font-weight:700;line-height:1.25}.ds-bot-text span,.ds-bot-text em,.ds-bot-rating{color:var(--muted)}.ds-bot.is-on span,.ds-bot.is-on em{color:inherit}.ds-bot-rating{flex-shrink:0;font-size:.875rem;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Cartão do treinador",
+      "kind": "card",
+      "refersTo": "coach-card",
+      "description": "Superfície chapada com o sinal grande na cor da classe e o comentário em voz de amigo de clube.",
+      "html": "<section class=\"ds-coach\"><div class=\"ds-coach-head\"><span class=\"ds-coach-sign\" aria-hidden=\"true\">??</span><div><h2>Erro grave</h2><p>17. Cf3</p></div></div><p class=\"ds-coach-text\">Olha o garfo: Cf3 ataca o rei e a dama de uma vez.</p></section>",
+      "css": ".ds-coach{padding:16px;border-radius:3px;background:var(--surface);color:var(--ink);font-family:'Figtree Variable',ui-sans-serif,system-ui,sans-serif}.ds-coach-head{display:flex;align-items:flex-start;gap:16px}.ds-coach-sign{min-width:56px;text-align:center;font-family:'Barlow Condensed','Figtree Variable',sans-serif;font-size:3.75rem;font-weight:700;line-height:1;color:var(--text-blunder)}.ds-coach h2{margin:0;font-size:1.125rem;font-weight:700;line-height:1.375;color:var(--text-blunder)}.ds-coach-head p{margin:0;font-size:1.125rem;line-height:1.375}.ds-coach-text{margin:12px 0 0;max-width:65ch;font-size:1rem;line-height:1.625}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Da Sombra à Placa",
+    "overview": "A partida sai do escuro, casa por casa, até o ponto em que virou, e uma placa amarela entrega a resposta. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.\n\nO tema da noite é aquele para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.\n\nO carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um treinador que fala como amigo de clube e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.",
+    "keyCharacteristics": [
+      "Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao ponto de virada.",
+      "Escala de 11 tons, visível como barra de 6px no topo das telas de navegação.",
+      "Superfícies chapadas: a profundidade vem do tom, quase nunca de sombra.",
+      "Cantos de 2px e 3px; a placa não tem canto nenhum.",
+      "Barlow Condensed pesada para anunciar, Figtree para ler.",
+      "Lance bom é neutro. Cor forte só onde há erro, e sempre com símbolo junto.",
+      "A geometria recorrente é a casa do tabuleiro: símbolo, retratos e ondas são feitos dela."
+    ],
+    "rules": [
+      {
+        "name": "A Regra da Placa",
+        "body": "O amarelo é só para ação e ponto de virada. Se não dá para tocar e não marca onde a partida virou, não é amarelo. No tabuleiro, o resto é mudança de tom.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Acerto",
+        "body": "A única exceção aceita é o acerto de exercício: a onda e o flash amarelos na casa do lance certo. Ela dura menos de um segundo e some sozinha. O código ainda tem barras de progresso e um aviso de análise em segundo plano em amarelo; eles divergem da regra e não servem de modelo.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra da Cor no Erro",
+        "body": "Lance bom é neutro: Melhor, Excelente e Boa usam branco e cinzas, e o texto deles é o texto comum. Cor forte aparece só em Imprecisão, Erro, Erro grave e Chance perdida, e nunca sozinha: o símbolo garante a leitura sem cor.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Fundo Fixo",
+        "body": "O símbolo, os retratos dos bots e a tela da Revelação ao fim de uma análise ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Letreiro",
+        "body": "Títulos de tela e de seção, nomes de bots e números de impacto usam Barlow Condensed. Parágrafos, rótulos e botões usam Figtree.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Número Alinhado",
+        "body": "Avaliações, forças dos bots, contagens e números da placa usam algarismos tabulares, para não dançarem quando mudam.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Chapado",
+        "body": "Sombra só no que flutua sobre o conteúdo sem ser diálogo. O que está no fluxo da página fica plano.",
+        "section": "elevation"
+      },
+      {
+        "name": "A Regra da Inversão",
+        "body": "Seleção se mostra invertendo texto e fundo, não com amarelo. Amarelo chama para agir; a inversão diz o que já está escolhido.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** use o amarelo #ffd100 em botões principais, no traço da seção atual, em interruptores ligados e em tudo que marca o ponto de virada, sempre com texto #0b0b0d.",
+      "**Do** mostre seleção invertendo texto e fundo.",
+      "**Do** mantenha cantos em 3px nos controles e cartões, 2px no tabuleiro e nos retratos, e 0 na placa.",
+      "**Do** separe planos com tom e borda de 1px.",
+      "**Do** coloque símbolo junto de toda cor de classificação.",
+      "**Do** desenhe novos ícones em SVG e novos retratos na mesma grade de 8 por 8 casas, com os quatro tons da escala.",
+      "**Do** faça toda animação nova terminar no estado de repouso certo e respeitar a preferência por menos movimento, sem perder informação.",
+      "**Do** escreva como amigo de clube: curto, direto, com \"você\".",
+      "**Do** deixe o símbolo, os retratos e a Revelação sobre tons escuros fixos nos dois temas."
+    ],
+    "donts": [
+      "**Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do ponto de virada e do acerto de exercício.",
+      "**Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.",
+      "**Don't** dê cor forte a Melhor, Excelente ou Boa.",
+      "**Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.",
+      "**Don't** arredonde a placa.",
+      "**Don't** use Barlow Condensed em parágrafos.",
+      "**Don't** interrompa uma tarefa com personalidade: bordões ficam na escolha de bots, e a Revelação sempre pode ser pulada com um toque.",
+      "**Don't** transforme a Revelação em animação de tela comum: ela é o momento do ponto de virada."
+    ]
+  }
+}

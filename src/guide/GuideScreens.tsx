@@ -36,7 +36,7 @@ function BackLink({ label = 'Voltar' }: { label?: string }) {
 function ProgressBar({ value, label }: { value: number; label: string }) {
   return (
     <div role="img" aria-label={label} className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-sunken">
-      <div className="h-full rounded-full bg-action" style={{ width: `${Math.round(value * 100)}%` }} />
+      <div className="h-full rounded-full bg-ink" style={{ width: `${Math.round(value * 100)}%` }} />
     </div>
   )
 }

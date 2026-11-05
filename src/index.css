@@ -31,7 +31,7 @@
   /* Tabuleiro */
   --board-dark: var(--zone-5);
   --board-light: var(--zone-8);
-  --board-notation-on-dark: var(--zone-9);
+  --board-notation-on-dark: var(--zone-10);
   --board-notation-on-light: var(--zone-3);
   /* O amarelo no tabuleiro é só do ponto de virada. O resto é mudança de tom. */
   --board-last: rgb(255 255 255 / 0.32);
@@ -42,12 +42,12 @@
 
   /* Fundo dos sinais e pontos do gráfico (validados para daltonismo). */
   /* Lance bom é neutro. Cor só onde há erro; o símbolo garante a leitura sem cor. */
-  --fill-book: #868690;
+  --fill-book: #74747d;
   --fill-best: #f4f4f6;
   --fill-excellent: #3a3a41;
   --fill-good: #6a6a73;
   --fill-inaccuracy: #c28a00;
-  --fill-mistake: #cf5a08;
+  --fill-mistake: #bd5206;
   --fill-blunder: #a30f2e;
   --fill-miss: #8446dc;
   --on-fill: #ffffff;

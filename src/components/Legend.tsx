@@ -51,7 +51,7 @@ function LegendDialog({ onClose }: { onClose: () => void }) {
         if (event.target === event.currentTarget) onClose()
       }}
     >
-      <div role="dialog" aria-modal="true" aria-label="O que cada símbolo significa" className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-lg bg-surface sm:rounded-lg">
+      <div role="dialog" aria-modal="true" aria-label="O que cada símbolo significa" className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-md bg-surface sm:rounded-md">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-line py-2 pr-2 pl-4">
           <h2 className="font-display text-xl font-semibold">O que cada símbolo significa</h2>
           <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar a legenda" className="flex size-11 shrink-0 items-center justify-center rounded-md text-2xl hover:bg-sunken">
