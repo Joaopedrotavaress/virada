@@ -57,7 +57,7 @@ export function Board({ fen, orientation, arrows = [], squareStyles = {}, badge,
           onSquareClick: ({ square }) => onSquareClick?.(square),
           squareRenderer: ({ square, children }) => (
             // Com squareRenderer, a biblioteca ignora squareStyles: o estilo precisa ser aplicado aqui.
-            <div style={{ position: 'relative', width: '100%', height: '100%', ...squareStyles[square] }}>
+            <div style={{ position: 'relative', width: '100%', height: '100%', ...squareStyles[square], boxShadow: squareStyles[square]?.backgroundColor === 'var(--board-last)' ? 'inset 0 0 0 3px var(--zone-0)' : undefined }}>
               {children}
               {badge?.square === square && (
                 <ClassBadge cls={badge.cls} className="pointer-events-none absolute top-[1%] right-[1%] z-10 w-[42%]" />
