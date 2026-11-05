@@ -3,60 +3,91 @@
 :root {
   color-scheme: light dark;
 
-  --bg: #e6ebef;
-  --surface: #f6f8f9;
-  --sunken: #dde3e8;
-  --ink: #16202b;
-  --muted: #4f5d69;
-  --line: #c6cfd7;
+  /* Dia: o tema claro. A noite, logo abaixo, é o tema para o qual o Virada foi desenhado. */
+  --bg: #e6e6ea;
+  --surface: #f7f7f8;
+  --sunken: #d8d8de;
+  --ink: #0b0b0d;
+  --muted: #4c4c55;
+  --line: #bcbcc4;
+
+  /* A placa: a única cor forte. Só em algo que dá para tocar e no ponto de virada. */
+  --action: #ffd100;
+  --on-action: #0b0b0d;
+
+  /* Escala de 11 tons, a mesma nos dois temas. */
+  --zone-0: #0b0b0d;
+  --zone-1: #17171b;
+  --zone-2: #26262c;
+  --zone-3: #3a3a41;
+  --zone-4: #4e4e57;
+  --zone-5: #6a6a73;
+  --zone-6: #868690;
+  --zone-7: #a6a6ae;
+  --zone-8: #b9b9c0;
+  --zone-9: #d8d8de;
+  --zone-10: #f4f4f6;
+
+  /* Tabuleiro */
+  --board-dark: var(--zone-4);
+  --board-light: var(--zone-8);
+  --board-notation-on-dark: var(--zone-9);
+  --board-notation-on-light: var(--zone-3);
+  --board-last: color-mix(in srgb, #ffd100 42%, transparent);
+  --board-select: color-mix(in srgb, #ffd100 62%, transparent);
+  --board-hint: rgb(255 209 0 / 0.8);
+  --board-from: color-mix(in srgb, #ffd100 70%, transparent);
+  --board-mated: #c81e3a;
 
   /* Fundo dos sinais e pontos do gráfico (validados para daltonismo). */
   --fill-book: #6b7a87;
   --fill-best: #0e8a7d;
   --fill-excellent: #2f9e44;
   --fill-good: #7a9a1e;
-  --fill-inaccuracy: #d4a900;
+  --fill-inaccuracy: #c28a00;
   --fill-mistake: #cf5a08;
   --fill-blunder: #a30f2e;
   --fill-miss: #8446dc;
+  --on-fill: #ffffff;
+  --on-fill-inaccuracy: #0b0b0d;
 
   /* Mesmas categorias como texto: contraste AA sobre a superfície. */
-  --text-book: #566470;
+  --text-book: #4f5c68;
   --text-best: #0a6f64;
   --text-excellent: #1f7a33;
   --text-good: #566f10;
-  --text-inaccuracy: #7f6400;
+  --text-inaccuracy: #7a5a00;
   --text-mistake: #ab4805;
   --text-blunder: #a30f2e;
   --text-miss: #6c34bd;
 
   /* A barra e o gráfico são a mesma metáfora: a parte clara é das brancas. */
-  --share-white: #f3f5f6;
-  --share-black: #2b353f;
-  --share-mid: #8896a2;
+  --share-white: #f4f4f6;
+  --share-black: #26262c;
+  --share-mid: #868690;
 }
 
 /* Peças pretas capturadas sumiriam no fundo escuro. */
 @media (prefers-color-scheme: dark) {
   .captured-dark {
-    filter: drop-shadow(0 0 1px #e7edf2);
+    filter: drop-shadow(0 0 1px #f4f4f6);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #11171d;
-    --surface: #1a222a;
-    --sunken: #242e37;
-    --ink: #e7edf2;
-    --muted: #9dabb7;
-    --line: #313d48;
+    --bg: #0b0b0d;
+    --surface: #17171b;
+    --sunken: #26262c;
+    --ink: #eeeef1;
+    --muted: #a9a9b1;
+    --line: #34343b;
 
     --text-book: #a6b3bf;
     --text-best: #4fd0bf;
     --text-excellent: #68d278;
     --text-good: #b5d352;
-    --text-inaccuracy: #ecc53f;
+    --text-inaccuracy: #e6ae3a;
     --text-mistake: #f5944c;
     --text-blunder: #f97f8c;
     --text-miss: #bb99f7;
@@ -70,12 +101,17 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-action: var(--action);
+  --color-on-action: var(--on-action);
   --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-book: 'Literata Variable', Georgia, serif;
+  --font-display: 'Barlow Condensed', 'Figtree Variable', sans-serif;
+  --radius-sm: 2px;
+  --radius-md: 3px;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--zone-5) transparent;
 }
 
 body {
@@ -84,6 +120,12 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   overflow-wrap: break-word;
+  caret-color: var(--action);
+}
+
+::selection {
+  background: var(--action);
+  color: var(--on-action);
 }
 
 :focus-visible {
@@ -91,12 +133,31 @@ body {
   outline-offset: 2px;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
 button:not(:disabled) {
   cursor: pointer;
 }
 
+a {
+  text-underline-offset: 3px;
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* A barra de tons no topo: a mesma escala da revelação. */
+.zone-ramp {
+  display: flex;
+  height: 6px;
+}
+.zone-ramp i {
+  flex: 1;
 }
 
 /* O SVG do gráfico recebe foco ao ser clicado; o contorno não ajuda ali. */
@@ -113,15 +174,52 @@ button:not(:disabled) {
   }
   45% {
     opacity: 1;
-    filter: drop-shadow(0 0 6px #0e8a7d);
-  }
-  100% {
-    filter: none;
   }
 }
 
 .arrow-pop svg:has(marker) {
   animation: arrow-pop 0.9s ease-out 2;
+}
+
+/* O acerto de um exercício: uma onda amarela sai da casa do lance. */
+@keyframes acerto-onda {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(5);
+  }
+}
+@keyframes acerto-casa {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  60% {
+    opacity: 0.85;
+  }
+}
+.acerto-onda {
+  position: absolute;
+  z-index: 3;
+  width: 12.5%;
+  height: 12.5%;
+  border: 4px solid var(--action);
+  pointer-events: none;
+  animation: acerto-onda 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.acerto-casa {
+  position: absolute;
+  z-index: 1;
+  width: 12.5%;
+  height: 12.5%;
+  background: var(--action);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation: acerto-casa 0.9s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

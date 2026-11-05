@@ -1,5 +1,5 @@
 {
-  "name": "treinador-xadrez",
+  "name": "virada",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",
-    "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
     "chess.js": "^1.4.0",
     "react": "^19.3.1",
     "react-chessboard": "^5.12.1",
@@ -36,5 +36,6 @@
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.1.0"
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "description": "Toda partida tem um ponto de virada. Ache o seu."
 }
