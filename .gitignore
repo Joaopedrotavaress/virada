@@ -12,3 +12,6 @@ src/chess/openings.generated.json
 data-local
 src/guide/catalog.generated.json
 claims.tmp.txt
+
+# binário da skill de design, baixado pelo instalador
+.claude/skills/impeccable/scripts/bin/
