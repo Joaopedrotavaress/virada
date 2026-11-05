@@ -1,4 +1,5 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { Icon } from './Icons'
 
 /** Avisa quando há versão nova. A atualização nunca interrompe uma partida sem a pessoa pedir. */
 export function UpdatePrompt() {
@@ -16,7 +17,7 @@ export function UpdatePrompt() {
         Atualizar
       </button>
       <button type="button" onClick={() => setNeedRefresh(false)} aria-label="Agora não" className="flex size-11 shrink-0 items-center justify-center text-xl">
-        ×
+        <Icon name="close" />
       </button>
     </div>
   )

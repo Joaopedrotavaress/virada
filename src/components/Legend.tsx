@@ -1,3 +1,4 @@
+import { Icon } from './Icons'
 import { BEST_ARROW_COLOR, THREAT_ARROW_COLOR } from './Board'
 import { useEffect, useRef, useState } from 'react'
 import type { MoveClass } from '../chess/classify'
@@ -54,7 +55,7 @@ function LegendDialog({ onClose }: { onClose: () => void }) {
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-line py-2 pr-2 pl-4">
           <h2 className="font-display text-xl font-semibold">O que cada símbolo significa</h2>
           <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar a legenda" className="flex size-11 shrink-0 items-center justify-center rounded-md text-2xl hover:bg-sunken">
-            ×
+            <Icon name="close" className="size-6" />
           </button>
         </div>
         <div className="overflow-y-auto px-4 py-3">
