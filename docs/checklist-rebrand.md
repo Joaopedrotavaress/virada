@@ -1,6 +1,6 @@
 # Checklist do rebrand
 
-Tudo abaixo foi conferido no build de produção, em tela de celular (390 px), antes de mudar qualquer coisa. O ponto de retorno é a tag `antes-do-rebrand`.
+Tudo abaixo foi conferido no build de produção, em tela de celular (390 px), antes e depois do rebrand. O ponto de retorno é a tag `antes-do-rebrand`.
 
 | # | O que funciona | Como foi conferido | Antes | Depois |
 |---|---|---|---|---|
