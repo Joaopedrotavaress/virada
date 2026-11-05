@@ -4,6 +4,7 @@ import { ChessComError, TIME_CLASSES, createChessComClient, monthLabel, timeClas
 import { idbCache } from '../chesscom/idbCache'
 import { type GameOutcome, type GameRecord, ingestChessCom, recordsFor, removeRecord, updateRecord, useAllRecords } from '../data/library'
 import { analysisQueue, useQueue } from '../data/queue'
+import { Icon } from './Icons'
 import { timeClassFor as timeClassOf } from '../data/stats'
 import { loadMonthsLoaded, saveMonthsLoaded } from '../storage'
 
@@ -15,7 +16,7 @@ const PAGE_SIZE = 50
 const BATCH_SIZE = 20
 
 const OUTCOME: Record<GameOutcome, { label: string; plural: string; color: string }> = {
-  win: { label: 'Vitória', plural: 'Vitórias', color: 'var(--text-best)' },
+  win: { label: 'Vitória', plural: 'Vitórias', color: 'var(--positive)' },
   loss: { label: 'Derrota', plural: 'Derrotas', color: 'var(--text-blunder)' },
   draw: { label: 'Empate', plural: 'Empates', color: 'var(--muted)' },
 }
@@ -70,7 +71,7 @@ export function viewRecord(record: GameRecord) {
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${active ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${active ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
       {children}
     </button>
   )
@@ -111,7 +112,7 @@ function GameDetails({ record, onClose }: { record: GameRecord; onClose: () => v
                 onClick={() => void updateRecord(record.key, { tags: record.tags.filter((other) => other !== item) })}
                 className="flex min-h-9 items-center gap-1 rounded-sm bg-surface px-3 text-sm font-semibold hover:bg-bg"
               >
-                {item} <span aria-hidden="true">×</span>
+                {item} <Icon name="close" className="size-4" />
               </button>
             </li>
           ))}
@@ -426,9 +427,10 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{view.title}</span>
                       <span className="tabular block truncate text-sm text-muted">
-                        {[view.myRating || view.opponentRating ? `${view.myRating ?? '?'} x ${view.opponentRating ?? '?'}` : '', klass ? timeClassLabel(klass) : '', formatDay(record.playedAt)].filter(Boolean).join(', ')}
+                        {[formatDay(record.playedAt), klass ? timeClassLabel(klass) : '', view.myRating || view.opponentRating ? `${view.myRating ?? '?'} x ${view.opponentRating ?? '?'}` : ''].filter(Boolean).join(', ')}
                       </span>
                       {record.opening && <span className="block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
+                      {record.digest && record.digest.errors.length > 0 && <span className="block text-sm font-semibold">Virou no lance {record.digest.errors.reduce((worst, error) => (error.loss > worst.loss ? error : worst)).moveNumber}</span>}
                       {(record.tags.length > 0 || record.note) && <span className="block truncate text-sm text-muted">{[...record.tags, record.note].filter(Boolean).join(', ')}</span>}
                     </span>
                     <span className="shrink-0 text-right">
@@ -438,7 +440,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
                         </span>
                       )}
                       {view.accuracy !== null && <span className="tabular block text-xs text-muted">{`Precisão ${view.accuracy.toFixed(0)}%`}</span>}
-                      <span className={`block text-xs ${record.digest ? 'font-semibold text-(--text-best)' : 'text-muted'}`}>{record.digest ? 'Analisada' : record.queued ? 'Na fila' : 'Sem análise'}</span>
+                      <span className={`block text-xs ${record.digest ? 'font-semibold text-(--positive)' : 'text-muted'}`}>{record.digest ? 'Analisada' : record.queued ? 'Na fila' : 'Sem análise'}</span>
                     </span>
                   </button>
                   <button
