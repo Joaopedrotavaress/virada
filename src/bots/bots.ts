@@ -83,12 +83,29 @@ export interface PgnHeaders {
   result: string
   date: Date
   termination?: string
+  startFen?: string
+  /** Relógio depois de cada lance, em segundos. */
+  stamps?: (number | null)[]
+  timeControl?: string
+}
+
+function clockComment(seconds: number): string {
+  const total = Math.max(0, seconds)
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const rest = (total % 60).toFixed(1).padStart(4, '0')
+  return `[%clk ${hours}:${String(minutes).padStart(2, '0')}:${rest}]`
 }
 
 /** PGN da partida contra o bot, pronto para a análise. */
-export function buildBotPgn(sans: string[], { white, black, result, date, termination }: PgnHeaders): string {
-  const chess = new Chess()
-  for (const san of sans) chess.move(san)
+export function buildBotPgn(sans: string[], { white, black, result, date, termination, startFen, stamps, timeControl }: PgnHeaders): string {
+  const chess = startFen ? new Chess(startFen) : new Chess()
+  sans.forEach((san, index) => {
+    chess.move(san)
+    const stamp = stamps?.[index]
+    if (stamp !== null && stamp !== undefined) chess.setComment(clockComment(stamp))
+  })
+  if (timeControl) chess.setHeader('TimeControl', timeControl)
   const pad = (value: number) => String(value).padStart(2, '0')
   chess.setHeader('Event', 'Treinador de Xadrez')
   chess.setHeader('Site', 'Jogo contra bot')
