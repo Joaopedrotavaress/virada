@@ -22,7 +22,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   return (
     <div className="rounded-md bg-surface p-3">
       <dt className="text-sm text-muted">{label}</dt>
-      <dd className="font-display tabular text-3xl font-semibold">{value}</dd>
+      <dd className={value === '–' ? 'py-1.5 text-base font-semibold text-muted' : 'tabular font-display text-4xl font-extrabold'}>{value === '–' ? 'Sem dados' : value}</dd>
       {hint && <dd className="text-xs text-muted">{hint}</dd>}
     </div>
   )
@@ -101,14 +101,14 @@ export function Progress({ username }: { username: string }) {
     <div className="mt-3 flex flex-col gap-1.5">
       <div role="group" aria-label="Período" className="flex flex-wrap gap-1.5">
         {RANGES.map((range) => (
-          <button key={range.id} type="button" aria-pressed={rangeId === range.id} onClick={() => setRangeId(range.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${rangeId === range.id ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
+          <button key={range.id} type="button" aria-pressed={rangeId === range.id} onClick={() => setRangeId(range.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${rangeId === range.id ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
             {range.label}
           </button>
         ))}
       </div>
       <div role="group" aria-label="Ritmo" className="flex flex-wrap gap-1.5">
         {[{ id: 'all', label: 'Todos os ritmos' }, ...TIME_CLASSES].map((item) => (
-          <button key={item.id} type="button" aria-pressed={timeClass === item.id} onClick={() => setTimeClass(item.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${timeClass === item.id ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
+          <button key={item.id} type="button" aria-pressed={timeClass === item.id} onClick={() => setTimeClass(item.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${timeClass === item.id ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
             {item.label}
           </button>
         ))}
@@ -135,7 +135,7 @@ export function Progress({ username }: { username: string }) {
           ) : (
             <>
               <dl className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
-                <Stat label="Partidas" value={String(totals.games)} hint={`${totals.wins} vitórias, ${totals.draws} empates, ${totals.losses} derrotas`} />
+                <Stat label="Partidas" value={String(totals.games)} hint={`${totals.wins} ${totals.wins === 1 ? 'vitória' : 'vitórias'}, ${totals.draws} ${totals.draws === 1 ? 'empate' : 'empates'}, ${totals.losses} ${totals.losses === 1 ? 'derrota' : 'derrotas'}`} />
                 <Stat label="Aproveitamento" value={pct(totals.score)} hint="Pontos sobre o total possível" />
                 <Stat label="Precisão média" value={pct(totals.accuracy)} hint="Sua, nas partidas com precisão" />
                 <Stat label="Erros graves por partida" value={decimal(totals.errorsPerGame)} hint={`Em ${totals.analyzed} ${totals.analyzed === 1 ? 'partida analisada' : 'partidas analisadas'}`} />
