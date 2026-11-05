@@ -10,6 +10,8 @@ Um treinador de xadrez grátis, em português, que analisa suas partidas do ches
 
 Sem cadastro. Sem assinatura. Sem servidor. Seus dados ficam com você.
 
+**[Abrir o Virada](https://virada-kappa.vercel.app)**
+
 <img src="docs/revelacao.gif" width="300" alt="Animação: o tabuleiro surge da sombra, Morphy entrega a dama em b8, dá mate com a torre em d8, o rei sai voando, e uma placa amarela sobe com o número 17">
 
 </div>
