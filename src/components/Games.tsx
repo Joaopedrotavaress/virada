@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { formatOpening } from '../chess/book'
-import { parseTimeControl } from '../chess/clock'
 import { ChessComError, TIME_CLASSES, createChessComClient, monthLabel, timeClassLabel } from '../chesscom/api'
 import { idbCache } from '../chesscom/idbCache'
 import { type GameOutcome, type GameRecord, ingestChessCom, recordsFor, removeRecord, updateRecord, useAllRecords } from '../data/library'
 import { analysisQueue, useQueue } from '../data/queue'
+import { timeClassFor as timeClassOf } from '../data/stats'
 import { loadMonthsLoaded, saveMonthsLoaded } from '../storage'
 
 const client = createChessComClient({ cache: idbCache })
@@ -23,18 +23,6 @@ const OUTCOME: Record<GameOutcome, { label: string; plural: string; color: strin
 const formatDay = (ms: number) => new Date(ms).toLocaleDateString('pt-BR')
 const formatTime = (ms: number) => new Date(ms).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 const describeFailure = (failure: unknown) => (failure instanceof ChessComError ? failure.message : 'Não consegui buscar as partidas. Tente de novo.')
-
-/** O ritmo vem do chess.com. Nas outras partidas, sai do controle de tempo do PGN. */
-export function timeClassOf(record: GameRecord): string | null {
-  if (record.timeClass) return record.timeClass
-  const control = parseTimeControl(record.timeControl)
-  if (!control) return null
-  const estimate = control.base + 40 * control.increment
-  if (estimate < 180) return 'bullet'
-  if (estimate < 600) return 'blitz'
-  if (estimate < 3000) return 'rapid'
-  return 'daily'
-}
 
 export interface GameFilters {
   query: string
