@@ -5,15 +5,15 @@ import { formatClock } from '../chess/clock'
 import type { Color } from '../chess/evaluation'
 import { materialState } from '../chess/material'
 import { sanToPt, uciParts } from '../chess/notation'
-import { BEST_ARROW_COLOR, Board } from './Board'
+import { BEST_ARROW_COLOR, Board, THREAT_ARROW_COLOR } from './Board'
+import { BotAvatar } from './BotAvatar'
 import { CapturedPieces } from './CapturedPieces'
 import { EvalBar } from './EvalBar'
 import { LegendButton } from './Legend'
 import { useIsDesktop } from './useLayout'
 
-const THREAT_ARROW_COLOR = '#d12d2d'
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
+const LAST_MOVE_TINT = 'var(--board-last)'
 const PROMOTIONS = [
   { piece: 'q', label: 'Dama' },
   { piece: 'r', label: 'Torre' },
@@ -83,16 +83,16 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
       styles[lastMove.to] = { backgroundColor: tint }
     }
     if (game.hint?.level === 1 && game.hint.uci) {
-      styles[uciParts(game.hint.uci).from] = { backgroundColor: 'color-mix(in srgb, #0e8a7d 60%, transparent)' }
+      styles[uciParts(game.hint.uci).from] = { backgroundColor: 'var(--board-from)' }
     }
     if (selected) {
-      styles[selected] = { backgroundColor: 'color-mix(in srgb, #0e8a7d 45%, transparent)' }
+      styles[selected] = { backgroundColor: 'var(--board-select)' }
       for (const candidate of legalMoves(game.fen, selected)) {
         styles[candidate.to] = {
           ...styles[candidate.to],
           backgroundImage: candidate.captured
-            ? 'radial-gradient(circle, transparent 58%, rgb(14 138 125 / 0.65) 60%)'
-            : 'radial-gradient(circle, rgb(14 138 125 / 0.65) 22%, transparent 24%)',
+            ? 'radial-gradient(circle, transparent 58%, var(--board-hint) 60%)'
+            : 'radial-gradient(circle, var(--board-hint) 22%, transparent 24%)',
         }
       }
     }
@@ -120,11 +120,12 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         className="size-3 shrink-0 rounded-full border border-muted"
         style={{ backgroundColor: side === 'w' ? 'var(--share-white)' : 'var(--share-black)' }}
       />
+      {!you && <BotAvatar id={bot.id} name={bot.name} className="size-6" />}
       <span className="min-w-0 truncate font-semibold">{name}</span>
       {you && name !== 'Você' && <span className="shrink-0 text-muted">(você)</span>}
       <CapturedPieces color={side} pieces={material.captured[side]} advantage={material.advantage[side]} />
       {game.clocks && (
-        <span className={`tabular ml-auto shrink-0 rounded-sm px-1.5 font-semibold ${game.turn === side && game.phase !== 'over' ? 'bg-ink text-bg' : 'bg-surface'} ${game.clocks[side] < 20_000 ? 'text-(--text-blunder)' : ''}`}>
+        <span className={`tabular ml-auto shrink-0 rounded-sm px-1.5 font-semibold ${game.turn === side && game.phase !== 'over' ? 'bg-action text-on-action' : 'bg-surface'} ${game.clocks[side] < 20_000 ? 'text-(--text-blunder)' : ''}`}>
           {formatClock(game.clocks[side] / 1000)}
         </span>
       )}
@@ -133,11 +134,11 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
 
   const statusText =
     game.phase === 'starting'
-      ? 'Preparando a partida…'
+      ? 'Arrumando as peças…'
       : game.phase === 'bot'
         ? `${bot.name} está pensando…`
         : game.phase === 'checking'
-          ? 'O treinador está olhando seu lance…'
+          ? 'Deixa eu ver esse lance…'
           : game.phase === 'player'
             ? game.inCheck
               ? 'Xeque! Sua vez.'
@@ -173,11 +174,11 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         </p>
       ) : game.phase === 'warning' ? (
         <>
-          <h2 className="font-book text-xl leading-snug font-semibold text-(--text-mistake)">Cuidado: tem um lance bem melhor aqui.</h2>
-          {game.warning && <p className="font-book mt-2 max-w-prose text-base leading-relaxed">{game.warning}</p>}
+          <h2 className="font-display text-xl leading-snug font-semibold text-(--text-mistake)">Opa, calma. Tem um lance bem melhor aqui.</h2>
+          {game.warning && <p className="mt-2 max-w-prose text-base leading-relaxed">{game.warning}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {allowUndo && (
-              <button type="button" onClick={game.undo} className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold whitespace-nowrap text-bg">
+              <button type="button" onClick={game.undo} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold whitespace-nowrap text-on-action">
                 Voltar lance
               </button>
             )}
@@ -189,8 +190,8 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
       ) : (
         <>
           <p className="font-semibold">{statusText}</p>
-          {game.comment && <p className="font-book mt-1 max-w-prose text-base leading-relaxed">{game.comment}</p>}
-          {game.threat && <p className="font-book mt-1 max-w-prose text-base leading-relaxed">{game.threat.text}</p>}
+          {game.comment && <p className="mt-1 max-w-prose text-base leading-relaxed">{game.comment}</p>}
+          {game.threat && <p className="mt-1 max-w-prose text-base leading-relaxed">{game.threat.text}</p>}
           {game.hint && (
             <p className="mt-1 text-sm text-muted">
               {game.hint.level === 1 ? 'A peça destacada é a que deve se mexer. Toque em "Dica" de novo para ver o lance.' : 'A seta mostra o melhor lance.'}
@@ -242,7 +243,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
             setConfirmResign(false)
             game.resign()
           }}
-          className="min-h-11 flex-1 rounded-md bg-ink px-2 font-semibold text-bg"
+          className="min-h-11 flex-1 rounded-md bg-action px-2 font-semibold text-on-action"
         >
           Confirmar desistência
         </button>
@@ -255,7 +256,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
   )
 
   const moveText = (
-    <ol className="font-book flex flex-wrap gap-x-2 text-base leading-relaxed" aria-label="Lances da partida">
+    <ol className="flex flex-wrap gap-x-2 text-base leading-relaxed" aria-label="Lances da partida">
       {game.history.map((move, index) =>
         index % 2 === 0 ? (
           <li key={index}>
@@ -306,12 +307,12 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
       {game.result && (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Resultado da partida">
           <div className="w-full max-w-sm rounded-md bg-surface p-5 text-center">
-            <p className="font-book text-4xl leading-tight font-bold">{OUTCOME_TITLE[game.result.outcome]}</p>
+            <p className="font-display text-4xl leading-tight font-bold">{OUTCOME_TITLE[game.result.outcome]}</p>
             <p className="mt-1 text-muted">
               {game.result.reason}{game.history.length > game.lockedPlies ? `, ${Math.ceil(game.history.length / 2)} ${game.history.length > 2 ? 'lances' : 'lance'}` : ''}.
             </p>
             {game.result.hasMoves && (
-              <button type="button" autoFocus onClick={() => onReview(game.result!)} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+              <button type="button" autoFocus onClick={() => onReview(game.result!)} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
                 Revisar partida
               </button>
             )}

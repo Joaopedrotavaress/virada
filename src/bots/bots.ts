@@ -8,6 +8,8 @@ export interface BotConfig {
   /** Força aproximada, só para orientar a escolha. */
   rating: string
   description: string
+  /** A frase que define o personagem. */
+  catchphrase: string
   options: Record<string, string | number | boolean>
   movetime: number
   /** Quantas linhas pedir ao motor para poder errar de forma humana. */
@@ -24,18 +26,18 @@ const skill = (level: number) => ({ UCI_LimitStrength: false, 'Skill Level': lev
 const elo = (rating: number) => ({ 'Skill Level': 20, UCI_LimitStrength: true, UCI_Elo: rating })
 
 export const BOTS: BotConfig[] = [
-  { id: 'iniciante', name: 'Iniciante', rating: '~400', description: 'Deixa peças de graça com frequência.', options: skill(0), movetime: 50, multiPv: 3, varyChance: 0.6, temperature: 250, randomChance: 0.2 },
-  { id: 'aprendiz', name: 'Aprendiz', rating: '~600', description: 'Já captura o que está solto, mas se distrai.', options: skill(1), movetime: 75, multiPv: 3, varyChance: 0.5, temperature: 200, randomChance: 0.12 },
-  { id: 'casual', name: 'Casual', rating: '~800', description: 'Conhece o básico, mas erra táticas simples.', options: skill(2), movetime: 100, multiPv: 3, varyChance: 0.45, temperature: 150, randomChance: 0.06 },
-  { id: 'intermediario', name: 'Intermediário', rating: '~1000', description: 'Vê ameaças diretas e cai em táticas de dois lances.', options: skill(3), movetime: 150, multiPv: 3, varyChance: 0.35, temperature: 110, randomChance: 0.03 },
-  { id: 'clube', name: 'Clube', rating: '~1200', description: 'Joga com sentido e pune erros grosseiros.', options: skill(5), movetime: 200, multiPv: 3, varyChance: 0.25, temperature: 80, randomChance: 0 },
-  { id: 'competidor', name: 'Competidor', rating: '~1400', description: 'Raramente perde peça de graça.', options: elo(1400), movetime: 300, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'forte', name: 'Forte', rating: '~1600', description: 'Pede atenção em cada lance.', options: elo(1600), movetime: 400, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'avancado', name: 'Avançado', rating: '~1800', description: 'Calcula bem e aproveita posições melhores.', options: elo(1800), movetime: 500, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'expert', name: 'Expert', rating: '~2000', description: 'Quase não dá presentes.', options: elo(2000), movetime: 600, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'candidato', name: 'Candidato', rating: '~2200', description: 'Táticas longas e finais bem conduzidos.', options: elo(2200), movetime: 700, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'titulado', name: 'Titulado', rating: '~2500', description: 'Força de jogador com título.', options: elo(2500), movetime: 850, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
-  { id: 'mestre', name: 'Mestre', rating: 'força total', description: 'O Stockfish sem limites.', options: skill(20), movetime: 1000, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'iniciante', name: 'Tio Beto', rating: '~400', description: 'Deixa peças de graça com frequência.', catchphrase: 'Essa torre eu nem queria mesmo.', options: skill(0), movetime: 50, multiPv: 3, varyChance: 0.6, temperature: 250, randomChance: 0.2 },
+  { id: 'aprendiz', name: 'Duda', rating: '~600', description: 'Já captura o que está solto, mas se distrai.', catchphrase: 'Se está solto, é meu.', options: skill(1), movetime: 75, multiPv: 3, varyChance: 0.5, temperature: 200, randomChance: 0.12 },
+  { id: 'casual', name: 'Seu Zé da Praça', rating: '~800', description: 'Conhece o básico, mas erra táticas simples.', catchphrase: 'Mais uma, que essa foi aquecimento.', options: skill(2), movetime: 100, multiPv: 3, varyChance: 0.45, temperature: 150, randomChance: 0.06 },
+  { id: 'intermediario', name: 'Marli', rating: '~1000', description: 'Vê ameaças diretas e cai em táticas de dois lances.', catchphrase: 'Essa ameaça eu vi. A outra, não.', options: skill(3), movetime: 150, multiPv: 3, varyChance: 0.35, temperature: 110, randomChance: 0.03 },
+  { id: 'clube', name: 'Jorginho do Clube', rating: '~1200', description: 'Joga com sentido e pune erros grosseiros.', catchphrase: 'Aqui no clube, peça solta não dura.', options: skill(5), movetime: 200, multiPv: 3, varyChance: 0.25, temperature: 80, randomChance: 0 },
+  { id: 'competidor', name: 'Rafa da Madrugada', rating: '~1400', description: 'Raramente perde peça de graça.', catchphrase: 'Só mais uma blitz e eu durmo.', options: elo(1400), movetime: 300, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'forte', name: 'Dona Cida', rating: '~1600', description: 'Pede atenção em cada lance.', catchphrase: 'Quarenta anos de clube, meu bem.', options: elo(1600), movetime: 400, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'avancado', name: 'Dr. Nogueira', rating: '~1800', description: 'Calcula bem e aproveita posições melhores.', catchphrase: 'Vejamos a variante até o fim.', options: elo(1800), movetime: 500, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'expert', name: 'Bia Campeã', rating: '~2000', description: 'Quase não dá presentes.', catchphrase: 'Presente, só no aniversário.', options: elo(2000), movetime: 600, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'candidato', name: 'Caio do Final', rating: '~2200', description: 'Táticas longas e finais bem conduzidos.', catchphrase: 'Pode trocar tudo, o final é comigo.', options: elo(2200), movetime: 700, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'titulado', name: 'Mestra Iara', rating: '~2500', description: 'Força de jogador com título.', catchphrase: 'Já vi essa posição. Em 1998.', options: elo(2500), movetime: 850, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
+  { id: 'mestre', name: 'O Stockfish', rating: 'força total', description: 'O motor sem nenhum limite.', catchphrase: 'Não erra, não cansa e não conversa.', options: skill(20), movetime: 1000, multiPv: 1, varyChance: 0, temperature: 0, randomChance: 0 },
 ]
 
 /** Avaliação do ponto de vista do bot, em centipeões. Mate vira um valor enorme. */
@@ -107,7 +109,7 @@ export function buildBotPgn(sans: string[], { white, black, result, date, termin
   })
   if (timeControl) chess.setHeader('TimeControl', timeControl)
   const pad = (value: number) => String(value).padStart(2, '0')
-  chess.setHeader('Event', 'Treinador de Xadrez')
+  chess.setHeader('Event', 'Virada')
   chess.setHeader('Site', 'Jogo contra bot')
   chess.setHeader('Date', `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`)
   chess.setHeader('White', white)
