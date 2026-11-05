@@ -65,7 +65,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
 
       {retry.phase === 'found' && (
         <>
-          <p className="font-display text-5xl leading-none font-bold text-(--text-best)">Achou!</p>
+          <p className="font-display text-5xl leading-none font-bold text-(--positive)">Achou!</p>
           <p className="mt-3 max-w-prose text-base leading-relaxed">
             {retry.cls === 'best' ? `${tried} é o melhor lance da posição.` : `${tried} é quase tão bom quanto o melhor, ${best}.`}
             {retry.after ? ` A avaliação fica em ${formatEval(retry.after.eval)}.` : ''}
