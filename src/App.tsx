@@ -12,6 +12,7 @@ import { DataScreen } from './components/DataScreen'
 import { Games } from './components/Games'
 import { Home } from './components/Home'
 import { Shell } from './components/Shell'
+import { Training } from './training/Training'
 import { type GameRecord, addUnanalyzed, allRecords, colorOfUser, getAnalysis, initLibrary, recordKeyOf, saveAnalyzed, useAllRecords } from './data/library'
 import { analysisQueue } from './data/queue'
 import { EngineAbortError, getEngine } from './engine/stockfish'
@@ -21,6 +22,7 @@ import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUserna
 // O que tem gráfico fica fora do pacote inicial: a tela de abertura carrega bem mais rápido.
 const AnalysisView = lazy(() => import('./components/AnalysisView').then((module) => ({ default: module.AnalysisView })))
 const Progress = lazy(() => import('./components/Progress').then((module) => ({ default: module.Progress })))
+const Session = lazy(() => import('./training/Session').then((module) => ({ default: module.Session })))
 
 interface AnalysisJob {
   game: ParsedGame
@@ -308,6 +310,14 @@ export default function App() {
     )
   }
 
+  if (route.name === 'session') {
+    return (
+      <Suspense fallback={loading}>
+        <Session key={route.theme ?? 'hoje'} theme={route.theme} />
+      </Suspense>
+    )
+  }
+
   if (route.name === 'bot-setup') {
     return (
       <BotSetup
@@ -329,6 +339,8 @@ export default function App() {
     content = <Games username={username} onUsernameChange={setUsername} onOpen={openRecord} />
   } else if (route.name === 'data') {
     content = <DataScreen username={username} />
+  } else if (route.name === 'training') {
+    content = <Training username={username} />
   } else if (route.name === 'progress') {
     content = (
       <Suspense fallback={loading}>
