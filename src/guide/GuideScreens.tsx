@@ -313,7 +313,7 @@ export function OpeningPage({ slug, username, onPlayFrom }: { slug: string; user
     <main className="mx-auto w-full max-w-6xl px-4 pt-2 pb-10 lg:pt-6">
       <BackLink />
       <div className="mt-1 grid gap-x-8 gap-y-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <div className="lg:sticky lg:top-4 lg:self-start">
+        <div className="mx-auto w-full max-w-md lg:sticky lg:top-4 lg:max-w-none lg:self-start">
           <LineViewer moves={moves} orientation={orientation} />
         </div>
         <div className="min-w-0">
@@ -438,7 +438,7 @@ export function FamilyPage({ id, onPlayFrom }: { id: string; onPlayFrom: (start:
     <main className="mx-auto w-full max-w-6xl px-4 pt-2 pb-10 lg:pt-6">
       <BackLink />
       <div className="mt-1 grid gap-x-8 gap-y-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <div className="lg:sticky lg:top-4 lg:self-start">
+        <div className="mx-auto w-full max-w-md lg:sticky lg:top-4 lg:max-w-none lg:self-start">
           <LineViewer moves={variant.moves} orientation="white" />
           <button type="button" onClick={() => onPlayFrom({ label: variant.name, sans: variant.moves, color: side })} className="mt-3 min-h-11 w-full rounded-md border border-line px-4 font-semibold hover:bg-sunken">
             Jogar contra um bot daqui
