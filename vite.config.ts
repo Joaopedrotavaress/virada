@@ -36,6 +36,8 @@ export default defineConfig({
         globIgnores: ['**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallback: 'index.html',
+        // O backend local responde pela mesma origem: isso nunca pode virar a página do app.
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],
