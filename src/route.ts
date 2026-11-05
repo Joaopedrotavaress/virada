@@ -9,7 +9,7 @@ export type Route =
   | { name: 'bot-game' }
   | { name: 'progress' }
   | { name: 'training' }
-  | { name: 'session' }
+  | { name: 'session'; theme?: string }
   | { name: 'puzzles' }
   | { name: 'guide' }
   | { name: 'opening'; slug: string }
@@ -37,7 +37,7 @@ export function parseRoute(hash: string): Route {
     case 'progresso':
       return { name: 'progress' }
     case 'treino':
-      return second === 'sessao' ? { name: 'session' } : { name: 'training' }
+      return second === 'sessao' ? { name: 'session', theme: third } : { name: 'training' }
     case 'puzzles':
       return { name: 'puzzles' }
     case 'guia':
