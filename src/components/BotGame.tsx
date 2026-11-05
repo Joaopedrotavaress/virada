@@ -147,10 +147,10 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
 
   const orientation = color === 'w' ? 'white' : 'black'
   const board = (
-    <div className="flex gap-1 lg:gap-2">
+    <div className={isDesktop ? 'flex gap-2' : 'flex flex-col gap-1'}>
       {/* A barra vem com o treinador: sem ele, a partida é sem ajuda nenhuma. */}
-      {coachOn && <EvalBar evaluation={game.evaluation} orientation={orientation} />}
-      <div className="min-w-0 flex-1">
+      {coachOn && <EvalBar evaluation={game.evaluation} orientation={orientation} horizontal={!isDesktop} />}
+      <div className={isDesktop ? 'min-w-0 flex-1' : 'min-w-0'}>
         <Board
           fen={game.fen}
           orientation={orientation}
@@ -339,9 +339,9 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         </header>
         <div className="flex min-h-0 flex-1 items-start gap-6 pb-6">
           <div className="shrink-0" style={{ width: `min(max(calc(100dvh - ${coachOn ? '8' : '10'}rem), 18rem), 56vw)` }}>
-            <div className={coachOn ? 'ml-10' : ''}>{strip(`${bot.name} (${bot.rating})`, opponentColor, false)}</div>
+            <div className={coachOn ? 'ml-8' : ''}>{strip(`${bot.name} (${bot.rating})`, opponentColor, false)}</div>
             {board}
-            <div className={coachOn ? 'ml-10' : ''}>{strip(setup.playerName, color, true)}</div>
+            <div className={coachOn ? 'ml-8' : ''}>{strip(setup.playerName, color, true)}</div>
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-3">
             {coachPanel}
@@ -362,9 +362,9 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         {coachOn && <LegendButton compact />}
       </header>
       <div className="mx-auto w-full shrink-0 px-2" style={{ maxWidth: 'max(16rem, calc(100dvh - 24rem))' }}>
-        <div className={coachOn ? 'ml-8' : ''}>{strip(`${bot.name} (${bot.rating})`, opponentColor, false)}</div>
+        <div>{strip(`${bot.name} (${bot.rating})`, opponentColor, false)}</div>
         {board}
-        <div className={coachOn ? 'ml-8' : ''}>{strip(setup.playerName, color, true)}</div>
+        <div>{strip(setup.playerName, color, true)}</div>
       </div>
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
         {coachPanel}
