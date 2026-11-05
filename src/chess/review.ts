@@ -4,7 +4,7 @@ import { type ClockData, clockInsights, swingOf } from './clock'
 import { type Color, type Eval, whiteWinPercent } from './evaluation'
 import { sanToPt } from './notation'
 
-export type MomentKind = 'missed-mate' | 'allowed-mate' | 'blunder' | 'miss' | 'mistake' | 'inaccuracy' | 'opponent-error' | 'punished'
+export type MomentKind = 'brilliant' | 'missed-mate' | 'allowed-mate' | 'blunder' | 'miss' | 'mistake' | 'inaccuracy' | 'opponent-error' | 'punished'
 
 export interface KeyMoment {
   ply: number
@@ -76,6 +76,11 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
     const turningNote = isTurningPoint ? `A partida virou aqui: este lance custou ${percent(move.loss)} de chance de vitória.` : null
     const base = { ply: move.ply, isTurningPoint }
     const weight = mine ? 20 : 0
+
+    if (move.cls === 'brilliant') {
+      found.push({ ...base, kind: 'brilliant', title: 'Lance brilhante', note: turningNote, importance: mine ? 120 : 45 })
+      return
+    }
 
     if (mateFor(before.eval, move.color) && !mateFor(after.eval, move.color) && move.cls !== 'best') {
       found.push({ ...base, kind: 'missed-mate', title: 'Mate perdido', note: turningNote, importance: 90 + weight })
@@ -211,10 +216,14 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
     const own = moves.filter((move) => move.color === userColor && move.cls !== 'book')
     if (parts.length > 0) insights.push(`Você teve ${list(parts)}.`)
     else if (own.length >= 6) insights.push('Você não cometeu nenhum erro sério. Muito bom.')
+
+    const { brilliant = 0, excellent = 0 } = summary[userColor].counts
+    if (brilliant > 0) insights.unshift(brilliant === 1 ? 'Você achou um lance brilhante nesta partida!' : `Você achou ${brilliant} lances brilhantes nesta partida!`)
+    if (excellent > 0) insights.push(excellent === 1 ? 'Você teve 1 lance excelente.' : `Você teve ${excellent} lances excelentes.`)
   }
 
   // 4. Mate perdido
-  const missedMate = moves.find((move, index) => move.cls !== 'best' && (!userColor || move.color === userColor) && mateFor(positions[index].eval, move.color) && !mateFor(positions[index + 1].eval, move.color))
+  const missedMate = moves.find((move, index) => move.cls !== 'best' && move.cls !== 'brilliant' && (!userColor || move.color === userColor) && mateFor(positions[index].eval, move.color) && !mateFor(positions[index + 1].eval, move.color))
   if (missedMate) {
     const evaluation = positions[missedMate.ply - 1].eval
     if (evaluation.kind === 'mate') {

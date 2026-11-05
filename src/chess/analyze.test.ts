@@ -61,10 +61,10 @@ describe('análise completa com Stockfish real', () => {
     expect(whiteWinPercent(last.eval)).toBe(100)
   })
 
-  it('reconhece os lances de mate como Melhor', () => {
+  it('marca o mate como Melhor e a dama entregue por Morphy como Brilhante', () => {
     const [queenSac, mateMove] = analysis.moves.filter((move) => move.san === 'Qb8+' || move.san === 'Rd8#')
     expect(mateMove.cls).toBe('best')
-    expect(queenSac.cls).toBe('best')
+    expect(queenSac.cls).toBe('brilliant')
     expect(analysis.positions[30].eval).toEqual({ kind: 'mate', moves: 2, winner: 'w' })
   })
 

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { Chess } from 'chess.js'
-import { type GameAnalysis, gameKey, hashText } from '../chess/analyze'
+import { type GameAnalysis, gameKey, hashText, withBrilliantMoves } from '../chess/analyze'
 import { type BookData, type OpeningInfo, findBookMoves, loadBook } from '../chess/book'
 import { type GameDigest, digestAnalysis, pgnFromAnalysis } from '../chess/digest'
 import type { Color } from '../chess/evaluation'
@@ -241,7 +241,8 @@ export async function getAnalysis(key: string): Promise<GameAnalysis | null> {
   const open = openAnalyses.get(key)
   if (open) return open
   try {
-    const stored = await readValue<GameAnalysis>(STORES.analyses, key)
+    const saved = await readValue<GameAnalysis>(STORES.analyses, key)
+    const stored = saved && withBrilliantMoves(saved)
     if (stored) {
       // Só as últimas ficam na memória: análises são grandes.
       if (openAnalyses.size >= 5) openAnalyses.delete(openAnalyses.keys().next().value as string)

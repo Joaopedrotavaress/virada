@@ -74,7 +74,7 @@ export function useVariant(positions: AnalyzedPosition[]) {
       const before = step.before ?? cache.current.get(step.beforeFen) ?? partial.current.get(step.beforeFen) ?? (await evaluate(step.beforeFen))
       const after = await evaluate(step.fen)
       if (controller.signal.aborted) return
-      const cls = classOf(gradeMove(step.uci, step.color, before, after))
+      const cls = classOf(gradeMove(step.uci, step.color, before, after), { fen: step.beforeFen, uci: step.uci, color: step.color, evalBefore: before.eval })
       setVariant((state) => state && { ...state, steps: state.steps.map((item) => (item.id === step.id ? { ...item, before, after, cls } : item)) })
     }
 

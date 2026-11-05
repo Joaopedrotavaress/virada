@@ -9,7 +9,7 @@ const BASE = Date.UTC(2026, 9, 5, 12) // segunda-feira
 const error = (patch: Partial<GameError> = {}): GameError => ({ ply: 21, moveNumber: 11, san: 'Nf3', cls: 'blunder', loss: 30, phase: 'middlegame', theme: 'fork', timePressure: false, fen: '', bestUci: 'e2e4', pvUci: [], ...patch })
 
 const digest = (errors: GameError[] = [], accuracy = 80): GameDigest => {
-  const counts = () => ({ book: 0, best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 })
+  const counts = () => ({ brilliant: 0, book: 0, best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, miss: 0, blunder: 0 })
   const w = counts()
   w.blunder = errors.length
   return { id: 'x', depth: 15, analyzedAt: 0, plies: 40, accuracy: { w: accuracy, b: 50 }, counts: { w, b: counts() }, errors }

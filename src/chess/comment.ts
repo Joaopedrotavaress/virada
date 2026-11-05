@@ -1,4 +1,5 @@
 import type { AnalyzedMove, AnalyzedPosition } from './analyze'
+import { sacrificeOf } from './brilliant'
 import { isErrorClass } from './classify'
 import { type Color, formatEval } from './evaluation'
 import { detectMotifs, explainMotifs } from './motifs'
@@ -16,6 +17,8 @@ export interface CommentInput {
   /** false esconde o melhor lance nos erros, para não estragar o "Tentar de novo". */
   revealBest?: boolean
 }
+
+const PIECE_NAMES = { q: 'a dama', r: 'a torre', b: 'o bispo', n: 'o cavalo', p: 'o peão', k: 'o rei' }
 
 const bestSanPt = (position: AnalyzedPosition) => {
   const san = uciToSan(position.fen, position.bestUci)
@@ -37,6 +40,14 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
   if (cls === 'book') return 'Teoria pura: esse lance está nos livros. A avaliação fica em ' + to + '.'
 
   const ending = after.terminal === 'stalemate' ? ' A partida termina em afogamento.' : after.terminal === 'draw' ? ' A partida termina empatada.' : ''
+
+  if (cls === 'brilliant') {
+    const sacrifice = sacrificeOf(before.fen, move.uci)
+    const gave = sacrifice ? `${PIECE_NAMES[sacrifice.piece]} em ${sacrifice.square}` : 'material'
+    const who = isUserMove ? 'Você entregou' : `${sideName(color)} entregaram`
+    const payoff = moverKeepsMate && after.eval.kind === 'mate' ? `tem mate em ${after.eval.moves}` : `a avaliação fica em ${to}`
+    return `Lance brilhante! ${who} ${gave} e a conta fecha: ${payoff}.${ending}`
+  }
 
   if (cls === 'best') {
     if (moverKeepsMate && after.eval.kind === 'mate') return `Perfeito: o mate em ${after.eval.moves} continua de pé.`

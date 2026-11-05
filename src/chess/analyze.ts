@@ -1,4 +1,5 @@
 import { type EngineLike, EngineAbortError } from '../engine/stockfish'
+import { isBrilliant } from './brilliant'
 import { type OpeningInfo, findBookMoves, loadBook } from './book'
 import { type ClassifiedMove, type SideSummary, classifyMoves, summarize } from './classify'
 import { type ClockData, computeClock } from './clock'
@@ -68,6 +69,19 @@ export interface AnalyzeGameOptions {
   /** done: posições já avaliadas; total: número de posições. */
   onProgress?: (done: number, total: number) => void
   signal?: AbortSignal
+}
+
+/** Partidas analisadas antes de existir o lance brilhante ganham a marca ao abrir, sem refazer a análise. */
+export function withBrilliantMoves(analysis: GameAnalysis): GameAnalysis {
+  let changed = analysis.summary.w.counts.brilliant === undefined
+  const moves = analysis.moves.map((move, index) => {
+    if (move.cls !== 'best' && move.cls !== 'excellent') return move
+    const { fen, eval: evalBefore } = analysis.positions[index]
+    if (!isBrilliant({ fen, uci: move.uci, color: move.color, loss: move.loss, winBefore: move.winBefore, winAfter: move.winAfter, evalBefore })) return move
+    changed = true
+    return { ...move, cls: 'brilliant' as const }
+  })
+  return changed ? { ...analysis, moves, summary: summarize(moves) } : analysis
 }
 
 export async function analyzeGame(

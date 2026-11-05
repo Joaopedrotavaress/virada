@@ -1,11 +1,13 @@
+import { isBrilliant } from './brilliant'
 import { type Color, type Eval, winPercentFor } from './evaluation'
 import type { GameMove } from './pgn'
 
-export type MoveClass = 'book' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
+export type MoveClass = 'brilliant' | 'book' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
 
-export const MOVE_CLASSES: MoveClass[] = ['book', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']
+export const MOVE_CLASSES: MoveClass[] = ['brilliant', 'book', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']
 
 export const CLASS_INFO: Record<MoveClass, { label: string; symbol: string }> = {
+  brilliant: { label: 'Brilhante', symbol: '!!' },
   book: { label: 'Livro', symbol: '' },
   best: { label: 'Melhor', symbol: '★' },
   excellent: { label: 'Excelente', symbol: '!' },
@@ -66,12 +68,13 @@ export function gradeMove(uci: string, color: Color, before: PositionEval, after
 }
 
 /** Classificação de um lance testado fora da partida (sem o contexto do lance anterior). */
-export function classOf(graded: Pick<GradedMove, 'isBest' | 'loss'>): MoveClass {
+export function classOf(graded: GradedMove, played?: { fen: string; uci: string; color: Color; evalBefore: Eval }): MoveClass {
+  if (played && isBrilliant({ ...played, loss: graded.loss, winBefore: graded.winBefore, winAfter: graded.winAfter })) return 'brilliant'
   return graded.isBest ? 'best' : classifyLoss(graded.loss)
 }
 
 /** positions tem moves.length + 1 itens: positions[i] é a posição antes de moves[i]. */
-export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], positions: PositionEval[], bookMoves: boolean[] = []): ClassifiedMove[] {
+export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], positions: (PositionEval & { fen?: string })[], bookMoves: boolean[] = []): ClassifiedMove[] {
   const classified: ClassifiedMove[] = []
   moves.forEach((move, index) => {
     const { winBefore, winAfter, loss: rawLoss, isBest, accuracy } = gradeMove(move.uci, move.color, positions[index], positions[index + 1])
@@ -87,6 +90,9 @@ export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], position
     if (isBest) cls = 'best'
     else if (previousLoss >= OPPORTUNITY_THRESHOLD && loss >= OPPORTUNITY_THRESHOLD) cls = 'miss'
     else cls = classifyLoss(loss)
+
+    const { fen } = positions[index]
+    if (fen && isBrilliant({ fen, uci: move.uci, color: move.color, loss, winBefore, winAfter, evalBefore: positions[index].eval })) cls = 'brilliant'
 
     classified.push({ winBefore, winAfter, loss, cls, accuracy })
   })
