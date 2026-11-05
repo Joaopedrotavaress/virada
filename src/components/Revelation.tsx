@@ -29,6 +29,8 @@ interface RevelationBoardProps {
   focus: string
   /** Rei em xeque-mate, quando o último lance for mate. */
   matedSquare?: string
+  /** Falso mostra direto a posição final. */
+  animate?: boolean
   /** Quando a última peça para de mexer, em ms. */
   onSettled?: (ms: number) => void
 }
@@ -40,7 +42,7 @@ function place(square: string, orientation: 'white' | 'black') {
 }
 
 /** O tabuleiro da Revelação. Sem animação, mostra direto a posição final: o estado de repouso é sempre o certo. */
-export function RevelationBoard({ fen, moves, orientation = 'white', focus, matedSquare, onSettled }: RevelationBoardProps) {
+export function RevelationBoard({ fen, moves, orientation = 'white', focus, matedSquare, animate = true, onSettled }: RevelationBoardProps) {
   const root = useRef<HTMLDivElement>(null)
 
   const { pieces, plan } = useMemo(() => {
@@ -89,7 +91,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
   useEffect(() => {
     const element = root.current
     if (!element) return
-    if (reducedMotion()) {
+    if (!animate || reducedMotion()) {
       onSettled?.(0)
       return
     }
@@ -172,7 +174,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
     }
     // Roda uma vez para cada posição.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fen, moves, orientation, focus])
+  }, [fen, moves, orientation, focus, animate])
 
   const percent = (square: string) => {
     const { x, y } = place(square, orientation)
