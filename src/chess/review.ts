@@ -36,7 +36,7 @@ const percent = (value: number) => `${Math.round(value)}%`
 const side = (color: Color) => (color === 'w' ? 'brancas' : 'pretas')
 
 /** O lance que mais custou na partida, se algum realmente mudou o rumo dela. */
-function turningPoint(moves: AnalyzedMove[]): AnalyzedMove | null {
+export function turningPoint(moves: AnalyzedMove[]): AnalyzedMove | null {
   const judged = moves.filter((move) => move.cls !== 'book')
   if (judged.length === 0) return null
   const worst = judged.reduce((a, b) => (b.loss > a.loss ? b : a))

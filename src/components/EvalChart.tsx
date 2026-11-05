@@ -3,6 +3,7 @@ import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YA
 import type { AnalyzedMove, AnalyzedPosition } from '../chess/analyze'
 import { CLASS_INFO, type MoveClass, isErrorClass } from '../chess/classify'
 import { formatEval, whiteWinPercent } from '../chess/evaluation'
+import { turningPoint } from '../chess/review'
 import { moveLabel } from './CoachCard'
 
 interface Point {
@@ -30,7 +31,7 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: readonl
   if (!active || !point) return null
   return (
     <div className="rounded-md border border-line bg-surface px-2.5 py-1.5 text-sm text-ink shadow-md">
-      <p className="font-book font-semibold">{point.move ? moveLabel(point.move) : 'Posição inicial'}</p>
+      <p className="font-display font-semibold">{point.move ? moveLabel(point.move) : 'Posição inicial'}</p>
       <p className="tabular text-muted">
         {point.evalText}
         {point.move ? `, ${CLASS_INFO[point.move.cls].label}` : ''}
@@ -40,7 +41,7 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: readonl
 }
 
 /** O desenho do gráfico só muda com a partida, não a cada lance navegado. */
-const EvalPlot = memo(function EvalPlot({ data }: { data: Point[] }) {
+const EvalPlot = memo(function EvalPlot({ data, turning }: { data: Point[]; turning: number | null }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} accessibilityLayer={false}>
@@ -48,6 +49,7 @@ const EvalPlot = memo(function EvalPlot({ data }: { data: Point[] }) {
         <YAxis hide domain={[-6, 106]} />
         <XAxis hide dataKey="ply" type="number" domain={[0, data.length - 1]} padding={{ left: PLOT_PADDING, right: PLOT_PADDING }} />
         <ReferenceLine y={50} stroke="var(--share-mid)" strokeWidth={1} />
+        {turning !== null && <ReferenceLine x={turning} stroke="var(--action)" strokeWidth={3} />}
         <Tooltip content={ChartTooltip} cursor={{ stroke: 'var(--share-mid)' }} isAnimationActive={false} />
         <Area
           dataKey="win"
@@ -62,7 +64,7 @@ const EvalPlot = memo(function EvalPlot({ data }: { data: Point[] }) {
           dot={(props) => {
             const cls = (props.payload as Point | undefined)?.move?.cls
             if (!cls || !isErrorClass(cls) || props.cx == null || props.cy == null) return <g key={props.key} />
-            return <circle key={props.key} cx={props.cx} cy={props.cy} r={DOT_RADIUS[cls]} fill={`var(--fill-${cls})`} stroke="#fff" strokeWidth={2} />
+            return <circle key={props.key} cx={props.cx} cy={props.cy} r={DOT_RADIUS[cls]} fill={`var(--fill-${cls})`} stroke="var(--on-fill)" strokeWidth={2} />
           }}
         />
       </AreaChart>
@@ -82,6 +84,7 @@ export function EvalChart({ positions, moves, ply, onSelect, showTitle = true }:
     [moves, positions],
   )
   const ratio = data.length > 1 ? ply / (data.length - 1) : 0
+  const turning = useMemo(() => turningPoint(moves)?.ply ?? null, [moves])
 
   return (
     <section aria-label="Gráfico de avaliação">
@@ -100,7 +103,7 @@ export function EvalChart({ positions, moves, ply, onSelect, showTitle = true }:
           onSelect(Math.max(0, Math.min(data.length - 1, Math.round(ratio * (data.length - 1)))))
         }}
       >
-        <EvalPlot data={data} />
+        <EvalPlot data={data} turning={turning} />
         {/* Traço duplo para a posição atual aparecer sobre o claro e sobre o escuro. */}
         <span
           aria-hidden="true"
