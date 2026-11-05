@@ -20,6 +20,7 @@ import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUserna
 
 // O que tem gráfico fica fora do pacote inicial: a tela de abertura carrega bem mais rápido.
 const AnalysisView = lazy(() => import('./components/AnalysisView').then((module) => ({ default: module.AnalysisView })))
+const Progress = lazy(() => import('./components/Progress').then((module) => ({ default: module.Progress })))
 
 interface AnalysisJob {
   game: ParsedGame
@@ -328,6 +329,12 @@ export default function App() {
     content = <Games username={username} onUsernameChange={setUsername} onOpen={openRecord} />
   } else if (route.name === 'data') {
     content = <DataScreen username={username} />
+  } else if (route.name === 'progress') {
+    content = (
+      <Suspense fallback={loading}>
+        <Progress username={username} />
+      </Suspense>
+    )
   } else {
     content = (
       <Home
