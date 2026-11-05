@@ -39,8 +39,9 @@ colors:
   arrow-best: "#0e8a7d"
   arrow-threat: "#d12d2d"
   fill-book: "#74747d"
+  fill-brilliant: "#16c2bb"
   fill-best: "#f4f4f6"
-  fill-excellent: "#3a3a41"
+  fill-excellent: "#1f8a45"
   fill-good: "#6a6a73"
   fill-inaccuracy: "#c28a00"
   fill-mistake: "#bd5206"
@@ -48,6 +49,7 @@ colors:
   fill-miss: "#8446dc"
   on-fill: "#ffffff"
   on-fill-best: "#0b0b0d"
+  on-fill-brilliant: "#04201f"
   on-fill-inaccuracy: "#0b0b0d"
   text-inaccuracy-day: "#7a5a00"
   text-inaccuracy-night: "#e6ae3a"
@@ -227,7 +229,7 @@ O carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em 
 - Superfícies chapadas: a profundidade vem do tom, quase nunca de sombra.
 - Cantos de 2px e 3px; a placa não tem canto nenhum.
 - Barlow Condensed pesada para anunciar, Figtree para ler.
-- Lance bom é neutro. Cor forte só onde há erro, e sempre com símbolo junto.
+- Lance comum é neutro. Cor forte só no erro e no lance que merece festa, e sempre com símbolo junto.
 - A geometria recorrente é a casa do tabuleiro: símbolo, retratos e ondas são feitos dela.
 
 ## Colors
@@ -259,7 +261,7 @@ Cinzas levemente frios mais um amarelo de sinalização; as outras cores só exi
 - **Rei em xeque-mate** (#c81e3a): a casa inteira, na Revelação.
 - **Casa do lance classificado:** a cor do selo a 48% misturada à casa.
 - **Setas:** melhor lance em verde-azulado (#0e8a7d), ameaça do adversário em vermelho (#d12d2d). São valores literais porque a biblioteca do tabuleiro usa a cor no identificador da seta.
-- **Barra e gráfico de avaliação:** a parte clara é das brancas (#f4f4f6), a escura das pretas (#26262c), o meio é #868690.
+- **Barra e gráfico de avaliação:** a parte clara é das brancas (#f4f4f6), a escura das pretas (#26262c), o meio é #868690. No computador, a barra fica em pé, com 24px. No celular, ela vira uma linha de 6px acima do tabuleiro, de ponta a ponta, e o número aparece no cartão do treinador.
 
 ### Classificações
 As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como texto (com contraste próprio por tema). O detalhe de cada selo está em Components.
@@ -269,7 +271,7 @@ As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como tex
 
 **A Regra do Acerto.** A única exceção aceita é o acerto de exercício: a onda e o flash amarelos na casa do lance certo. Ela dura menos de um segundo e some sozinha. O código ainda tem barras de progresso e um aviso de análise em segundo plano em amarelo; eles divergem da regra e não servem de modelo.
 
-**A Regra da Cor no Erro.** Lance bom é neutro: Melhor, Excelente e Boa usam branco e cinzas, e o texto deles é o texto comum. Cor forte aparece só em Imprecisão, Erro, Erro grave e Chance perdida, e nunca sozinha: o símbolo garante a leitura sem cor.
+**A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Boa e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grave e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
 
 **A Regra do Fundo Fixo.** O símbolo, os retratos dos bots e a tela da Revelação ao fim de uma análise ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.
 
@@ -305,6 +307,7 @@ O app é feito primeiro para o celular. Até 1024px, a navegação fica fixa emb
 - **Primeira visita:** no celular, tabuleiro, placa de ponta a ponta, campo do usuário, título e o restante. Na tela larga, duas colunas (até 26rem para o tabuleiro e a placa, e o resto para o texto), com 48px entre elas. O tabuleiro tem margem de 20px no celular, enquanto o contrato de direção pedia largura de tela, e encolhe em telas baixas para a placa continuar à vista.
 - **Quem volta:** coluna principal e coluna de 22rem com as partidas recentes.
 - **Tabuleiro em uso:** tela cheia, sem a navegação. O tabuleiro fica sempre à vista, e o texto fica embaixo no celular e ao lado na tela larga, rolando sozinho.
+- **Revisão no celular:** de cima para baixo, cabeçalho, linha da avaliação, tabuleiro de ponta a ponta, fila de lances que rola para os lados, abas, comentário e uma barra fixa com Tocar, Melhor, Tentar e o próximo passo em amarelo. O tabuleiro cede altura só em tela baixa, reservando 21rem para o resto.
 - **Ritmo:** passos de 4px. Os mais usados são 8px entre botões, 12px e 16px dentro de blocos, 24px entre grupos, 40px e 48px entre seções, com 16px ou 20px de margem lateral.
 - **Alvos de toque:** 44px no mínimo, 48px em botões principais e 56px na navegação e nas linhas de bot.
 
@@ -379,8 +382,9 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 
 | Classe | Fundo do selo | Sinal | Cor do sinal | Texto no dia | Texto na noite |
 |---|---|---|---|---|---|
+| Brilhante | #16c2bb | Sinal "!!" | #04201f | #0a7470 | #4fe3dc |
 | Melhor | #f4f4f6 | Ícone de estrela | #0b0b0d | Texto comum | Texto comum |
-| Excelente | #3a3a41 | Sinal "!" | #ffffff | Texto comum | Texto comum |
+| Excelente | #1f8a45 | Sinal "!" | #ffffff | #1f7a33 | #68d278 |
 | Boa | #6a6a73 | Ícone de visto | #ffffff | Texto comum | Texto comum |
 | Imprecisão | #c28a00 | Sinal "?!" | #0b0b0d | #7a5a00 | #e6ae3a |
 | Erro | #bd5206 | Sinal "?" | #ffffff | #ab4805 | #f5944c |
@@ -389,7 +393,8 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 | Livro | #74747d | Ícone de livro aberto | #ffffff | Texto apagado | Texto apagado |
 
 - **Ícones:** desenhados em SVG, porque sinais de texto dependem da fonte de cada aparelho. Os sinais de notação ("!", "?!", "?", "??") são texto em Figtree 800.
-- **No cartão do treinador:** o sinal aparece grande (3.75rem, ícones de 56px) na cor de texto da classe, ao lado do nome da classe.
+- **Brilhante:** entrega ao menos 2 pontos de material, já descontado o que capturou, é o melhor lance ou perde menos de 2%, e quem jogou não fica pior. Não vale em lance forçado, nem em partida já ganha, a não ser que force o mate. Ao chegar nele, uma onda na cor do selo sai da casa.
+- **No cartão do treinador:** o sinal aparece grande (3.75rem, ícones de 56px) na cor de texto da classe, ao lado do nome da classe. No celular, o selo tem 28px e divide a linha com o lance e a avaliação.
 - **Acessibilidade:** o selo tem o nome da classe como rótulo.
 
 ### Placa
@@ -424,7 +429,7 @@ Quando a pessoa acha o lance, sai uma onda amarela da casa dele. É decorativa, 
 - **Menos movimento:** as animações terminam em 0.01ms, então a onda e o flash não aparecem. O acerto continua claro pelo texto.
 
 ### Outros movimentos
-Peças deslizam em 140ms no tabuleiro de jogo e param de animar com menos movimento. A barra de avaliação muda de altura em 200ms e a barra de análise em 150ms. A regra global de menos movimento reduz qualquer transição ou animação de CSS a 0.01ms.
+Peças deslizam em 140ms no tabuleiro de jogo e param de animar com menos movimento. A barra de avaliação muda de tamanho em 200ms e a barra de análise em 150ms. A regra global de menos movimento reduz qualquer transição ou animação de CSS a 0.01ms.
 
 ### Voz do treinador
 Um amigo de clube que joga melhor que você: direto, com humor leve e sem julgar. A voz faz parte do acabamento, então vale para todo texto novo.
@@ -474,7 +479,7 @@ A tela inicial termina com "Feito com carinho no Brasil" em Barlow Condensed 700
 ### Don't:
 - **Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do ponto de virada e do acerto de exercício.
 - **Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.
-- **Don't** dê cor forte a Melhor, Excelente ou Boa.
+- **Don't** dê cor forte a Melhor ou Boa.
 - **Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.
 - **Don't** arredonde a placa.
 - **Don't** use Barlow Condensed em parágrafos.

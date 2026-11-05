@@ -27,6 +27,7 @@ O Virada acha esse lance, explica em português o que aconteceu, como um amigo d
 | | |
 |---|---|
 | **Acha a virada** | Classifica cada lance, marca o ponto em que a partida mudou de lado e mostra isso com uma animação na sua própria posição. |
+| **Festeja o brilhante** | Quando você entrega material e a conta fecha, o lance vira Brilhante. A regra confere o sacrifício de verdade, então ele é raro. |
 | **Explica de verdade** | Peça sem defesa, garfo, cravada, mate perdido: o erro é explicado em português, com as linhas do Stockfish. |
 | **Revisão guiada** | Passa pela partida sozinho, em quatro velocidades, e para nos momentos decisivos. |
 | **Treina os seus erros** | Seus piores lances viram exercícios com repetição espaçada, numa sessão diária com sequência de dias. |
