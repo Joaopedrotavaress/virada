@@ -17,7 +17,7 @@ import { allRecords } from '../data/library'
 /** Com poucos erros para rever, puzzles completam a sessão até este tamanho. */
 const SESSION_MINIMUM = 5
 
-const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
+const LAST_MOVE_TINT = 'var(--board-last)'
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
 interface ItemProps {
@@ -44,20 +44,20 @@ function LineItem({ card, title, status, nextLabel, onAnswered, onNext }: ItemPr
   const styles = line.lastStep ? { [line.lastStep.from]: { backgroundColor: LAST_MOVE_TINT }, [line.lastStep.to]: { backgroundColor: LAST_MOVE_TINT } } : undefined
   const arrows = line.shownStep ? [{ startSquare: line.shownStep.from, endSquare: line.shownStep.to, color: BEST_ARROW_COLOR }] : []
   return (
-    <BoardScreen title={title} status={status} onBack={goBack} board={<PlayableBoard fen={line.fen} orientation={card.color === 'w' ? 'white' : 'black'} canMove={line.userTurn} onMove={line.play} squareStyles={styles} arrows={arrows} />}>
+    <BoardScreen title={title} status={status} onBack={goBack} board={<PlayableBoard fen={line.fen} orientation={card.color === 'w' ? 'white' : 'black'} canMove={line.userTurn} onMove={line.play} squareStyles={styles} arrows={arrows} celebrate={line.done && line.lastStep ? line.lastStep.to : null} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         <p className="text-sm text-muted">{card.label}</p>
         {line.done ? (
-          <h2 className="font-book mt-1 text-xl font-semibold text-(--text-best)">{line.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${line.errors} ${line.errors === 1 ? 'erro' : 'erros'}.`}</h2>
+          <h2 className="font-display mt-1 text-xl font-semibold text-(--text-best)">{line.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${line.errors} ${line.errors === 1 ? 'erro' : 'erros'}.`}</h2>
         ) : line.wrong ? (
-          <h2 className="font-book mt-1 text-xl font-semibold text-(--text-mistake)">{line.wrong} não é o lance desta linha. Tente outro.</h2>
+          <h2 className="font-display mt-1 text-xl font-semibold text-(--text-mistake)">{line.wrong} não é o lance desta linha. Tente outro.</h2>
         ) : (
-          <h2 className="font-book mt-1 text-xl font-semibold">{line.userTurn ? 'Qual é o próximo lance da linha?' : 'O outro lado responde…'}</h2>
+          <h2 className="font-display mt-1 text-xl font-semibold">{line.userTurn ? 'Qual é o próximo lance da linha?' : 'O outro lado responde…'}</h2>
         )}
         {line.shownStep && <p className="mt-1 text-sm text-muted">A seta mostra o lance.</p>}
-        <p className="font-book mt-2 text-base leading-relaxed">{line.cursor > 0 ? formatLinePt(START_FEN, sans.slice(0, line.cursor)) : ' '}</p>
+        <p className="mt-2 text-base leading-relaxed">{line.cursor > 0 ? formatLinePt(START_FEN, sans.slice(0, line.cursor)) : ' '}</p>
         {line.done && (
-          <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-ink px-4 font-semibold text-bg">
+          <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
             {nextLabel}
           </button>
         )}
@@ -129,12 +129,12 @@ export function Session({ theme }: { theme?: string }) {
       <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-3 p-6">
         {items.length === 0 ? (
           <>
-            <h1 className="font-book text-3xl font-semibold">Nada para treinar agora</h1>
+            <h1 className="font-display text-3xl font-semibold">Nada para treinar agora</h1>
             <p className="text-muted">Os exercícios saem dos erros graves nas partidas analisadas. Quando houver novos, ou quando os antigos vencerem, eles aparecem aqui.</p>
           </>
         ) : (
           <>
-            <h1 className="font-book text-3xl font-semibold">Sessão completa</h1>
+            <h1 className="font-display text-3xl font-semibold">Sessão completa</h1>
             <p className="text-lg">
               Você acertou {right} de {results.length}.
             </p>
@@ -144,7 +144,7 @@ export function Session({ theme }: { theme?: string }) {
             </p>
           </>
         )}
-        <button type="button" onClick={() => navigate('#/treino', { replace: true })} className="mt-2 min-h-12 rounded-md bg-ink px-5 font-semibold text-bg">
+        <button type="button" onClick={() => navigate('#/treino', { replace: true })} className="mt-2 min-h-12 rounded-md bg-action px-5 font-semibold text-on-action">
           Voltar ao treino
         </button>
       </main>

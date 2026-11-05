@@ -18,12 +18,12 @@ export function TodaySummary({ compact = false }: { compact?: boolean }) {
     <section aria-label="Treino de hoje" className={`rounded-md bg-surface p-4 ${compact ? 'mt-4' : 'mt-3'}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="font-book text-xl font-semibold">{count > 0 ? `${count} ${count === 1 ? 'exercício' : 'exercícios'} para hoje` : daily.doneToday > 0 ? 'Treino de hoje em dia' : 'Treino de hoje'}</h2>
+          <h2 className="font-display text-xl font-semibold">{count > 0 ? `${count} ${count === 1 ? 'exercício' : 'exercícios'} para hoje` : daily.doneToday > 0 ? 'Treino de hoje em dia' : 'Treino de hoje'}</h2>
           <p className="text-sm text-muted">
             {[daily.streak > 0 ? `${daily.streak} ${daily.streak === 1 ? 'dia' : 'dias'} seguidos` : '', daily.doneToday > 0 ? `${daily.doneToday} feitos hoje` : '', count > 0 ? 'Leva uns minutos' : ''].filter(Boolean).join(', ') || cards.length === 0 ? 'Os erros das partidas analisadas viram exercícios. Enquanto isso, há puzzles.' : 'Nenhum exercício vencido agora.'}
           </p>
         </div>
-        <button type="button" onClick={() => navigate('#/treino/sessao')} className={`min-h-12 w-full shrink-0 rounded-md px-5 font-semibold sm:w-auto ${count > 0 ? 'bg-ink text-bg' : 'border border-line hover:bg-sunken'}`}>
+        <button type="button" onClick={() => navigate('#/treino/sessao')} className={`min-h-12 w-full shrink-0 rounded-md px-5 font-semibold sm:w-auto ${count > 0 ? 'bg-action text-on-action' : 'border border-line hover:bg-sunken'}`}>
           {count > 0 ? 'Começar' : 'Treinar com puzzles'}
         </button>
       </div>
@@ -44,11 +44,11 @@ export function Training({ username }: { username: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-4 pb-10 lg:pt-8">
-      <h1 className="font-book text-3xl font-semibold">Treino</h1>
+      <h1 className="font-display text-3xl font-semibold">Treino</h1>
       <TodaySummary />
 
       <section className="mt-4 rounded-md bg-surface p-4">
-        <h2 className="font-book text-xl font-semibold">Puzzles</h2>
+        <h2 className="font-display text-xl font-semibold">Puzzles</h2>
         <p className="mt-1 max-w-prose text-muted">Um puzzle por dia, ou quantos quiser por tema. Funciona sem internet.</p>
         <button type="button" onClick={() => navigate('#/puzzles')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
           Abrir puzzles
@@ -57,10 +57,10 @@ export function Training({ username }: { username: string }) {
 
       {patterns.length > 0 && (
         <section className="mt-6">
-          <h2 className="font-book text-xl font-semibold">O que se repete nos seus erros</h2>
+          <h2 className="font-display text-xl font-semibold">O que se repete nos seus erros</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {patterns.map((pattern) => (
-              <li key={pattern.id} className="font-book max-w-prose text-base leading-relaxed">
+              <li key={pattern.id} className="max-w-prose text-base leading-relaxed">
                 {pattern.text}
               </li>
             ))}
@@ -69,7 +69,7 @@ export function Training({ username }: { username: string }) {
       )}
 
       <section className="mt-6">
-        <h2 className="font-book text-xl font-semibold">Seus erros por tema</h2>
+        <h2 className="font-display text-xl font-semibold">Seus erros por tema</h2>
         {themes.length === 0 ? (
           <p className="mt-1 max-w-prose text-muted">Ainda não há exercícios. Analise suas partidas: os piores erros de cada uma entram aqui, com a agenda de revisão.</p>
         ) : (

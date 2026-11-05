@@ -29,10 +29,29 @@ interface PlayableBoardProps {
   squareStyles?: Record<string, CSSProperties>
   badge?: { square: string; cls: MoveClass } | null
   animateArrow?: boolean
+  /** Casa do lance certo: a onda amarela sai dela. */
+  celebrate?: string | null
+}
+
+const FILES = 'abcdefgh'
+
+/** O acerto: uma onda amarela sai da casa do lance. Decorativa, e some sozinha. */
+function Acerto({ square, orientation }: { square: string; orientation: 'white' | 'black' }) {
+  const file = FILES.indexOf(square[0])
+  const rank = 8 - Number(square[1])
+  const x = orientation === 'white' ? file : 7 - file
+  const y = orientation === 'white' ? rank : 7 - rank
+  const style = { left: `${x * 12.5}%`, top: `${y * 12.5}%` }
+  return (
+    <>
+      <span aria-hidden="true" className="acerto-casa" style={style} />
+      <span aria-hidden="true" className="acerto-onda" style={style} />
+    </>
+  )
 }
 
 /** Tabuleiro que aceita arrastar ou tocar na peça e no destino, com a escolha de promoção. */
-export function PlayableBoard({ fen, orientation, canMove, onMove, arrows, squareStyles, badge, animateArrow }: PlayableBoardProps) {
+export function PlayableBoard({ fen, orientation, canMove, onMove, arrows, squareStyles, badge, animateArrow, celebrate }: PlayableBoardProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const [promotion, setPromotion] = useState<{ from: string; to: string } | null>(null)
   const turn = fen.split(' ')[1] as 'w' | 'b'
@@ -64,11 +83,11 @@ export function PlayableBoard({ fen, orientation, canMove, onMove, arrows, squar
   const styles = useMemo(() => {
     const result: Record<string, CSSProperties> = { ...squareStyles }
     if (selected) {
-      result[selected] = { backgroundColor: 'color-mix(in srgb, #0e8a7d 45%, transparent)' }
+      result[selected] = { backgroundColor: 'var(--board-select)' }
       for (const candidate of legalMoves(fen, selected)) {
         result[candidate.to] = {
           ...result[candidate.to],
-          backgroundImage: candidate.captured ? 'radial-gradient(circle, transparent 58%, rgb(14 138 125 / 0.65) 60%)' : 'radial-gradient(circle, rgb(14 138 125 / 0.65) 22%, transparent 24%)',
+          backgroundImage: candidate.captured ? 'radial-gradient(circle, transparent 58%, var(--board-hint) 60%)' : 'radial-gradient(circle, var(--board-hint) 22%, transparent 24%)',
         }
       }
     }
@@ -77,7 +96,10 @@ export function PlayableBoard({ fen, orientation, canMove, onMove, arrows, squar
 
   return (
     <>
-      <Board fen={fen} orientation={orientation} arrows={arrows} squareStyles={styles} badge={badge} animateArrow={animateArrow} interactive={canMove} turn={turn} onPieceDrop={attempt} onSquareClick={canMove ? onSquareClick : undefined} />
+      <div className="relative">
+        <Board fen={fen} orientation={orientation} arrows={arrows} squareStyles={styles} badge={badge} animateArrow={animateArrow} interactive={canMove} turn={turn} onPieceDrop={attempt} onSquareClick={canMove ? onSquareClick : undefined} />
+        {celebrate && <Acerto key={celebrate} square={celebrate} orientation={orientation} />}
+      </div>
       {promotion && (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Promover o peão">
           <div className="w-full max-w-xs rounded-md bg-surface p-4">
@@ -119,7 +141,7 @@ export function BoardScreen({ title, status, onBack, board, children }: { title:
           </svg>
           Voltar
         </button>
-        <h1 className="font-book min-w-0 flex-1 truncate text-right text-base font-semibold lg:text-lg">{title}</h1>
+        <h1 className="font-display min-w-0 flex-1 truncate text-right text-base font-semibold lg:text-lg">{title}</h1>
         {status && <p className="tabular shrink-0 text-sm text-muted">{status}</p>}
       </header>
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:items-start lg:gap-6 lg:pb-6">

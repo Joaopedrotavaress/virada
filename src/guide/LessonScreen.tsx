@@ -13,7 +13,7 @@ import { LESSONS_KEY } from './repertoire'
 
 const FOUND_LOSS = 2
 const REPLY_DELAY_MS = 450
-const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
+const LAST_MOVE_TINT = 'var(--board-last)'
 
 type Status = 'playing' | 'checking' | 'wrong' | 'solved' | 'other-solution'
 
@@ -137,21 +137,21 @@ function PositionExercise({ lesson, position, index, onNext }: { lesson: Lesson;
   const orientation = position.fen.split(' ')[1] === 'w' ? 'white' : 'black'
   const hasNext = index + 1 < lesson.positions.length
   return (
-    <BoardScreen title={lesson.title} status={lesson.positions.length > 1 ? `${index + 1} de ${lesson.positions.length}` : undefined} onBack={goBack} board={<PlayableBoard fen={exercise.fen} orientation={orientation} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} />}>
+    <BoardScreen title={lesson.title} status={lesson.positions.length > 1 ? `${index + 1} de ${lesson.positions.length}` : undefined} onBack={goBack} board={<PlayableBoard fen={exercise.fen} orientation={orientation} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} celebrate={done && exercise.last ? exercise.last.to : null} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
-            <h2 className="font-book text-xl font-semibold text-(--text-best)">{exercise.status === 'other-solution' ? 'Também resolve!' : 'Isso!'}</h2>
-            <p className="font-book mt-1 max-w-prose text-base leading-relaxed">{position.after}</p>
-            <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-ink px-4 font-semibold text-bg">
+            <h2 className="font-display text-xl font-semibold text-(--text-best)">{exercise.status === 'other-solution' ? 'Também resolve!' : 'Isso!'}</h2>
+            <p className="mt-1 max-w-prose text-base leading-relaxed">{position.after}</p>
+            <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
               {hasNext ? 'Próximo exercício' : 'Terminar a lição'}
             </button>
           </>
         ) : exercise.status === 'wrong' ? (
           <>
-            <h2 className="font-book text-xl font-semibold text-(--text-mistake)">{exercise.tried} não resolve.</h2>
+            <h2 className="font-display text-xl font-semibold text-(--text-mistake)">{exercise.tried} não resolve.</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" autoFocus onClick={exercise.again} className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold whitespace-nowrap text-bg">
+              <button type="button" autoFocus onClick={exercise.again} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold whitespace-nowrap text-on-action">
                 Tentar de novo
               </button>
               <button type="button" onClick={exercise.reveal} className="min-h-11 flex-1 rounded-md border border-line px-4 font-semibold whitespace-nowrap hover:bg-sunken">
@@ -161,7 +161,7 @@ function PositionExercise({ lesson, position, index, onNext }: { lesson: Lesson;
           </>
         ) : (
           <>
-            <h2 className="font-book text-xl leading-snug font-semibold">{position.prompt}</h2>
+            <h2 className="font-display text-xl leading-snug font-semibold">{position.prompt}</h2>
             {exercise.status === 'checking' && <p className="mt-1 text-sm text-muted">O Stockfish está conferindo…</p>}
             {exercise.expectedStep && <p className="mt-1 text-sm text-muted">A seta mostra o lance.</p>}
             {!exercise.expectedStep && (
@@ -184,8 +184,8 @@ export function LessonScreen({ id }: { id: string }) {
   if (!lesson) {
     return (
       <main className="mx-auto max-w-md p-6">
-        <h1 className="font-book text-3xl font-semibold">Lição não encontrada</h1>
-        <button type="button" onClick={() => navigate('#/guia', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+        <h1 className="font-display text-3xl font-semibold">Lição não encontrada</h1>
+        <button type="button" onClick={() => navigate('#/guia', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
           Abrir o guia
         </button>
       </main>
@@ -210,16 +210,16 @@ export function LessonScreen({ id }: { id: string }) {
         </svg>
         Voltar
       </button>
-      <h1 className="font-book mt-1 text-3xl font-semibold">{lesson.title}</h1>
+      <h1 className="font-display mt-1 text-3xl font-semibold">{lesson.title}</h1>
       {finished && <p className="mt-2 rounded-md bg-surface p-3 font-semibold text-(--text-best)">Lição concluída.</p>}
       {lesson.paragraphs.map((paragraph) => (
-        <p key={paragraph} className="font-book mt-3 max-w-prose text-lg leading-relaxed">
+        <p key={paragraph} className="mt-3 max-w-prose text-lg leading-relaxed">
           {paragraph}
         </p>
       ))}
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         {lesson.positions.length > 0 && (
-          <button type="button" onClick={() => setStep(0)} className="min-h-12 rounded-md bg-ink px-5 font-semibold text-bg">
+          <button type="button" onClick={() => setStep(0)} className="min-h-12 rounded-md bg-action px-5 font-semibold text-on-action">
             {finished ? 'Fazer de novo' : lesson.positions.length === 1 ? 'Fazer o exercício' : `Fazer os ${lesson.positions.length} exercícios`}
           </button>
         )}
@@ -230,7 +230,7 @@ export function LessonScreen({ id }: { id: string }) {
               if (lesson.positions.length === 0 && !done.includes(lesson.id)) setDone([...done, lesson.id])
               navigate(`#/puzzles/${lesson.puzzleTheme}`)
             }}
-            className={`min-h-12 rounded-md px-5 font-semibold ${lesson.positions.length === 0 ? 'bg-ink text-bg' : 'border border-line hover:bg-sunken'}`}
+            className={`min-h-12 rounded-md px-5 font-semibold ${lesson.positions.length === 0 ? 'bg-action text-on-action' : 'border border-line hover:bg-sunken'}`}
           >
             Praticar com puzzles
           </button>

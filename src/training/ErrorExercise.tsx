@@ -90,10 +90,10 @@ export function ErrorExercise({ card, exercise, orientation }: { card: TrainingC
   }, [card.bestUci, phase])
   const styles = useMemo(() => {
     if (!tried) return undefined
-    const tint = phase === 'found' ? 'color-mix(in srgb, var(--fill-best) 48%, transparent)' : phase === 'wrong' ? 'color-mix(in srgb, var(--fill-mistake) 48%, transparent)' : 'color-mix(in srgb, #d4a900 42%, transparent)'
+    const tint = phase === 'found' ? 'color-mix(in srgb, var(--fill-best) 48%, transparent)' : phase === 'wrong' ? 'color-mix(in srgb, var(--fill-mistake) 48%, transparent)' : 'var(--board-last)'
     return { [tried.from]: { backgroundColor: tint }, [tried.to]: { backgroundColor: tint } }
   }, [phase, tried])
-  return <PlayableBoard fen={tried?.fen ?? fen} orientation={orientation} canMove={phase === 'playing'} onMove={exercise.play} arrows={arrows} squareStyles={styles} animateArrow={phase === 'found'} />
+  return <PlayableBoard fen={tried?.fen ?? fen} orientation={orientation} canMove={phase === 'playing'} onMove={exercise.play} arrows={arrows} squareStyles={styles} animateArrow={phase === 'found'} celebrate={phase === 'found' ? (tried?.to ?? null) : null} />
 }
 
 /** O texto ao lado do tabuleiro. */
@@ -109,15 +109,15 @@ export function ErrorPanel({ card, exercise, nextLabel, onNext }: { card: Traini
       <p className="text-sm text-muted">{card.label}</p>
       {phase === 'playing' || phase === 'evaluating' ? (
         <>
-          <h2 className="font-book mt-1 text-xl leading-snug font-semibold">Você jogou {sanToPt(card.playedSan ?? '')}. Qual era o melhor lance?</h2>
+          <h2 className="font-display mt-1 text-xl leading-snug font-semibold">Na partida, foi {sanToPt(card.playedSan ?? '')}. E agora, qual é o lance?</h2>
           <p className="mt-1 text-sm text-muted">{phase === 'evaluating' ? 'O Stockfish está conferindo…' : `Jogue com as ${side}.`}</p>
         </>
       ) : phase === 'wrong' ? (
-        <h2 className="font-book mt-1 text-xl leading-snug font-semibold text-(--text-mistake)">{tried ? `${sanToPt(tried.san)} não resolve.` : 'Não é esse.'} Tente outro.</h2>
+        <h2 className="font-display mt-1 text-xl leading-snug font-semibold text-(--text-mistake)">{tried ? `${sanToPt(tried.san)} não resolve.` : 'Não é esse.'} Olha de novo.</h2>
       ) : phase === 'found' ? (
-        <h2 className="font-book mt-1 text-xl leading-snug font-semibold text-(--text-best)">Achou! {tried ? sanToPt(tried.san) : best} resolve.</h2>
+        <h2 className="font-display mt-1 text-xl leading-snug font-semibold text-(--text-best)">Achou! {tried ? sanToPt(tried.san) : best} era o caminho.</h2>
       ) : (
-        <h2 className="font-book mt-1 text-xl leading-snug font-semibold">O melhor lance era {best}.</h2>
+        <h2 className="font-display mt-1 text-xl leading-snug font-semibold">O melhor lance era {best}.</h2>
       )}
       {error && (
         <p role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
@@ -128,12 +128,12 @@ export function ErrorPanel({ card, exercise, nextLabel, onNext }: { card: Traini
         <div className="mt-2 text-sm text-muted">
           {line && <p>Linha: {line}</p>}
           {card.theme && <p>Tema: {THEME_LABEL[card.theme].one}.</p>}
-          <p className="mt-1">{phase === 'answer' ? 'Este exercício volta logo.' : 'Quanto mais você acerta, mais tempo ele demora para voltar.'}</p>
+          <p className="mt-1">{phase === 'answer' ? 'Esse volta logo, para fixar.' : 'Quanto mais você acerta, mais tempo ele demora para voltar.'}</p>
         </div>
       )}
       <div className="mt-3 flex flex-wrap gap-2">
         {phase === 'wrong' && (
-          <button type="button" onClick={exercise.again} autoFocus className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold text-bg">
+          <button type="button" onClick={exercise.again} autoFocus className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold text-on-action">
             Tentar de novo
           </button>
         )}
@@ -143,7 +143,7 @@ export function ErrorPanel({ card, exercise, nextLabel, onNext }: { card: Traini
           </button>
         )}
         {settled && (
-          <button type="button" autoFocus onClick={onNext} className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold text-bg">
+          <button type="button" autoFocus onClick={onNext} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold text-on-action">
             {nextLabel}
           </button>
         )}

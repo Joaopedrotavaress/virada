@@ -8,7 +8,7 @@ import { goBack, navigate } from '../route'
 import { DAILY_KEY, type DailyState, EMPTY_DAILY, afterExercise, dayOf } from '../training/daily'
 import { EMPTY_PUZZLE_STATS, LEVELS, PUZZLE_KEY, type Puzzle, type PuzzleStats, THEMES, afterSolved, loadPuzzles, pickPuzzles, puzzleOfDay, suggestedLevel, themeLabel } from './puzzles'
 
-const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
+const LAST_MOVE_TINT = 'var(--board-last)'
 
 /** Um puzzle no tabuleiro. Também aparece dentro da sessão de treino. */
 export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext, onBack = goBack }: { puzzle: Puzzle; title: string; status?: string; nextLabel: string; onSolved: (clean: boolean) => void; onNext: () => void; onBack?: () => void }) {
@@ -23,23 +23,23 @@ export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext
     if (exercise.status === 'wrong' || exercise.expectedStep) setHadTrouble(true)
   }, [exercise.expectedStep, exercise.status])
   return (
-    <BoardScreen title={title} status={status} onBack={onBack} board={<PlayableBoard fen={exercise.fen} orientation={puzzle.fen.split(' ')[1] === 'w' ? 'white' : 'black'} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} />}>
+    <BoardScreen title={title} status={status} onBack={onBack} board={<PlayableBoard fen={exercise.fen} orientation={puzzle.fen.split(' ')[1] === 'w' ? 'white' : 'black'} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} celebrate={done ? last.to : null} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
-            <h2 className="font-book text-xl font-semibold text-(--text-best)">{hadTrouble ? 'Resolvido.' : 'Resolvido de primeira!'}</h2>
+            <h2 className="font-display text-xl font-semibold text-(--text-best)">{hadTrouble ? 'Resolvido.' : 'Resolvido de primeira!'}</h2>
             <p className="mt-1 text-sm text-muted">
               Temas: {puzzle.themes.map(themeLabel).join(', ')}. Dificuldade {puzzle.rating}.
             </p>
-            <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-ink px-4 font-semibold text-bg">
+            <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
               {nextLabel}
             </button>
           </>
         ) : exercise.status === 'wrong' ? (
           <>
-            <h2 className="font-book text-xl font-semibold text-(--text-mistake)">{exercise.tried} não resolve.</h2>
+            <h2 className="font-display text-xl font-semibold text-(--text-mistake)">{exercise.tried} não resolve.</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" autoFocus onClick={exercise.again} className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold whitespace-nowrap text-bg">
+              <button type="button" autoFocus onClick={exercise.again} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold whitespace-nowrap text-on-action">
                 Tentar de novo
               </button>
               <button type="button" onClick={exercise.reveal} className="min-h-11 flex-1 rounded-md border border-line px-4 font-semibold whitespace-nowrap hover:bg-sunken">
@@ -49,7 +49,7 @@ export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext
           </>
         ) : (
           <>
-            <h2 className="font-book text-xl font-semibold">Jogue de {side}. Qual é o melhor lance?</h2>
+            <h2 className="font-display text-xl font-semibold">Jogue de {side}. Qual é o melhor lance?</h2>
             {exercise.status === 'checking' && <p className="mt-1 text-sm text-muted">O Stockfish está conferindo…</p>}
             {exercise.expectedStep ? (
               <p className="mt-1 text-sm text-muted">A seta mostra o lance.</p>
@@ -136,14 +136,14 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-4 pb-10 lg:pt-8">
-      <h1 className="font-book text-3xl font-semibold">Puzzles</h1>
+      <h1 className="font-display text-3xl font-semibold">Puzzles</h1>
       <p className="mt-1 text-sm text-muted">{stats.solved.length > 0 ? `${stats.solved.length} resolvidos neste aparelho.` : 'Posições tiradas de partidas reais. Funciona sem internet.'}</p>
 
       <fieldset className="mt-4">
         <legend className="mb-1.5 text-sm font-semibold">Dificuldade</legend>
         <div className="grid grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
           {LEVELS.map((level) => (
-            <label key={level.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${levelId === level.id ? 'bg-ink text-bg' : 'bg-surface'}`}>
+            <label key={level.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${levelId === level.id ? 'bg-action text-on-action' : 'bg-surface'}`}>
               <input type="radio" name="dificuldade" checked={levelId === level.id} onChange={() => setLevelId(level.id)} className="sr-only" />
               {level.label}
             </label>
@@ -159,9 +159,9 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
 
       {ofDay && (
         <section className="mt-4 rounded-md bg-surface p-4">
-          <h2 className="font-book text-xl font-semibold">Puzzle do dia</h2>
+          <h2 className="font-display text-xl font-semibold">Puzzle do dia</h2>
           <p className="mt-1 text-sm text-muted">{stats.dailyDone === today ? 'Você já resolveu o de hoje. Amanhã tem outro.' : 'Um por dia, escolhido pela data.'}</p>
-          <button type="button" onClick={() => setRun({ items: [ofDay], index: 0, title: 'Puzzle do dia', isDaily: true })} className="mt-3 min-h-12 w-full rounded-md bg-ink px-5 font-semibold text-bg sm:w-auto">
+          <button type="button" onClick={() => setRun({ items: [ofDay], index: 0, title: 'Puzzle do dia', isDaily: true })} className="mt-3 min-h-12 w-full rounded-md bg-action px-5 font-semibold text-on-action sm:w-auto">
             {stats.dailyDone === today ? 'Ver de novo' : 'Resolver'}
           </button>
         </section>
@@ -170,7 +170,7 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
       {puzzles && (
         <section className="mt-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-book text-xl font-semibold">Por tema</h2>
+            <h2 className="font-display text-xl font-semibold">Por tema</h2>
             <button type="button" onClick={() => start?.()} className="min-h-11 rounded-md border border-line px-4 font-semibold hover:bg-sunken">
               Misturar temas
             </button>
