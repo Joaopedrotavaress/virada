@@ -29,33 +29,37 @@
   --zone-10: #f4f4f6;
 
   /* Tabuleiro */
-  --board-dark: var(--zone-4);
+  --board-dark: var(--zone-5);
   --board-light: var(--zone-8);
   --board-notation-on-dark: var(--zone-9);
   --board-notation-on-light: var(--zone-3);
-  --board-last: color-mix(in srgb, #ffd100 42%, transparent);
-  --board-select: color-mix(in srgb, #ffd100 62%, transparent);
-  --board-hint: rgb(255 209 0 / 0.8);
-  --board-from: color-mix(in srgb, #ffd100 70%, transparent);
+  /* O amarelo no tabuleiro é só do ponto de virada. O resto é mudança de tom. */
+  --board-last: rgb(255 255 255 / 0.32);
+  --board-select: rgb(255 255 255 / 0.5);
+  --board-hint: rgb(11 11 13 / 0.55);
+  --board-from: rgb(255 255 255 / 0.32);
   --board-mated: #c81e3a;
 
   /* Fundo dos sinais e pontos do gráfico (validados para daltonismo). */
-  --fill-book: #6b7a87;
-  --fill-best: #0e8a7d;
-  --fill-excellent: #2f9e44;
-  --fill-good: #7a9a1e;
+  /* Lance bom é neutro. Cor só onde há erro; o símbolo garante a leitura sem cor. */
+  --fill-book: #868690;
+  --fill-best: #f4f4f6;
+  --fill-excellent: #3a3a41;
+  --fill-good: #6a6a73;
   --fill-inaccuracy: #c28a00;
   --fill-mistake: #cf5a08;
   --fill-blunder: #a30f2e;
   --fill-miss: #8446dc;
   --on-fill: #ffffff;
   --on-fill-inaccuracy: #0b0b0d;
+  --on-fill-best: #0b0b0d;
 
   /* Mesmas categorias como texto: contraste AA sobre a superfície. */
-  --text-book: #4f5c68;
-  --text-best: #0a6f64;
-  --text-excellent: #1f7a33;
-  --text-good: #566f10;
+  --text-book: var(--muted);
+  --text-best: var(--ink);
+  --text-excellent: var(--ink);
+  --text-good: var(--ink);
+  --positive: #1f7a33;
   --text-inaccuracy: #7a5a00;
   --text-mistake: #ab4805;
   --text-blunder: #a30f2e;
@@ -83,10 +87,7 @@
     --muted: #a9a9b1;
     --line: #34343b;
 
-    --text-book: #a6b3bf;
-    --text-best: #4fd0bf;
-    --text-excellent: #68d278;
-    --text-good: #b5d352;
+    --positive: #68d278;
     --text-inaccuracy: #e6ae3a;
     --text-mistake: #f5944c;
     --text-blunder: #f97f8c;

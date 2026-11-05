@@ -50,6 +50,9 @@ export function Board({ fen, orientation, arrows = [], squareStyles = {}, badge,
           lightSquareStyle: { backgroundColor: 'var(--board-light)' },
           darkSquareNotationStyle: { color: 'var(--board-notation-on-dark)' },
           lightSquareNotationStyle: { color: 'var(--board-notation-on-light)' },
+          // As letras e os números ficam por cima das peças da borda.
+          alphaNotationStyle: { position: 'absolute', right: '3%', bottom: '2%', zIndex: 5, fontSize: '11px', fontWeight: 700, lineHeight: 1, pointerEvents: 'none' },
+          numericNotationStyle: { position: 'absolute', left: '3%', top: '2%', zIndex: 5, fontSize: '11px', fontWeight: 700, lineHeight: 1, pointerEvents: 'none' },
           onPieceDrop: ({ sourceSquare, targetSquare }) => (targetSquare && onPieceDrop ? onPieceDrop(sourceSquare, targetSquare) : false),
           onSquareClick: ({ square }) => onSquareClick?.(square),
           squareRenderer: ({ square, children }) => (
