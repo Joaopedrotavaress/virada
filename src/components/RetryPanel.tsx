@@ -16,7 +16,7 @@ interface RetryPanelProps {
   isUser?: boolean
 }
 
-const primary = 'min-h-11 rounded-md bg-ink px-4 font-semibold text-bg'
+const primary = 'min-h-11 rounded-md bg-action px-4 font-semibold text-on-action'
 const secondary = 'min-h-11 rounded-md border border-line px-4 font-semibold hover:bg-sunken'
 
 export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isUser }: RetryPanelProps) {
@@ -47,7 +47,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
       {retry.phase === 'playing' && (
         <>
           <h2 className="text-lg font-bold">Sua vez de novo</h2>
-          <p className="font-book mt-1 max-w-prose text-base leading-relaxed">Na partida saiu {moveLabel(move)}. Procure um lance melhor e jogue no tabuleiro.</p>
+          <p className="mt-1 max-w-prose text-base leading-relaxed">Na partida saiu {moveLabel(move)}. Procure um lance melhor e jogue no tabuleiro.</p>
           {retry.error && (
             <p role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
               {retry.error}
@@ -65,8 +65,8 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
 
       {retry.phase === 'found' && (
         <>
-          <p className="font-book text-5xl leading-none font-bold text-(--text-best)">Achou!</p>
-          <p className="font-book mt-3 max-w-prose text-base leading-relaxed">
+          <p className="font-display text-5xl leading-none font-bold text-(--text-best)">Achou!</p>
+          <p className="mt-3 max-w-prose text-base leading-relaxed">
             {retry.cls === 'best' ? `${tried} é o melhor lance da posição.` : `${tried} é quase tão bom quanto o melhor, ${best}.`}
             {retry.after ? ` A avaliação fica em ${formatEval(retry.after.eval)}.` : ''}
           </p>
@@ -78,7 +78,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
           <h2 className="text-lg font-bold" style={{ color: `var(--text-${retry.cls})` }}>
             Esse lance seria: {CLASS_INFO[retry.cls].label} ({formatEval(retry.after.eval)})
           </h2>
-          <p className="font-book mt-1 max-w-prose text-base leading-relaxed">{explanation ?? `${tried} ainda não é o que a posição pede.`}</p>
+          <p className="mt-1 max-w-prose text-base leading-relaxed">{explanation ?? `${tried} ainda não é o que a posição pede.`}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={onAgain} className={primary}>
               Tentar mais uma vez
@@ -94,7 +94,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
         <>
           <h2 className="text-lg font-bold">A resposta era {best}</h2>
           <p className="tabular text-sm text-muted">Avaliação {formatEval(before.eval)}</p>
-          {line.length > 1 && <p className="font-book mt-2 text-base leading-relaxed">{formatLinePt(before.fen, line)}</p>}
+          {line.length > 1 && <p className="mt-2 text-base leading-relaxed">{formatLinePt(before.fen, line)}</p>}
         </>
       )}
 

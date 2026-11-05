@@ -19,7 +19,7 @@ export function Analyzing({ game, done, total, orientation, onCancel }: Analyzin
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-5 px-4 py-6">
       <div>
-        <h1 className="font-book truncate text-xl font-semibold">
+        <h1 className="font-display truncate text-xl font-semibold">
           {game.white} contra {game.black}
         </h1>
       </div>
@@ -38,7 +38,7 @@ export function Analyzing({ game, done, total, orientation, onCancel }: Analyzin
           aria-label="Progresso da análise"
           className="h-2 overflow-hidden rounded-full bg-sunken"
         >
-          <div className="h-full rounded-full bg-ink transition-[width] duration-150" style={{ width: `${percent}%` }} />
+          <div className="h-full rounded-full bg-action transition-[width] duration-150" style={{ width: `${percent}%` }} />
         </div>
       </div>
       <button type="button" onClick={onCancel} className="min-h-12 rounded-md border border-line font-semibold hover:bg-sunken">

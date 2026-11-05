@@ -22,7 +22,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   return (
     <div className="rounded-md bg-surface p-3">
       <dt className="text-sm text-muted">{label}</dt>
-      <dd className="font-book tabular text-3xl font-semibold">{value}</dd>
+      <dd className="font-display tabular text-3xl font-semibold">{value}</dd>
       {hint && <dd className="text-xs text-muted">{hint}</dd>}
     </div>
   )
@@ -40,7 +40,7 @@ function ChartTip({ title, value }: { title: string; value: string }) {
 function ChartBlock({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
     <section className="rounded-md bg-surface p-3">
-      <h2 className="font-book text-lg font-semibold">{title}</h2>
+      <h2 className="font-display text-lg font-semibold">{title}</h2>
       {note && <p className="text-sm text-muted">{note}</p>}
       <div className="mt-2 h-52">{children}</div>
     </section>
@@ -101,14 +101,14 @@ export function Progress({ username }: { username: string }) {
     <div className="mt-3 flex flex-col gap-1.5">
       <div role="group" aria-label="Período" className="flex flex-wrap gap-1.5">
         {RANGES.map((range) => (
-          <button key={range.id} type="button" aria-pressed={rangeId === range.id} onClick={() => setRangeId(range.id)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${rangeId === range.id ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
+          <button key={range.id} type="button" aria-pressed={rangeId === range.id} onClick={() => setRangeId(range.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${rangeId === range.id ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
             {range.label}
           </button>
         ))}
       </div>
       <div role="group" aria-label="Ritmo" className="flex flex-wrap gap-1.5">
         {[{ id: 'all', label: 'Todos os ritmos' }, ...TIME_CLASSES].map((item) => (
-          <button key={item.id} type="button" aria-pressed={timeClass === item.id} onClick={() => setTimeClass(item.id)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${timeClass === item.id ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
+          <button key={item.id} type="button" aria-pressed={timeClass === item.id} onClick={() => setTimeClass(item.id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${timeClass === item.id ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
             {item.label}
           </button>
         ))}
@@ -118,12 +118,12 @@ export function Progress({ username }: { username: string }) {
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-10 lg:pt-8">
-      <h1 className="font-book text-3xl font-semibold">Progresso</h1>
+      <h1 className="font-display text-3xl font-semibold">Progresso</h1>
 
       {owned.length === 0 ? (
         <div className="mt-3 rounded-md bg-surface p-4">
           <p className="max-w-prose text-muted">Sua evolução aparece aqui quando houver partidas guardadas. Busque as do chess.com ou jogue contra um bot.</p>
-          <button type="button" onClick={() => navigate('#/partidas')} className="mt-3 min-h-11 rounded-md bg-ink px-5 font-semibold text-bg">
+          <button type="button" onClick={() => navigate('#/partidas')} className="mt-3 min-h-11 rounded-md bg-action px-5 font-semibold text-on-action">
             Ver partidas
           </button>
         </div>
@@ -143,11 +143,11 @@ export function Progress({ username }: { username: string }) {
 
               {(patterns.length > 0 || colors) && (
                 <section className="mt-4 rounded-md bg-surface p-4">
-                  <h2 className="font-book text-xl font-semibold">O que se repete</h2>
+                  <h2 className="font-display text-xl font-semibold">O que se repete</h2>
                   <ul className="mt-2 flex flex-col gap-2">
                     {patterns.map((pattern) => (
                       <li key={pattern.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                        <span className="font-book max-w-prose text-base leading-relaxed">{pattern.text}</span>
+                        <span className="max-w-prose text-base leading-relaxed">{pattern.text}</span>
                         {pattern.theme && (
                           <button type="button" onClick={() => navigate(`#/treino/sessao/${pattern.theme}`)} className="min-h-11 shrink-0 rounded-md border border-line px-4 font-semibold hover:bg-sunken">
                             Treinar
@@ -155,7 +155,7 @@ export function Progress({ username }: { username: string }) {
                         )}
                       </li>
                     ))}
-                    {colors && <li className="font-book max-w-prose text-base leading-relaxed">{colors}</li>}
+                    {colors && <li className="max-w-prose text-base leading-relaxed">{colors}</li>}
                   </ul>
                 </section>
               )}

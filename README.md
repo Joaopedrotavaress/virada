@@ -1,4 +1,6 @@
-# Treinador de Xadrez
+# Virada
+
+Toda partida tem um ponto de virada. Ache o seu.
 
 Analisa suas partidas do chess.com e joga contra bots com treinador, com o Stockfish rodando 100% no aparelho. Grátis, sem servidor e sem API paga. Funciona no celular e no computador, instala como app e roda sem internet.
 

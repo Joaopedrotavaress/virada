@@ -21,9 +21,9 @@ export function ClassBadge({ cls, className }: { cls: MoveClass; className?: str
   const { symbol, label } = CLASS_INFO[cls]
   return (
     <svg viewBox="0 0 100 100" role="img" aria-label={label} className={className}>
-      <circle cx="50" cy="50" r="46" fill={`var(--fill-${cls})`} stroke="#fff" strokeWidth="7" />
+      <circle cx="50" cy="50" r="46" fill={`var(--fill-${cls})`} stroke="var(--on-fill)" strokeWidth="7" />
       {cls === 'book' ? (
-        <g transform="translate(20 20) scale(2.5)" fill="#fff">
+        <g transform="translate(20 20) scale(2.5)" fill="var(--on-fill)">
           <path d={BOOK_PATH} />
         </g>
       ) : (
@@ -35,7 +35,7 @@ export function ClassBadge({ cls, className }: { cls: MoveClass; className?: str
           fontFamily="var(--font-sans)"
           fontWeight="800"
           fontSize={symbol.length > 1 ? 50 : 60}
-          fill={cls === 'inaccuracy' ? '#16202b' : '#fff'}
+          fill={cls === 'inaccuracy' ? 'var(--on-fill-inaccuracy)' : 'var(--on-fill)'}
         >
           {symbol}
         </text>

@@ -1,6 +1,6 @@
 # Créditos e licenças
 
-O Treinador de Xadrez é distribuído sob a licença GPL-3.0 (arquivo `LICENSE`).
+O Virada é distribuído sob a licença GPL-3.0 (arquivo `LICENSE`).
 
 ## Código de terceiros
 

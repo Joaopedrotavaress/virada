@@ -84,7 +84,7 @@ export function DataScreen({ username }: { username: string }) {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 pt-4 pb-10 lg:pt-8">
-      <h1 className="font-book text-3xl font-semibold">Seus dados</h1>
+      <h1 className="font-display text-3xl font-semibold">Seus dados</h1>
       <p className="mt-2 max-w-prose text-muted">Partidas, análises e treino ficam neste aparelho, sem conta e sem servidor. Um backup leva tudo para outro aparelho.</p>
 
       <dl className="mt-4 divide-y divide-line rounded-md bg-surface px-4">
@@ -124,9 +124,9 @@ export function DataScreen({ username }: { username: string }) {
       </dl>
 
       <section className="mt-6">
-        <h2 className="font-book text-xl font-semibold">Backup</h2>
+        <h2 className="font-display text-xl font-semibold">Backup</h2>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <button type="button" disabled={busy} onClick={() => void saveBackup(true)} className="min-h-12 rounded-md bg-ink px-5 font-semibold text-bg disabled:opacity-60">
+          <button type="button" disabled={busy} onClick={() => void saveBackup(true)} className="min-h-12 rounded-md bg-action px-5 font-semibold text-on-action disabled:opacity-60">
             Salvar backup completo
           </button>
           <button type="button" disabled={busy} onClick={() => void saveBackup(false)} className="min-h-12 rounded-md border border-line px-5 font-semibold hover:bg-sunken disabled:opacity-60">
@@ -157,13 +157,13 @@ export function DataScreen({ username }: { username: string }) {
       </section>
 
       <section className="mt-8">
-        <h2 className="font-book text-xl font-semibold">Sincronizar entre aparelhos</h2>
+        <h2 className="font-display text-xl font-semibold">Sincronizar entre aparelhos</h2>
         <p className="mt-1 max-w-prose text-sm text-muted">
           Opcional. Usa um gist secreto na sua conta do GitHub, sem nenhum servidor nosso. Partidas, notas e treino vão junto; as análises são refeitas no outro aparelho. Um gist secreto não aparece em buscas, mas quem tiver o link consegue ler.
         </p>
         {hasToken ? (
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <button type="button" disabled={gistBusy} onClick={() => void runGist()} className="min-h-12 rounded-md bg-ink px-5 font-semibold text-bg disabled:opacity-60">
+            <button type="button" disabled={gistBusy} onClick={() => void runGist()} className="min-h-12 rounded-md bg-action px-5 font-semibold text-on-action disabled:opacity-60">
               {gistBusy ? 'Sincronizando…' : 'Sincronizar agora'}
             </button>
             <button
@@ -197,7 +197,7 @@ export function DataScreen({ username }: { username: string }) {
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input id="token-gist" type="password" autoComplete="off" spellCheck={false} value={draftToken} onChange={(event) => setDraftToken(event.target.value)} className="min-h-12 min-w-0 flex-1 rounded-md border border-line bg-surface px-3 text-base" />
-              <button type="submit" disabled={!draftToken.trim()} className="min-h-12 shrink-0 rounded-md bg-ink px-5 font-semibold text-bg disabled:opacity-60">
+              <button type="submit" disabled={!draftToken.trim()} className="min-h-12 shrink-0 rounded-md bg-action px-5 font-semibold text-on-action disabled:opacity-60">
                 Ligar
               </button>
             </div>
@@ -219,7 +219,7 @@ export function DataScreen({ username }: { username: string }) {
 
       {backend.info && (
         <section className="mt-8">
-          <h2 className="font-book text-xl font-semibold">Computador local</h2>
+          <h2 className="font-display text-xl font-semibold">Computador local</h2>
           <p className="mt-1 max-w-prose text-muted">
             Conectado ao banco deste computador. Cada alteração também fica guardada lá{backend.info.engine ? ', e a análise em lote usa o motor completo.' : '.'}
           </p>

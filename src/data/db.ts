@@ -35,7 +35,7 @@ export function openDb(): Promise<IDBDatabase> {
     }
     request.onblocked = () => {
       connection = null
-      reject(new Error('Feche as outras abas do Treinador de Xadrez e tente de novo.'))
+      reject(new Error('Feche as outras abas do Virada e tente de novo.'))
     }
   })
   return connection

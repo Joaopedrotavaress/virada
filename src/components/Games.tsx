@@ -70,7 +70,7 @@ export function viewRecord(record: GameRecord) {
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${active ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
+    <button type="button" aria-pressed={active} onClick={onClick} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${active ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
       {children}
     </button>
   )
@@ -109,7 +109,7 @@ function GameDetails({ record, onClose }: { record: GameRecord; onClose: () => v
                 type="button"
                 aria-label={`Tirar o marcador ${item}`}
                 onClick={() => void updateRecord(record.key, { tags: record.tags.filter((other) => other !== item) })}
-                className="flex min-h-9 items-center gap-1 rounded-full bg-surface px-3 text-sm font-semibold hover:bg-bg"
+                className="flex min-h-9 items-center gap-1 rounded-sm bg-surface px-3 text-sm font-semibold hover:bg-bg"
               >
                 {item} <span aria-hidden="true">×</span>
               </button>
@@ -136,7 +136,7 @@ function GameDetails({ record, onClose }: { record: GameRecord; onClose: () => v
           </a>
         )}
         {confirming ? (
-          <button type="button" onClick={() => void removeRecord(record.key)} className="min-h-11 rounded-md bg-ink px-4 font-semibold text-bg">
+          <button type="button" onClick={() => void removeRecord(record.key)} className="min-h-11 rounded-md bg-action px-4 font-semibold text-on-action">
             Confirmar: apagar partida
           </button>
         ) : (
@@ -253,7 +253,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-4 pb-10 lg:pt-8">
-      <h1 className="font-book text-3xl font-semibold">Partidas</h1>
+      <h1 className="font-display text-3xl font-semibold">Partidas</h1>
 
       {!user ? (
         <form
@@ -268,7 +268,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input id="usuario-partidas" value={draftUser} onChange={(event) => setDraftUser(event.target.value)} autoCapitalize="off" autoCorrect="off" spellCheck={false} className="min-h-12 min-w-0 flex-1 rounded-md border border-line bg-bg px-3 text-base" />
-            <button type="submit" disabled={!draftUser.trim()} className="min-h-12 shrink-0 rounded-md bg-ink px-6 font-semibold text-bg disabled:opacity-50">
+            <button type="submit" disabled={!draftUser.trim()} className="min-h-12 shrink-0 rounded-md bg-action px-6 font-semibold text-on-action disabled:opacity-50">
               Buscar partidas
             </button>
           </div>
@@ -307,7 +307,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
           <p className="text-sm text-muted">Pode sair desta tela. Se fechar o app, a fila continua ao abrir de novo.</p>
           <div className="mt-2 flex gap-2">
             {queue.error && (
-              <button type="button" onClick={() => void analysisQueue.resume()} className="min-h-11 rounded-md bg-ink px-4 font-semibold text-bg">
+              <button type="button" onClick={() => void analysisQueue.resume()} className="min-h-11 rounded-md bg-action px-4 font-semibold text-on-action">
                 Tentar de novo
               </button>
             )}
@@ -397,7 +397,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
               {user && archives.length > 0 && monthsLoaded > 0 ? `, do chess.com desde ${monthLabel(archives[Math.min(monthsLoaded, archives.length) - 1])}` : ''}
             </p>
             {toAnalyze.length > 0 && (
-              <button type="button" onClick={() => void analysisQueue.add(toAnalyze.map((record) => record.key))} className="min-h-11 rounded-md bg-ink px-4 font-semibold text-bg">
+              <button type="button" onClick={() => void analysisQueue.add(toAnalyze.map((record) => record.key))} className="min-h-11 rounded-md bg-action px-4 font-semibold text-on-action">
                 Analisar {toAnalyze.length === 1 ? 'a última' : `as últimas ${toAnalyze.length}`}
               </button>
             )}
@@ -428,7 +428,7 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
                       <span className="tabular block truncate text-sm text-muted">
                         {[view.myRating || view.opponentRating ? `${view.myRating ?? '?'} x ${view.opponentRating ?? '?'}` : '', klass ? timeClassLabel(klass) : '', formatDay(record.playedAt)].filter(Boolean).join(', ')}
                       </span>
-                      {record.opening && <span className="font-book block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
+                      {record.opening && <span className="block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
                       {(record.tags.length > 0 || record.note) && <span className="block truncate text-sm text-muted">{[...record.tags, record.note].filter(Boolean).join(', ')}</span>}
                     </span>
                     <span className="shrink-0 text-right">

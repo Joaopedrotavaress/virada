@@ -45,7 +45,7 @@ export function parseBackup(text: string): BackupData {
   } catch {
     throw new BackupError('Este arquivo não é um backup válido: não consegui ler o conteúdo.')
   }
-  if (data?.app !== BACKUP_APP) throw new BackupError('Este arquivo não é um backup do Treinador de Xadrez.')
+  if (data?.app !== BACKUP_APP) throw new BackupError('Este arquivo não é um backup do Virada.')
   if (typeof data.version !== 'number' || data.version > 1) throw new BackupError('Este backup foi feito por uma versão mais nova do app. Atualize o app e tente de novo.')
   const games = Array.isArray(data.games) ? data.games.filter((game) => game?.key && typeof game.pgn === 'string') : []
   const analyses = Array.isArray(data.analyses) ? data.analyses.filter((item) => item?.key && Array.isArray(item.analysis?.moves) && Array.isArray(item.analysis?.positions)) : []

@@ -3,7 +3,9 @@ import { type Arrow, Chessboard } from 'react-chessboard'
 import type { MoveClass } from '../chess/classify'
 import { ClassBadge } from './ClassBadge'
 
+// A biblioteca do tabuleiro usa a cor no identificador da seta: aqui precisa ser um valor literal.
 export const BEST_ARROW_COLOR = '#0e8a7d'
+export const THREAT_ARROW_COLOR = '#d12d2d'
 
 interface BoardProps {
   fen: string
@@ -44,10 +46,10 @@ export function Board({ fen, orientation, arrows = [], squareStyles = {}, badge,
           canDragPiece: ({ piece }) => !turn || piece.pieceType[0] === turn,
           allowDrawingArrows: false,
           animationDurationInMs: reducedMotion() ? 0 : animationMs,
-          darkSquareStyle: { backgroundColor: '#6f8da1' },
-          lightSquareStyle: { backgroundColor: '#dfe6eb' },
-          darkSquareNotationStyle: { color: '#dfe6eb' },
-          lightSquareNotationStyle: { color: '#55707f' },
+          darkSquareStyle: { backgroundColor: 'var(--board-dark)' },
+          lightSquareStyle: { backgroundColor: 'var(--board-light)' },
+          darkSquareNotationStyle: { color: 'var(--board-notation-on-dark)' },
+          lightSquareNotationStyle: { color: 'var(--board-notation-on-light)' },
           onPieceDrop: ({ sourceSquare, targetSquare }) => (targetSquare && onPieceDrop ? onPieceDrop(sourceSquare, targetSquare) : false),
           onSquareClick: ({ square }) => onSquareClick?.(square),
           squareRenderer: ({ square, children }) => (

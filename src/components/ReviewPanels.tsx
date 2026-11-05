@@ -6,7 +6,7 @@ import type { ReviewStatus } from './useGuidedReview'
 
 function InsightList({ insights }: { insights: string[] }) {
   return (
-    <ul className="font-book grid max-w-prose gap-2 text-base leading-relaxed">
+    <ul className="grid max-w-prose gap-2 text-base leading-relaxed">
       {insights.map((insight) => (
         <li key={insight}>{insight}</li>
       ))}
@@ -22,11 +22,11 @@ function MomentLinks({ moments, moves, onJump }: { moments: KeyMoment[]; moves: 
         return (
           <li key={moment.ply}>
             <button type="button" onClick={() => onJump(moment.ply)} className="flex min-h-11 w-full items-center gap-3 rounded-sm px-1 text-left hover:bg-sunken">
-              <span aria-hidden="true" className="font-book flex w-7 shrink-0 justify-center text-lg font-bold" style={{ color: `var(--text-${move.cls})` }}>
+              <span aria-hidden="true" className="font-display flex w-7 shrink-0 justify-center text-lg font-bold" style={{ color: `var(--text-${move.cls})` }}>
                 <ClassSymbol cls={move.cls} iconClassName="size-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="font-book block truncate">{moveLabel(move)}</span>
+                <span className="block truncate">{moveLabel(move)}</span>
                 <span className="block truncate text-sm text-muted">{moment.title}</span>
               </span>
             </button>
@@ -47,8 +47,8 @@ interface IntroProps {
 export function ReviewIntro({ insights, moments, onStart }: IntroProps) {
   return (
     <section aria-label="Resumo da revisão" className="rounded-md bg-surface p-4 sm:p-5">
-      <h2 className="font-book text-2xl leading-tight font-semibold">Como foi a partida</h2>
-      <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-ink px-4 font-semibold text-bg">
+      <h2 className="font-display text-2xl leading-tight font-semibold">Como foi a partida</h2>
+      <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">
         Começar revisão
       </button>
       <p className="mt-2 text-sm text-muted">
@@ -79,7 +79,7 @@ interface EndProps {
 export function ReviewEnd({ insights, moments, moves, result, onJump, onRestart, onExit }: EndProps) {
   return (
     <section aria-label="Conclusão da revisão" aria-live="polite" className="rounded-md bg-surface p-4 sm:p-5">
-      <h2 className="font-book text-2xl leading-tight font-semibold">Fim da revisão{result !== '*' ? `: ${result}` : ''}</h2>
+      <h2 className="font-display text-2xl leading-tight font-semibold">Fim da revisão{result !== '*' ? `: ${result}` : ''}</h2>
       {insights.length > 0 && (
         <div className="mt-3">
           <h3 className="mb-1.5 text-sm font-semibold text-muted">Principais pontos</h3>
@@ -93,7 +93,7 @@ export function ReviewEnd({ insights, moments, moves, result, onJump, onRestart,
         </div>
       )}
       <div className="mt-3 flex flex-wrap gap-2">
-        <button type="button" onClick={onRestart} className="min-h-11 flex-1 rounded-md bg-ink px-4 font-semibold whitespace-nowrap text-bg">
+        <button type="button" onClick={onRestart} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold whitespace-nowrap text-on-action">
           Rever do início
         </button>
         <button type="button" onClick={onExit} className="min-h-11 flex-1 rounded-md border border-line px-4 font-semibold whitespace-nowrap hover:bg-sunken">
@@ -125,7 +125,7 @@ export function ReviewBar({ status, ply, total, moments, moves, speed, hasNext, 
     <div role="group" aria-label="Controles da revisão" className="rounded-md bg-surface px-2.5 pt-3 pb-1.5">
       {/* Trilha da partida: cada marca é uma parada, e dá para ir direto a ela. */}
       <div className="relative mx-2 h-1.5 rounded-full bg-sunken">
-        <div className="absolute inset-y-0 left-0 rounded-full bg-ink" style={{ width: `${position}%` }} />
+        <div className="absolute inset-y-0 left-0 rounded-full bg-action" style={{ width: `${position}%` }} />
         {moments.map((moment) => {
           const move = moves[moment.ply - 1]
           return (
@@ -152,7 +152,7 @@ export function ReviewBar({ status, ply, total, moments, moves, speed, hasNext, 
               aria-pressed={speed === item.id}
               aria-label={`Velocidade ${item.label}`}
               onClick={() => onSpeed(item.id)}
-              className={`tabular min-h-9 w-8 text-sm font-semibold ${speed === item.id ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}
+              className={`tabular min-h-9 w-8 text-sm font-semibold ${speed === item.id ? 'bg-action text-on-action' : 'hover:bg-sunken'}`}
             >
               {item.label}
             </button>

@@ -52,7 +52,7 @@ export function VariantPanel({ origin, step, isUserColor, error, onExit }: Varia
 
       {step && !step.cls && (
         <>
-          <h2 className="font-book text-xl font-semibold">{sanToPt(step.san)}</h2>
+          <h2 className="font-display text-xl font-semibold">{sanToPt(step.san)}</h2>
           <p className="mt-1 text-sm text-muted">O Stockfish está avaliando…</p>
         </>
       )}
@@ -62,14 +62,14 @@ export function VariantPanel({ origin, step, isUserColor, error, onExit }: Varia
           <h2 className="text-lg leading-snug font-bold" style={{ color: `var(--text-${step.cls})` }}>
             Esse lance seria: {CLASS_INFO[step.cls].label} ({formatEval(step.after.eval)})
           </h2>
-          <p className="font-book text-lg">{sanToPt(step.san)}</p>
-          {terminalText(step) && <p className="font-book mt-1 text-base">{terminalText(step)}</p>}
+          <p className="text-lg">{sanToPt(step.san)}</p>
+          {terminalText(step) && <p className="mt-1 text-base">{terminalText(step)}</p>}
           {bestSan && !isBest && (
             <p className="mt-2 text-sm text-muted">
-              O melhor seria <span className="font-book text-base font-semibold text-ink">{sanToPt(bestSan)}</span>
+              O melhor seria <span className="font-display text-base font-semibold text-ink">{sanToPt(bestSan)}</span>
             </p>
           )}
-          {explanation && <p className="font-book mt-2 max-w-prose text-base leading-relaxed">{explanation}</p>}
+          {explanation && <p className="mt-2 max-w-prose text-base leading-relaxed">{explanation}</p>}
         </>
       )}
 
@@ -79,7 +79,7 @@ export function VariantPanel({ origin, step, isUserColor, error, onExit }: Varia
         </p>
       )}
 
-      <button type="button" onClick={onExit} className="mt-3 min-h-11 w-full rounded-md bg-ink px-4 font-semibold text-bg">
+      <button type="button" onClick={onExit} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
         Voltar à partida
       </button>
     </section>

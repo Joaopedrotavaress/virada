@@ -53,7 +53,7 @@ const PROMOTIONS = [
   { piece: 'n', label: 'Cavalo' },
 ]
 
-const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
+const LAST_MOVE_TINT = 'var(--board-last)'
 
 /** Lances possíveis de uma casa, para a marcação no tabuleiro e o toque-para-mover. */
 function legalMoves(fen: string, from: string) {
@@ -262,13 +262,13 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
   const boardProps = useMemo(() => {
     const withSelection = (fen: string, styles: Record<string, CSSProperties>) => {
       if (!selected) return styles
-      styles[selected] = { backgroundColor: 'color-mix(in srgb, #0e8a7d 45%, transparent)' }
+      styles[selected] = { backgroundColor: 'var(--board-select)' }
       for (const candidate of legalMoves(fen, selected)) {
         styles[candidate.to] = {
           ...styles[candidate.to],
           backgroundImage: candidate.captured
-            ? 'radial-gradient(circle, transparent 58%, rgb(14 138 125 / 0.65) 60%)'
-            : 'radial-gradient(circle, rgb(14 138 125 / 0.65) 22%, transparent 24%)',
+            ? 'radial-gradient(circle, transparent 58%, var(--board-hint) 60%)'
+            : 'radial-gradient(circle, var(--board-hint) 22%, transparent 24%)',
         }
       }
       return styles
@@ -570,7 +570,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       <div className="mx-auto flex w-full max-w-[120rem] flex-col px-6 xl:h-dvh xl:overflow-hidden">
         <header className="flex h-14 shrink-0 items-center justify-between gap-3">
           {backButton}
-          {analysis.opening && <p className="font-book min-w-0 truncate text-base">{formatOpening(analysis.opening)}</p>}
+          {analysis.opening && <p className="min-w-0 truncate text-base">{formatOpening(analysis.opening)}</p>}
           <div className="flex min-w-0 shrink-0 items-center gap-3">
             <p className="tabular min-w-0 truncate text-sm text-muted">{meta}</p>
             <LegendButton />
@@ -627,7 +627,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     <div className="flex h-dvh flex-col overflow-hidden">
       <header className="flex h-11 shrink-0 items-center justify-between gap-2 px-2">
         {backButton}
-        <p className={`ml-auto min-w-0 truncate text-right ${analysis.opening ? 'font-book text-sm' : 'tabular text-xs text-muted'}`}>{analysis.opening ? formatOpening(analysis.opening) : shortMeta}</p>
+        <p className={`ml-auto min-w-0 truncate text-right ${analysis.opening ? 'text-sm' : 'tabular text-xs text-muted'}`}>{analysis.opening ? formatOpening(analysis.opening) : shortMeta}</p>
         <LegendButton compact />
       </header>
       {noticeBox}

@@ -19,8 +19,8 @@ function ClockCard({ analysis, userColor }: { analysis: GameAnalysis; userColor:
   if (sentences.length === 0) return null
   return (
     <section aria-label={userColor ? 'Você e o relógio' : 'O relógio'} className="mt-3 rounded-md bg-surface p-4">
-      <h3 className="font-book text-lg font-semibold">{userColor ? 'Você e o relógio' : 'O relógio'}</h3>
-      <ul className="font-book mt-1.5 grid max-w-prose gap-1.5 text-base leading-relaxed">
+      <h3 className="font-display text-lg font-semibold">{userColor ? 'Você e o relógio' : 'O relógio'}</h3>
+      <ul className="mt-1.5 grid max-w-prose gap-1.5 text-base leading-relaxed">
         {sentences.map((sentence) => (
           <li key={sentence}>{sentence}</li>
         ))}
@@ -34,7 +34,7 @@ export function Summary({ analysis, showTitle = true, userColor = null }: { anal
   return (
     <section aria-label="Resumo da partida">
       {showTitle && <h2 className="mb-1.5 text-sm font-semibold">Resumo</h2>}
-      {analysis.opening && <p className="font-book mb-2 text-base leading-snug">{formatOpening(analysis.opening)}</p>}
+      {analysis.opening && <p className="mb-2 text-base leading-snug">{formatOpening(analysis.opening)}</p>}
       <table className="tabular w-full table-fixed border-collapse overflow-hidden rounded-md bg-surface text-sm">
         <thead>
           <tr>
@@ -42,13 +42,13 @@ export function Summary({ analysis, showTitle = true, userColor = null }: { anal
               Precisão
             </th>
             <th scope="col" className="p-3 pl-0 text-right font-normal">
-              <span className="font-book block text-lg leading-none font-semibold whitespace-nowrap">{formatPercent(summary.w.accuracy)}</span>
+              <span className="font-display block text-lg leading-none font-semibold whitespace-nowrap">{formatPercent(summary.w.accuracy)}</span>
               <span className="mt-1 block truncate text-xs text-muted" title={white}>
                 {white}
               </span>
             </th>
             <th scope="col" className="p-3 pl-0 text-right font-normal">
-              <span className="font-book block text-lg leading-none font-semibold whitespace-nowrap">{formatPercent(summary.b.accuracy)}</span>
+              <span className="font-display block text-lg leading-none font-semibold whitespace-nowrap">{formatPercent(summary.b.accuracy)}</span>
               <span className="mt-1 block truncate text-xs text-muted" title={black}>
                 {black}
               </span>

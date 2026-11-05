@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useQueue } from '../data/queue'
+import { Logo, ZoneRamp } from './Logo'
 import { navigate, type Route } from '../route'
 
 const ITEMS: { path: string; label: string; icon: string; active: Route['name'][] }[] = [
@@ -24,7 +25,7 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
           event.preventDefault()
           navigate(item.path)
         }}
-        className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-md text-xs font-semibold lg:min-h-11 lg:flex-none lg:flex-row lg:gap-2 lg:px-3 lg:text-sm ${current ? 'text-ink lg:bg-surface' : 'text-muted hover:text-ink'}`}
+        className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border-t-3 text-xs font-semibold lg:min-h-11 lg:flex-none lg:flex-row lg:gap-2 lg:border-t-0 lg:border-b-3 lg:px-3 lg:text-sm ${current ? 'border-action text-ink' : 'border-transparent text-muted hover:text-ink'}`}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6 lg:size-5" fill="currentColor">
           <path d={item.icon} />
@@ -36,6 +37,7 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <ZoneRamp />
       <header className="hidden border-b border-line lg:block">
         <div className="mx-auto flex w-full max-w-5xl items-center gap-6 px-4 py-1.5">
           <a
@@ -44,9 +46,10 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
               event.preventDefault()
               navigate('#/')
             }}
-            className="font-book text-lg font-semibold"
+            className="rounded-sm"
+            aria-label="Virada, início"
           >
-            Treinador de Xadrez
+            <Logo size="text-xl" markClassName="size-6" />
           </a>
           <nav aria-label="Seções" className="flex gap-1">
             {links}
@@ -57,7 +60,7 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
       <div className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</div>
 
       {queue.running && (
-        <p role="status" className="fixed inset-x-2 bottom-[4.75rem] z-10 truncate rounded-md bg-ink px-3 py-1.5 text-sm text-bg lg:right-4 lg:bottom-4 lg:left-auto lg:w-80">
+        <p role="status" className="fixed inset-x-2 bottom-[4.75rem] z-10 truncate rounded-md bg-action px-3 py-1.5 text-sm text-on-action lg:right-4 lg:bottom-4 lg:left-auto lg:w-80">
           Analisando em segundo plano: faltam {queue.remaining}
         </p>
       )}

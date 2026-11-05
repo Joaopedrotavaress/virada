@@ -28,7 +28,7 @@ function ChartTooltip({ active, payload, white, black }: { active?: boolean; pay
   if (!active || !point) return null
   return (
     <div className="rounded-md border border-line bg-surface px-2.5 py-1.5 text-sm text-ink shadow-md">
-      <p className="font-book font-semibold">{point.move ? moveLabel(point.move) : 'Início'}</p>
+      <p className="font-display font-semibold">{point.move ? moveLabel(point.move) : 'Início'}</p>
       {point.move && isErrorClass(point.move.cls) && <p className="text-muted">{CLASS_INFO[point.move.cls].label}</p>}
       <p className="tabular text-muted">
         {white}: {formatClock(point.white)}

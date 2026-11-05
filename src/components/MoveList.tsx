@@ -38,7 +38,7 @@ const MoveCell = memo(function MoveCell({ move, current, time, activeRef, onSele
       className={`flex min-h-9 w-full items-center justify-between gap-1 rounded-sm px-2 text-left ${current ? 'bg-sunken font-bold outline-1 outline-line' : 'hover:bg-sunken'}`}
       style={{ color: `var(--text-${move.cls})` }}
     >
-      <span className="font-book truncate">{sanToPt(move.san)}</span>
+      <span className="truncate">{sanToPt(move.san)}</span>
       <span className="flex shrink-0 items-center gap-1.5">
         {time !== null && <span className="tabular font-sans text-[0.6875rem] font-normal text-muted">{formatClock(time)}</span>}
         <span aria-hidden="true" className="flex w-4 justify-end font-sans text-xs font-bold">
@@ -97,7 +97,7 @@ export function MoveList({ moves, ply, onSelect, showTitle = true, variant, onSe
                 ref={current ? active : undefined}
                 onClick={() => onSelectVariant?.(index)}
                 aria-current={current ? 'true' : undefined}
-                className={`font-book flex min-h-9 items-center gap-1 rounded-sm px-1.5 text-muted italic ${current ? 'bg-surface font-bold text-ink not-italic outline-1 outline-line' : 'hover:bg-surface'}`}
+                className={`font-display flex min-h-9 items-center gap-1 rounded-sm px-1.5 text-muted italic ${current ? 'bg-surface font-bold text-ink not-italic outline-1 outline-line' : 'hover:bg-surface'}`}
               >
                 <span>
                   {prefix && <span className="tabular mr-0.5 text-xs">{prefix}</span>}

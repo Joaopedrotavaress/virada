@@ -1,3 +1,4 @@
+import { BEST_ARROW_COLOR, THREAT_ARROW_COLOR } from './Board'
 import { useEffect, useRef, useState } from 'react'
 import type { MoveClass } from '../chess/classify'
 import { CLASS_INFO } from '../chess/classify'
@@ -51,7 +52,7 @@ function LegendDialog({ onClose }: { onClose: () => void }) {
     >
       <div role="dialog" aria-modal="true" aria-label="O que cada símbolo significa" className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-lg bg-surface sm:rounded-lg">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-line py-2 pr-2 pl-4">
-          <h2 className="font-book text-xl font-semibold">O que cada símbolo significa</h2>
+          <h2 className="font-display text-xl font-semibold">O que cada símbolo significa</h2>
           <button ref={closeButton} type="button" onClick={onClose} aria-label="Fechar a legenda" className="flex size-11 shrink-0 items-center justify-center rounded-md text-2xl hover:bg-sunken">
             ×
           </button>
@@ -85,11 +86,11 @@ function LegendDialog({ onClose }: { onClose: () => void }) {
           <h3 className="mt-5 text-sm font-semibold text-muted">No tabuleiro e nos gráficos</h3>
           <ul className="mt-2 grid gap-2 text-sm">
             <li className="flex items-center gap-3">
-              <Arrow color="#0e8a7d" />
+              <Arrow color={BEST_ARROW_COLOR} />
               <span>Seta verde: o melhor lance.</span>
             </li>
             <li className="flex items-center gap-3">
-              <Arrow color="#d12d2d" />
+              <Arrow color={THREAT_ARROW_COLOR} />
               <span>Seta vermelha: a ameaça do adversário, no jogo contra bots.</span>
             </li>
             <li className="flex items-center gap-3">
