@@ -1,75 +1,139 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { GameResult, GameSetup } from './bots/useBotGame'
-import { type GameAnalysis, analyzeGame, gameId, gameKey } from './chess/analyze'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { BOTS } from './bots/bots'
+import type { GameProgress, GameResult, GameSetup } from './bots/useBotGame'
+import { type GameAnalysis, analyzeGame } from './chess/analyze'
 import type { Color } from './chess/evaluation'
 import { PgnError, type ParsedGame, parsePgn } from './chess/pgn'
 import { SAMPLE_PGN } from './chess/sample'
-import { AnalysisView } from './components/AnalysisView'
 import { Analyzing } from './components/Analyzing'
 import { BotGame } from './components/BotGame'
-import { type BotChoice, BotSetup } from './components/BotSetup'
+import { type BotChoice, BotSetup, type StartPoint } from './components/BotSetup'
+import { DataScreen } from './components/DataScreen'
+import { Games } from './components/Games'
 import { Home } from './components/Home'
-import { type BrowserMemo, GameBrowser } from './components/GameBrowser'
-import type { ChessComGame } from './chesscom/api'
-import { viewGame } from './chesscom/api'
+import { Shell } from './components/Shell'
+import { type GameRecord, addUnanalyzed, allRecords, colorOfUser, getAnalysis, initLibrary, recordKeyOf, saveAnalyzed, useAllRecords } from './data/library'
+import { analysisQueue } from './data/queue'
 import { EngineAbortError, getEngine } from './engine/stockfish'
-import { loadDepth, loadPending, loadRecent, loadUsername, removeAnalysis, removePending, saveAnalysis, saveDepth, savePending, saveUsername } from './storage'
+import { gamePath, goBack, navigate, useRoute } from './route'
+import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUsername, saveActiveGame, saveDepth, saveUsername } from './storage'
 
-type Screen =
-  | { name: 'home' }
-  | { name: 'analyzing'; game: ParsedGame; done: number; total: number; userColor: Color | null }
-  | { name: 'analysis'; analysis: GameAnalysis }
-  | { name: 'bot-setup' }
-  | { name: 'browse'; username: string }
-  | { name: 'bot-game'; setup: GameSetup; round: number }
+// O que tem gráfico fica fora do pacote inicial: a tela de abertura carrega bem mais rápido.
+const AnalysisView = lazy(() => import('./components/AnalysisView').then((module) => ({ default: module.AnalysisView })))
+
+interface AnalysisJob {
+  game: ParsedGame
+  done: number
+  total: number
+  userColor: Color | null
+}
 
 interface StartOptions {
   /** Cor da pessoa quando não dá para saber pelo nome (partidas contra bots). */
-  userColor?: Color
-  source?: GameAnalysis['source']
+  userColor?: Color | null
+  source?: GameRecord['source']
+  owner?: string
+  key?: string
+  playedAt?: number
   /** Troca a tela atual no histórico em vez de empilhar outra. */
   replace?: boolean
 }
 
-/** Cor do usuário nesta partida, comparando o nome sem diferenciar maiúsculas. */
-function colorOfUser(username: string, white: string, black: string): Color | null {
-  const name = username.trim().toLowerCase()
-  if (!name) return null
-  if (white.trim().toLowerCase() === name) return 'w'
-  if (black.trim().toLowerCase() === name) return 'b'
-  return null
+const loading = (
+  <p role="status" className="p-6 text-muted">
+    Carregando…
+  </p>
+)
+
+/** Abre a análise pelo endereço. Sem análise guardada, mas com o PGN, analisa de novo. */
+function GameRoute({ gameKey, username, notice, onAnalyze, onPlayFrom }: { gameKey: string; username: string; notice: string | null; onAnalyze: (record: GameRecord) => void; onPlayFrom: (start: StartPoint) => void }) {
+  const [analysis, setAnalysis] = useState<GameAnalysis | null | undefined>(undefined)
+  const records = useAllRecords()
+  const record = records.find((item) => item.key === gameKey)
+  const missing = analysis === null
+
+  useEffect(() => {
+    let alive = true
+    setAnalysis(undefined)
+    void getAnalysis(gameKey).then((found) => {
+      if (alive) setAnalysis(found)
+    })
+    return () => {
+      alive = false
+    }
+  }, [gameKey])
+
+  useEffect(() => {
+    if (missing && record && !record.deletedAt) onAnalyze(record)
+    // Só quando descobre que falta a análise.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [missing, record?.key])
+
+  if (analysis === undefined) return loading
+  if (!analysis) {
+    if (record && !record.deletedAt) return loading
+    return (
+      <main className="mx-auto max-w-md p-6">
+        <h1 className="font-book text-3xl font-semibold">Partida não encontrada</h1>
+        <p className="mt-2 text-muted">Ela não está guardada neste aparelho. Pode ter sido apagada, ou o link veio de outro aparelho.</p>
+        <button type="button" onClick={() => navigate('#/partidas', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+          Ver minhas partidas
+        </button>
+      </main>
+    )
+  }
+  return (
+    <Suspense fallback={loading}>
+      <AnalysisView
+        key={analysis.id}
+        analysis={analysis}
+        record={record}
+        userColor={record?.userColor ?? analysis.userColor ?? colorOfUser(username, analysis.white, analysis.black)}
+        notice={notice}
+        onBack={goBack}
+        onPlayFrom={onPlayFrom}
+      />
+    </Suspense>
+  )
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>({ name: 'home' })
+  const route = useRoute()
+  const [job, setJob] = useState<AnalysisJob | null>(null)
   const [pgn, setPgn] = useState('')
   const [depth, setDepth] = useState(loadDepth)
-  const [username, setUsername] = useState(loadUsername)
-  const [recent, setRecent] = useState(loadRecent)
-  const [pending, setPending] = useState(loadPending)
+  const [username, setUsernameState] = useState(loadUsername)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [activeGame, setActiveGame] = useState(loadActiveGame)
+  const [startPoint, setStartPoint] = useState<StartPoint | null>(null)
   const running = useRef<AbortController | null>(null)
 
-  // Voltar do navegador (ou do celular) leva para a tela inicial, sem sair do app.
+  const setUsername = useCallback((next: string) => {
+    setUsernameState(next)
+    saveUsername(next.trim())
+  }, [])
+
   useEffect(() => {
-    const onPopState = (event: PopStateEvent) => {
-      running.current?.abort()
+    void initLibrary(username).then(() => analysisQueue.resume())
+    // Só uma vez, ao abrir o app.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Jogando ou esperando uma análise, o aparelho fica só para isso.
+  useEffect(() => {
+    analysisQueue.hold(route.name === 'bot-game' || route.name === 'analyzing')
+  }, [route.name])
+
+  // Saiu da tela de análise (voltar do celular, por exemplo): cancela. Recarregou no meio: volta ao início.
+  useEffect(() => {
+    if (route.name === 'analyzing') {
+      if (!running.current) navigate('#/', { replace: true })
+    } else if (running.current) {
+      running.current.abort()
       running.current = null
-      const state = event.state as { tela?: string; usuario?: string } | null
-      // Quem abriu uma partida da lista volta para a lista, não para o início.
-      setScreen(state?.tela === 'partidas' && state.usuario ? { name: 'browse', username: state.usuario } : { name: 'home' })
     }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
-
-  const leave = useCallback(() => window.history.back(), [])
-
-  const open = useCallback((analysis: GameAnalysis) => {
-    window.history.pushState({ tela: 'analise' }, '')
-    setScreen({ name: 'analysis', analysis })
-  }, [])
+  }, [route])
 
   const start = useCallback(
     async (text: string, options: StartOptions = {}) => {
@@ -84,22 +148,21 @@ export default function App() {
         return
       }
 
-      const saved = recent.find((analysis) => analysis.id === gameId(game, depth))
-      if (saved) {
-        if (options.replace) {
-          window.history.replaceState({ tela: 'analise' }, '')
-          setScreen({ name: 'analysis', analysis: saved })
-          return
-        }
-        return open(saved)
+      await initLibrary(username)
+      const key = options.key ?? recordKeyOf(game)
+      const saved = allRecords().find((record) => record.key === key && !record.deletedAt)
+      // Já analisada com profundidade igual ou maior: não precisa esperar de novo.
+      if (saved?.digest && saved.digest.depth >= depth && (await getAnalysis(key))) {
+        navigate(gamePath(key), { replace: options.replace })
+        return
       }
 
       const controller = new AbortController()
+      running.current?.abort()
       running.current = controller
-      if (options.replace) window.history.replaceState({ tela: 'analisando' }, '')
-      else window.history.pushState({ tela: 'analisando' }, '')
-      const userColor = options.userColor ?? colorOfUser(username, game.white, game.black)
-      setScreen({ name: 'analyzing', game, done: 0, total: game.positions.length, userColor })
+      const userColor = options.userColor ?? saved?.userColor ?? colorOfUser(username, game.white, game.black)
+      setJob({ game, done: 0, total: game.positions.length, userColor })
+      navigate('#/analisando', { replace: options.replace })
 
       try {
         const engine = getEngine()
@@ -107,152 +170,191 @@ export default function App() {
         const analysis = await analyzeGame(engine, game, depth, {
           signal: controller.signal,
           onProgress: (done, total) => {
-            if (!controller.signal.aborted) setScreen({ name: 'analyzing', game, done, total, userColor })
+            if (!controller.signal.aborted) setJob({ game, done, total, userColor })
           },
         })
         if (controller.signal.aborted) return
+        const { record, persisted } = await saveAnalyzed(
+          { ...analysis, userColor: userColor ?? undefined, source: options.source === 'pgn' ? undefined : options.source },
+          { pgn: text, key, userColor, source: options.source ?? saved?.source, owner: options.owner ?? saved?.owner, playedAt: options.playedAt ?? saved?.playedAt },
+        )
+        if (controller.signal.aborted) return
+        if (!persisted) setNotice('Esta análise não foi salva: o navegador está sem espaço para guardar partidas.')
         running.current = null
-        const stored: GameAnalysis = { ...analysis, userColor: options.userColor, source: options.source }
-        if (!saveAnalysis(stored)) setNotice('Esta análise não foi salva: o navegador está sem espaço para guardar partidas.')
-        setRecent(loadRecent())
-        setPending(removePending(gameKey(game)))
-        setScreen({ name: 'analysis', analysis: stored })
+        navigate(gamePath(record.key), { replace: true })
       } catch (failure) {
         if (controller.signal.aborted || failure instanceof EngineAbortError) return
         running.current = null
         setError(`A análise parou. ${failure instanceof Error ? failure.message : 'O Stockfish não respondeu. Recarregue a página e tente de novo.'}`)
-        leave()
+        goBack()
       }
     },
-    [depth, leave, open, recent, username],
+    [depth, username],
+  )
+
+  const openRecord = useCallback(
+    (record: GameRecord, replace = false) => {
+      if (record.digest) navigate(gamePath(record.key), { replace })
+      else void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace })
+    },
+    [start],
   )
 
   const playerName = username.trim() || 'Você'
-  const browserMemo = useRef<BrowserMemo | null>(null)
-  const analyzedLinks = useMemo(() => new Set(recent.flatMap((analysis) => (analysis.link ? [analysis.link] : []))), [recent])
-
-  const openChessComGame = useCallback(
-    (game: ChessComGame, user: string) => {
-      const saved = recent.find((analysis) => analysis.link === game.url)
-      if (saved) return open(saved)
-      void start(game.pgn, { userColor: viewGame(game, user).myColor, source: 'chesscom' })
-    },
-    [open, recent, start],
-  )
 
   const startBotGame = useCallback(
     (choice: BotChoice) => {
-      window.history.replaceState({ tela: 'jogo' }, '')
-      setScreen({ name: 'bot-game', setup: { ...choice, playerName }, round: Date.now() })
+      const active: ActiveGame = {
+        botId: choice.bot.id,
+        color: choice.color,
+        coachOn: choice.coachOn,
+        allowUndo: choice.allowUndo,
+        playerName,
+        startedAt: Date.now(),
+        sans: startPoint?.sans ?? [],
+        lockedPlies: startPoint?.sans?.length ?? 0,
+        startFen: startPoint?.fen,
+        time: choice.time,
+      }
+      saveActiveGame(active)
+      setActiveGame(active)
+      setStartPoint(null)
+      navigate('#/jogo', { replace: true })
     },
-    [playerName],
+    [playerName, startPoint],
   )
 
+  const playFrom = useCallback((start: StartPoint) => {
+    setStartPoint(start)
+    navigate('#/jogar')
+  }, [])
+
+  const finishActive = useCallback(() => {
+    clearActiveGame()
+    setActiveGame(null)
+  }, [])
+
   const onBotGameFinished = useCallback(
-    (setup: GameSetup, result: GameResult) => {
-      if (!result.hasMoves) return
-      const game = parsePgn(result.pgn)
-      setPending(
-        savePending({
-          id: gameKey(game),
-          pgn: result.pgn,
-          white: game.white,
-          black: game.black,
-          result: game.result,
-          date: game.date,
-          userColor: setup.color,
-          playedAt: Date.now(),
-        }),
-      )
+    (color: Color, result: GameResult) => {
+      clearActiveGame()
+      if (result.hasMoves) void addUnanalyzed({ pgn: result.pgn, userColor: color, source: 'bot', playedAt: Date.now() }).catch(() => undefined)
     },
     [],
   )
 
-  if (screen.name === 'analyzing') {
-    return <Analyzing game={screen.game} done={screen.done} total={screen.total} orientation={screen.userColor === 'b' ? 'black' : 'white'} onCancel={leave} />
+  const onBotGameProgress = useCallback((progress: GameProgress) => {
+    const current = loadActiveGame()
+    if (current) saveActiveGame({ ...current, ...progress })
+  }, [])
+
+  // ---------- Telas de tela cheia ----------
+
+  if (route.name === 'analyzing') {
+    if (!job) return loading
+    return <Analyzing game={job.game} done={job.done} total={job.total} orientation={job.userColor === 'b' ? 'black' : 'white'} onCancel={goBack} />
   }
 
-  if (screen.name === 'analysis') {
-    return (
-      <AnalysisView
-        key={screen.analysis.id}
-        analysis={screen.analysis}
-        userColor={screen.analysis.userColor ?? colorOfUser(username, screen.analysis.white, screen.analysis.black)}
-        notice={notice}
-        onBack={leave}
-      />
-    )
+  if (route.name === 'game') {
+    return <GameRoute gameKey={route.key} username={username} notice={notice} onAnalyze={(record) => openRecord(record, true)} onPlayFrom={playFrom} />
   }
 
-  if (screen.name === 'browse') {
-    return (
-      <GameBrowser
-        key={screen.username}
-        username={screen.username}
-        memo={browserMemo}
-        analyzedLinks={analyzedLinks}
-        onOpen={(game) => openChessComGame(game, screen.username)}
-        onBack={leave}
-      />
-    )
-  }
-
-  if (screen.name === 'bot-setup') {
-    return <BotSetup onStart={startBotGame} onBack={leave} />
-  }
-
-  if (screen.name === 'bot-game') {
-    const { setup } = screen
+  if (route.name === 'bot-game') {
+    const bot = activeGame && BOTS.find((item) => item.id === activeGame.botId)
+    if (!activeGame || !bot) {
+      return (
+        <main className="mx-auto max-w-md p-6">
+          <h1 className="font-book text-3xl font-semibold">Nenhuma partida em andamento</h1>
+          <button type="button" onClick={() => navigate('#/jogar', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+            Começar uma partida
+          </button>
+        </main>
+      )
+    }
+    const setup: GameSetup = {
+      bot,
+      color: activeGame.color,
+      coachOn: activeGame.coachOn,
+      allowUndo: activeGame.allowUndo,
+      playerName: activeGame.playerName,
+      startFen: activeGame.startFen,
+      initialSans: activeGame.sans,
+      lockedPlies: activeGame.lockedPlies,
+      time: activeGame.time,
+      initialClocks: activeGame.clocks,
+      initialStamps: activeGame.stamps,
+    }
     return (
       <BotGame
-        key={screen.round}
+        key={activeGame.startedAt}
         setup={setup}
-        onFinished={(result) => onBotGameFinished(setup, result)}
-        onReview={(result) => void start(result.pgn, { userColor: setup.color, source: 'bot', replace: true })}
-        onRematch={() => setScreen({ name: 'bot-game', setup, round: Date.now() })}
-        onLeave={leave}
+        onFinished={(result) => onBotGameFinished(activeGame.color, result)}
+        onProgress={onBotGameProgress}
+        onReview={(result) => {
+          finishActive()
+          void start(result.pgn, { userColor: activeGame.color, source: 'bot', playedAt: Date.now(), replace: true })
+        }}
+        onRematch={() => {
+          const next: ActiveGame = { ...activeGame, startedAt: Date.now(), sans: activeGame.sans.slice(0, activeGame.lockedPlies), clocks: undefined, stamps: undefined }
+          saveActiveGame(next)
+          setActiveGame(next)
+        }}
+        onLeave={() => {
+          // Partida terminada sai da memória. Em andamento, continua para retomar depois.
+          setActiveGame(loadActiveGame())
+          navigate('#/', { replace: true })
+        }}
       />
     )
   }
 
-  return (
-    <Home
-      pgn={pgn}
-      onPgnChange={(text) => {
-        setPgn(text)
-        setError(null)
-      }}
-      depth={depth}
-      onDepthChange={(next) => {
-        setDepth(next)
-        saveDepth(next)
-      }}
-      username={username}
-      onUsernameChange={(next) => {
-        setUsername(next)
-        saveUsername(next.trim())
-      }}
-      error={error}
-      recent={recent}
-      pending={pending}
-      onAnalyze={() => void start(pgn)}
-      onSample={() => {
-        setPgn(SAMPLE_PGN)
-        void start(SAMPLE_PGN)
-      }}
-      onOpen={open}
-      onBrowse={() => {
-        const user = username.trim()
-        window.history.pushState({ tela: 'partidas', usuario: user }, '')
-        setScreen({ name: 'browse', username: user })
-      }}
-      onOpenPending={(game) => void start(game.pgn, { userColor: game.userColor, source: 'bot' })}
-      onRemove={(id) => setRecent(removeAnalysis(id))}
-      onRemovePending={(id) => setPending(removePending(id))}
-      onPlayBot={() => {
-        window.history.pushState({ tela: 'bots' }, '')
-        setScreen({ name: 'bot-setup' })
-      }}
-    />
-  )
+  if (route.name === 'bot-setup') {
+    return (
+      <BotSetup
+        key={startPoint?.label ?? 'normal'}
+        start={startPoint}
+        onStart={startBotGame}
+        onBack={() => {
+          setStartPoint(null)
+          goBack()
+        }}
+      />
+    )
+  }
+
+  // ---------- Telas com a navegação do app ----------
+
+  let content
+  if (route.name === 'games') {
+    content = <Games username={username} onUsernameChange={setUsername} onOpen={openRecord} />
+  } else if (route.name === 'data') {
+    content = <DataScreen username={username} />
+  } else {
+    content = (
+      <Home
+        pgn={pgn}
+        onPgnChange={(text) => {
+          setPgn(text)
+          setError(null)
+        }}
+        depth={depth}
+        onDepthChange={(next) => {
+          setDepth(next)
+          saveDepth(next)
+        }}
+        username={username}
+        onUsernameChange={setUsername}
+        error={error}
+        activeGame={activeGame}
+        onAbandonGame={finishActive}
+        onAnalyze={() => void start(pgn)}
+        onSample={() => {
+          setPgn(SAMPLE_PGN)
+          void start(SAMPLE_PGN)
+        }}
+        onOpen={openRecord}
+      />
+    )
+  }
+
+  return <Shell route={route}>{content}</Shell>
 }
