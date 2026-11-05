@@ -12,6 +12,8 @@ describe('endereços do app', () => {
     expect(parseRoute('#/treino')).toEqual({ name: 'training' })
     expect(parseRoute('#/treino/sessao')).toEqual({ name: 'session', theme: undefined })
     expect(parseRoute('#/treino/sessao/fork')).toEqual({ name: 'session', theme: 'fork' })
+    expect(parseRoute('#/puzzles')).toEqual({ name: 'puzzles', theme: undefined })
+    expect(parseRoute('#/puzzles/fork')).toEqual({ name: 'puzzles', theme: 'fork' })
     expect(parseRoute('#/guia/abertura/italiana')).toEqual({ name: 'opening', slug: 'italiana' })
     expect(parseRoute('#/guia/praticar/italiana/2')).toEqual({ name: 'practice', slug: 'italiana', line: 2 })
     expect(parseRoute('#/guia/licao/garfo')).toEqual({ name: 'lesson', id: 'garfo' })

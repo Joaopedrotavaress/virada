@@ -10,7 +10,7 @@ export type Route =
   | { name: 'progress' }
   | { name: 'training' }
   | { name: 'session'; theme?: string }
-  | { name: 'puzzles' }
+  | { name: 'puzzles'; theme?: string }
   | { name: 'guide' }
   | { name: 'opening'; slug: string }
   | { name: 'family'; id: string }
@@ -39,7 +39,7 @@ export function parseRoute(hash: string): Route {
     case 'treino':
       return second === 'sessao' ? { name: 'session', theme: third } : { name: 'training' }
     case 'puzzles':
-      return { name: 'puzzles' }
+      return { name: 'puzzles', theme: second }
     case 'guia':
       if (second === 'abertura' && third) return { name: 'opening', slug: third }
       if (second === 'familia' && third) return { name: 'family', id: third }

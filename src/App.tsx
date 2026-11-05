@@ -22,6 +22,13 @@ import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUserna
 // O que tem gráfico fica fora do pacote inicial: a tela de abertura carrega bem mais rápido.
 const AnalysisView = lazy(() => import('./components/AnalysisView').then((module) => ({ default: module.AnalysisView })))
 const Progress = lazy(() => import('./components/Progress').then((module) => ({ default: module.Progress })))
+const GuideHome = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.GuideHome })))
+const OpeningPage = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.OpeningPage })))
+const FamilyPage = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.FamilyPage })))
+const Practice = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.Practice })))
+const MyOpenings = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.MyOpenings })))
+const LessonScreen = lazy(() => import('./guide/LessonScreen').then((module) => ({ default: module.LessonScreen })))
+const PuzzleScreen = lazy(() => import('./puzzles/PuzzleScreen').then((module) => ({ default: module.PuzzleScreen })))
 const Session = lazy(() => import('./training/Session').then((module) => ({ default: module.Session })))
 
 interface AnalysisJob {
@@ -318,6 +325,22 @@ export default function App() {
     )
   }
 
+  if (route.name === 'lesson') {
+    return (
+      <Suspense fallback={loading}>
+        <LessonScreen key={route.id} id={route.id} />
+      </Suspense>
+    )
+  }
+
+  if (route.name === 'practice') {
+    return (
+      <Suspense fallback={loading}>
+        <Practice slug={route.slug} line={route.line} />
+      </Suspense>
+    )
+  }
+
   if (route.name === 'bot-setup') {
     return (
       <BotSetup
@@ -339,6 +362,36 @@ export default function App() {
     content = <Games username={username} onUsernameChange={setUsername} onOpen={openRecord} />
   } else if (route.name === 'data') {
     content = <DataScreen username={username} />
+  } else if (route.name === 'guide') {
+    content = (
+      <Suspense fallback={loading}>
+        <GuideHome username={username} />
+      </Suspense>
+    )
+  } else if (route.name === 'opening') {
+    content = (
+      <Suspense fallback={loading}>
+        <OpeningPage key={route.slug} slug={route.slug} username={username} onPlayFrom={playFrom} />
+      </Suspense>
+    )
+  } else if (route.name === 'family') {
+    content = (
+      <Suspense fallback={loading}>
+        <FamilyPage key={route.id} id={route.id} onPlayFrom={playFrom} />
+      </Suspense>
+    )
+  } else if (route.name === 'my-openings') {
+    content = (
+      <Suspense fallback={loading}>
+        <MyOpenings username={username} />
+      </Suspense>
+    )
+  } else if (route.name === 'puzzles') {
+    content = (
+      <Suspense fallback={loading}>
+        <PuzzleScreen key={route.theme ?? 'lista'} theme={route.theme} username={username} />
+      </Suspense>
+    )
   } else if (route.name === 'training') {
     content = <Training username={username} />
   } else if (route.name === 'progress') {
