@@ -3,6 +3,7 @@ import { CLASS_INFO, isErrorClass } from '../chess/classify'
 import { coachComment, startComment } from '../chess/comment'
 import { formatEval } from '../chess/evaluation'
 import { formatLinePt, pvToSan, sanToPt } from '../chess/notation'
+import { speechOf } from '../chess/professor'
 import { ClassBadge, ClassSymbol } from './ClassBadge'
 import type { BestLines } from './useBestLines'
 
@@ -63,6 +64,7 @@ export function CoachCard({ move, before, current, previousMove, isUserMove, rev
   const comment =
     move && before ? coachComment({ move, before: { ...before, bestUci }, after: current, previousMove, isUserMove, revealBest: revealed }) : startComment(current)
   const canRetry = Boolean(move && isErrorClass(move.cls))
+  const speech = move && before ? speechOf({ move, before, after: current, isUserMove }) : null
 
   if (dense) {
     return (
@@ -86,7 +88,13 @@ export function CoachCard({ move, before, current, previousMove, isUserMove, rev
           </p>
         </div>
         {!compact && moment?.note && <p className="mt-1.5 text-xs text-muted">{moment.note}</p>}
-        {!compact && <p className="mt-1.5 text-sm leading-snug">{comment}</p>}
+        {!compact && (
+          <p className="mt-1.5 text-sm leading-snug">
+            {speech?.opener && <span className="font-semibold">{speech.opener} </span>}
+            {comment}
+          </p>
+        )}
+        {!compact && speech?.lesson && !revealed && <p className="mt-1.5 text-sm leading-snug text-muted italic">{speech.lesson}</p>}
         {!compact && revealed && reference.bestUci && (
           <div className="mt-2 border-t border-line pt-2">
             <LinesList fen={reference.fen} bestUci={bestUci} bestLines={bestLines} dense />
@@ -131,7 +139,13 @@ export function CoachCard({ move, before, current, previousMove, isUserMove, rev
         </div>
       </div>
 
-      {!compact && <p className="mt-3 max-w-prose text-base leading-relaxed">{comment}</p>}
+      {!compact && (
+        <p className="mt-3 max-w-prose text-base leading-relaxed">
+          {speech?.opener && <span className="font-semibold">{speech.opener} </span>}
+          {comment}
+        </p>
+      )}
+      {!compact && speech?.lesson && <p className="mt-2 max-w-prose text-base leading-relaxed text-muted italic">{speech.lesson}</p>}
 
       {!compact && onContinue && (
         <button type="button" onClick={onContinue} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">

@@ -8,7 +8,9 @@ import { sanToPt, uciParts } from '../chess/notation'
 import { BEST_ARROW_COLOR, Board, THREAT_ARROW_COLOR } from './Board'
 import { BotAvatar } from './BotAvatar'
 import { CapturedPieces } from './CapturedPieces'
+import { moodOf } from '../chess/professor'
 import { EvalBar } from './EvalBar'
+import { Professor } from './Professor'
 import { LegendButton } from './Legend'
 import { useIsDesktop } from './useLayout'
 
@@ -174,7 +176,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         </p>
       ) : game.phase === 'warning' ? (
         <>
-          <h2 className="font-display text-xl leading-snug font-semibold text-(--text-mistake)">Opa, calma. Tem um lance bem melhor aqui.</h2>
+          <h2 className="font-display text-xl leading-snug font-semibold text-(--text-mistake)">Ô, chefia, calma. Tem lance bem melhor aqui.</h2>
           {game.warning && <p className="mt-2 max-w-prose text-base leading-relaxed">{game.warning}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {allowUndo && (
@@ -201,6 +203,8 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
       )}
     </section>
   )
+
+  const coachSpeaks = coachOn ? <Professor mood={game.phase === 'warning' ? 'bravo' : moodOf(game.lastGrade?.cls)} large={isDesktop}>{coachPanel}</Professor> : coachPanel
 
   const coachButtons = coachOn && (
     <div className="flex gap-1.5">
@@ -344,7 +348,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
             <div className={coachOn ? 'ml-8' : ''}>{strip(setup.playerName, color, true)}</div>
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-3">
-            {coachPanel}
+            {coachSpeaks}
             {coachButtons}
             {gameButtons}
             <div className="min-h-24 overflow-y-auto rounded-md bg-surface p-3">{game.history.length > 0 ? moveText : <p className="text-sm text-muted">Os lances aparecem aqui.</p>}</div>
@@ -367,7 +371,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         <div>{strip(setup.playerName, color, true)}</div>
       </div>
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
-        {coachPanel}
+        {coachSpeaks}
         {game.history.length > 0 && <div className="rounded-md bg-surface p-3">{moveText}</div>}
       </div>
       <div className="flex shrink-0 flex-col gap-1.5 border-t border-line px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">

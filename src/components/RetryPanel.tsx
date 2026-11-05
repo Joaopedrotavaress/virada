@@ -3,6 +3,7 @@ import { CLASS_INFO } from '../chess/classify'
 import { type Color, formatEval } from '../chess/evaluation'
 import { detectMotifs, explainMotifs } from '../chess/motifs'
 import { formatLinePt, pvToSan, sanToPt, uciToSan } from '../chess/notation'
+import { lessonOf } from '../chess/professor'
 import { moveLabel } from './CoachCard'
 import type { RetryState } from './useRetry'
 
@@ -24,30 +25,28 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
   const line = pvToSan(before.fen, before.pvUci, 6)
   const tried = retry.tried ? sanToPt(retry.tried.san) : ''
   const color = before.fen.split(' ')[1] as Color
-  const explanation =
+  const motifs =
     retry.phase === 'wrong' && retry.tried && retry.after
-      ? explainMotifs(
-          detectMotifs({
-            color,
-            uci: retry.tried.uci,
-            beforeFen: before.fen,
-            afterFen: retry.tried.fen,
-            beforeEval: before.eval,
-            afterEval: retry.after.eval,
-            bestUci: before.bestUci,
-            beforePv: before.pvUci,
-            afterPv: retry.after.pvUci,
-          }),
-          { color, isUser, revealBest: false },
-        )
-      : null
+      ? detectMotifs({
+          color,
+          uci: retry.tried.uci,
+          beforeFen: before.fen,
+          afterFen: retry.tried.fen,
+          beforeEval: before.eval,
+          afterEval: retry.after.eval,
+          bestUci: before.bestUci,
+          beforePv: before.pvUci,
+          afterPv: retry.after.pvUci,
+        })
+      : []
+  const explanation = motifs.length > 0 ? explainMotifs(motifs, { color, isUser, revealBest: false }) : null
 
   return (
     <section aria-label="Tentar de novo" aria-live="polite" className="rounded-md bg-surface p-4 sm:p-5">
       {retry.phase === 'playing' && (
         <>
           <h2 className="text-lg font-bold">Sua vez de novo</h2>
-          <p className="mt-1 max-w-prose text-base leading-relaxed">Na partida saiu {moveLabel(move)}. Procure um lance melhor e jogue no tabuleiro.</p>
+          <p className="mt-1 max-w-prose text-base leading-relaxed">Na partida saiu {moveLabel(move)}. Olha com calma, chefia, procura um lance melhor e joga no tabuleiro.</p>
           {retry.error && (
             <p role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
               {retry.error}
@@ -59,7 +58,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
       {retry.phase === 'evaluating' && (
         <>
           <h2 className="text-lg font-bold">{tried}</h2>
-          <p className="mt-1 text-sm text-muted">O Stockfish está avaliando seu lance…</p>
+          <p className="mt-1 text-sm text-muted">Deixa eu ver esse lance com o Stockfish…</p>
         </>
       )}
 
@@ -67,7 +66,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
         <>
           <p className="font-display text-5xl leading-none font-bold text-(--positive)">Achou!</p>
           <p className="mt-3 max-w-prose text-base leading-relaxed">
-            {retry.cls === 'best' ? `${tried} é o melhor lance da posição.` : `${tried} é quase tão bom quanto o melhor, ${best}.`}
+            {retry.cls === 'best' ? `Isso, chefia! ${tried} é o melhor lance da posição.` : `Boa, chefia! ${tried} é quase tão bom quanto o melhor, ${best}.`}
             {retry.after ? ` A avaliação fica em ${formatEval(retry.after.eval)}.` : ''}
           </p>
         </>
@@ -78,7 +77,8 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
           <h2 className="text-lg font-bold" style={{ color: `var(--text-${retry.cls})` }}>
             Esse lance seria: {CLASS_INFO[retry.cls].label} ({formatEval(retry.after.eval)})
           </h2>
-          <p className="mt-1 max-w-prose text-base leading-relaxed">{explanation ?? `${tried} ainda não é o que a posição pede.`}</p>
+          <p className="mt-1 max-w-prose text-base leading-relaxed">{explanation ?? `${tried} ainda não é o que a posição pede, chefia.`}</p>
+          <p className="mt-2 max-w-prose text-base leading-relaxed text-muted italic">{lessonOf(motifs)}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={onAgain} className={primary}>
               Tentar mais uma vez
@@ -93,6 +93,7 @@ export function RetryPanel({ retry, move, before, onAgain, onReveal, onExit, isU
       {retry.phase === 'answer' && (
         <>
           <h2 className="text-lg font-bold">A resposta era {best}</h2>
+          <p className="mt-1 text-base">Guarda essa, chefia. Ela volta.</p>
           <p className="tabular text-sm text-muted">Avaliação {formatEval(before.eval)}</p>
           {line.length > 1 && <p className="mt-2 text-base leading-relaxed">{formatLinePt(before.fen, line)}</p>}
         </>

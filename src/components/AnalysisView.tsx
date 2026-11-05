@@ -13,6 +13,7 @@ import { REVIEW_SPEEDS, findKeyMoments, gameInsights, turningPoint } from '../ch
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
 import { isErrorClass } from '../chess/classify'
+import { type Mood, moodOf, speechOf } from '../chess/professor'
 import { CapturedPieces } from './CapturedPieces'
 import { ClockChart } from './ClockChart'
 import { CoachCard, moveLabel } from './CoachCard'
@@ -22,6 +23,7 @@ import { LegendButton } from './Legend'
 import { ICON_PATHS } from './Icons'
 import { MoveList } from './MoveList'
 import { MoveStrip } from './MoveStrip'
+import { Professor } from './Professor'
 import { RetryPanel } from './RetryPanel'
 import { ReviewBar, ReviewEnd, ReviewIntro } from './ReviewPanels'
 import { Summary, formatPercent } from './Summary'
@@ -537,15 +539,28 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     />
   )
 
+  // A cara do professor acompanha o que está na tela.
+  const mood: Mood = retry
+    ? retry.phase === 'found'
+      ? 'feliz'
+      : retry.phase === 'wrong'
+        ? moodOf(retry.cls)
+        : 'neutro'
+    : variant
+      ? moodOf(variantStep?.cls)
+      : move && before
+        ? speechOf({ move, before, after: position, isUserMove: move.color === userColor }).mood
+        : 'neutro'
+
   const coachWithTablebase = (
-    <>
+    <Professor mood={mood} large={isDesktop}>
       {coach}
       {tablebase && !playing && (
         <p role="status" className="rounded-md bg-surface p-3 text-sm">
           {tablebase}
         </p>
       )}
-    </>
+    </Professor>
   )
 
   const chart = (

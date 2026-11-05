@@ -1,4 +1,5 @@
 import { sanToPt } from '../chess/notation'
+import { FAREWELL, GREETING } from '../chess/professor'
 import { Icon } from './Icons'
 import { Placa } from './Revelation'
 import type { AnalyzedMove } from '../chess/analyze'
@@ -60,6 +61,7 @@ export function ReviewIntro({ insights, moments, onStart, turning, hideStart = f
         </div>
       )}
       <h2 className="font-display text-2xl leading-tight font-semibold">Como foi a partida</h2>
+      <p className="mt-1.5 max-w-prose text-base leading-snug">{GREETING}</p>
       {!hideStart && (
         <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">
           Começar revisão
@@ -94,6 +96,7 @@ export function ReviewEnd({ insights, moments, moves, result, onJump, onRestart,
   return (
     <section aria-label="Conclusão da revisão" aria-live="polite" className="rounded-md bg-surface p-4 sm:p-5">
       <h2 className="font-display text-2xl leading-tight font-semibold">Fim da revisão{result !== '*' ? `: ${result}` : ''}</h2>
+      <p className="mt-1.5 max-w-prose text-base leading-snug">{FAREWELL}</p>
       {insights.length > 0 && (
         <div className="mt-3">
           <h3 className="mb-1.5 text-sm font-semibold text-muted">Principais pontos</h3>

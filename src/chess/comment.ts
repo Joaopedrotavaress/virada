@@ -46,7 +46,7 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
     const gave = sacrifice ? `${PIECE_NAMES[sacrifice.piece]} em ${sacrifice.square}` : 'material'
     const who = isUserMove ? 'Você entregou' : `${sideName(color)} entregaram`
     const payoff = moverKeepsMate && after.eval.kind === 'mate' ? `tem mate em ${after.eval.moves}` : `a avaliação fica em ${to}`
-    return `Lance brilhante! ${who} ${gave} e a conta fecha: ${payoff}.${ending}`
+    return `${who} ${gave} e a conta fecha: ${payoff}.${ending}`
   }
 
   if (cls === 'best') {

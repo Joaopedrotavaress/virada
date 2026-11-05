@@ -113,6 +113,6 @@ describe('comentário do lance brilhante', () => {
     const after = { fen: '1Q2kb1r/p2n1ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 b k - 1 16', terminal: null, eval: { kind: 'mate', moves: 1, winner: 'w' }, bestUci: 'd7b8', pvUci: [] }
     const move = { ply: 31, moveNumber: 16, color: 'w', san: 'Qb8+', uci: 'b3b8', from: 'b3', to: 'b8', winBefore: 100, winAfter: 100, loss: 0, cls: 'brilliant', accuracy: 100 }
     const text = coachComment({ move, before, after, isUserMove: true } as never)
-    expect(text).toBe('Lance brilhante! Você entregou a dama em b8 e a conta fecha: tem mate em 1.')
+    expect(text).toBe('Você entregou a dama em b8 e a conta fecha: tem mate em 1.')
   })
 })
