@@ -10,6 +10,10 @@ export interface ChessComGame {
   time_class: string
   end_time: number
   rules?: string
+  time_control?: string
+  rated?: boolean
+  accuracies?: { white?: number; black?: number }
+  eco?: string
   white: ChessComPlayer
   black: ChessComPlayer
 }
@@ -61,9 +65,9 @@ function memoryCache(): CacheStore {
 
 /** Só o que a lista usa: reduz o que fica guardado no aparelho. */
 function slimGame(game: ChessComGame): ChessComGame {
-  const { url, pgn, time_class, end_time, rules, white, black } = game
+  const { url, pgn, time_class, end_time, rules, time_control, rated, accuracies, eco, white, black } = game
   const player = ({ username, rating, result }: ChessComPlayer) => ({ username, rating, result })
-  return { url, pgn, time_class, end_time, rules, white: player(white), black: player(black) }
+  return { url, pgn, time_class, end_time, rules, time_control, rated, accuracies, eco, white: player(white), black: player(black) }
 }
 
 export interface FetchOptions {
@@ -143,7 +147,8 @@ export function createChessComClient(deps: ClientDeps = {}) {
     async month(url: string, isCurrent: boolean, { force = false }: FetchOptions = {}): Promise<ChessComGame[]> {
       // Um mês só está completo se foi guardado depois de acabar. Guardado antes, ainda pode faltar partida.
       const isValid = (savedAt: number) => (isCurrent ? now() - savedAt < CURRENT_MONTH_TTL : savedAt >= monthEnd(url))
-      return cached(`month:${url}`, isValid, force, async () => {
+      // A versão no nome: meses guardados antes de existirem precisão e ritmo são buscados uma vez de novo.
+      return cached(`v2:month:${url}`, isValid, force, async () => {
         const data = await request<{ games?: ChessComGame[] }>(url, force)
         return (data.games ?? [])
           .filter((game) => game.pgn)
