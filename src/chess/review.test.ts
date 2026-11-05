@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { AnalyzedMove, AnalyzedPosition } from './analyze'
 import { type MoveClass, summarize } from './classify'
 import type { Eval } from './evaluation'
-import { findKeyMoments, gameInsights, stepDelay } from './review'
+import { findKeyMoments, gameInsights, revelationLine, stepDelay } from './review'
 
 const cp = (value: number): Eval => ({ kind: 'cp', cp: value })
 const mate = (moves: number, winner: 'w' | 'b'): Eval => ({ kind: 'mate', moves, winner })
@@ -180,5 +180,34 @@ describe('ritmo', () => {
   it('teoria passa mais rápido e o momento-chave tem uma pausa antes', () => {
     expect(stepDelay('2x', true, false)).toBeLessThan(stepDelay('2x', false, false))
     expect(stepDelay('2x', false, true)).toBeGreaterThan(stepDelay('2x', false, false))
+  })
+})
+
+describe('revelationLine', () => {
+  const game = (count: number, lastSan = 'Nf3') =>
+    Array.from({ length: count }, (_, index) => ({ uci: `a${index}b${index}`, san: index === count - 1 ? lastSan : 'Nf3' }))
+
+  it('mostra o lance da virada e os dois seguintes', () => {
+    expect(revelationLine(game(20), 5)).toEqual({ start: 4, moves: ['a4b4', 'a5b5', 'a6b6'], focus: 'b4', focusAt: 0 })
+  })
+
+  it('mostra menos lances quando a partida acaba antes', () => {
+    expect(revelationLine(game(6), 6).moves).toEqual(['a5b5'])
+  })
+
+  it('volta um lance para terminar no mate que veio logo depois da virada', () => {
+    expect(revelationLine(game(7, 'Qxf7#'), 6)).toEqual({ start: 4, moves: ['a4b4', 'a5b5', 'a6b6'], focus: 'b5', focusAt: 1 })
+  })
+
+  it('termina no mate que veio três lances depois, com a virada já no tabuleiro', () => {
+    expect(revelationLine(game(9, 'Qh7#'), 6)).toEqual({ start: 6, moves: ['a6b6', 'a7b7', 'a8b8'], focus: 'b5', focusAt: -1 })
+  })
+
+  it('ignora um mate distante', () => {
+    expect(revelationLine(game(30, 'Qh7#'), 6).start).toBe(5)
+  })
+
+  it('não passa do começo da partida', () => {
+    expect(revelationLine(game(2, 'Qh4#'), 1)).toEqual({ start: 0, moves: ['a0b0', 'a1b1'], focus: 'b0', focusAt: 0 })
   })
 })

@@ -43,6 +43,23 @@ export function turningPoint(moves: AnalyzedMove[]): AnalyzedMove | null {
   return worst.loss >= TURNING_POINT_LOSS ? worst : null
 }
 
+/**
+ * Os 3 lances que a Revelação mostra: o da virada e os dois seguintes.
+ * Se a partida acaba em mate logo depois, mostra os 3 últimos, para terminar no mate.
+ * `focusAt` é o índice do lance da virada; -1 quer dizer que ele já estava no tabuleiro.
+ */
+export function revelationLine(moves: { uci: string; san: string }[], ply: number) {
+  const total = moves.length
+  const endsInMate = moves[total - 1]?.san.endsWith('#') ?? false
+  const start = endsInMate && total - ply <= 3 ? Math.max(0, total - 3) : ply - 1
+  return {
+    start,
+    moves: moves.slice(start, start + 3).map((move) => move.uci),
+    focus: moves[ply - 1].uci.slice(2, 4),
+    focusAt: ply - 1 - start,
+  }
+}
+
 /** Os pontos em que vale parar: os erros da pessoa pesam mais que os do adversário. */
 export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Color | null): KeyMoment[] {
   const turning = turningPoint(moves)
