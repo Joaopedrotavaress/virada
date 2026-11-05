@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { BEST_ARROW_COLOR } from '../components/Board'
 import type { StartPoint } from '../components/BotSetup'
 import { Board } from '../components/Board'
+import { Icon } from '../components/Icons'
 import { BoardScreen, PlayableBoard } from '../components/PlayableBoard'
 import type { Color } from '../chess/evaluation'
 import { formatLinePt, sanToPt } from '../chess/notation'
@@ -59,16 +60,16 @@ function LineViewer({ moves, orientation, children }: { moves: string[]; orienta
       <Board fen={step?.fen ?? START_FEN} orientation={orientation} squareStyles={styles} />
       <div className="mt-1.5 flex gap-1.5">
         <button type="button" className={button} onClick={() => setCursor(0)} disabled={cursor === 0} aria-label="Ir para o início">
-          «
+          <Icon name="first" />
         </button>
         <button type="button" className={button} onClick={() => setCursor((value) => Math.max(0, value - 1))} disabled={cursor === 0} aria-label="Lance anterior">
-          ‹
+          <Icon name="previous" />
         </button>
         <button type="button" className={button} onClick={() => setCursor((value) => Math.min(moves.length, value + 1))} disabled={cursor === moves.length} aria-label="Próximo lance">
-          ›
+          <Icon name="next" />
         </button>
         <button type="button" className={button} onClick={() => setCursor(moves.length)} disabled={cursor === moves.length} aria-label="Ir para o fim">
-          »
+          <Icon name="last" />
         </button>
       </div>
       {/* Toque num lance para ver a posição. */}
@@ -76,7 +77,7 @@ function LineViewer({ moves, orientation, children }: { moves: string[]; orienta
         {moves.map((san, index) => (
           <li key={index}>
             {index % 2 === 0 && <span className="tabular text-sm text-muted">{index / 2 + 1}.</span>}{' '}
-            <button type="button" onClick={() => setCursor(index + 1)} aria-current={cursor === index + 1 ? 'step' : undefined} className={`rounded-sm px-0.5 ${cursor === index + 1 ? 'bg-action text-on-action' : 'hover:bg-sunken'}`}>
+            <button type="button" onClick={() => setCursor(index + 1)} aria-current={cursor === index + 1 ? 'step' : undefined} className={`rounded-sm px-0.5 ${cursor === index + 1 ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}>
               {sanToPt(san)}
             </button>
           </li>
@@ -133,7 +134,7 @@ export function GuideHome({ username }: { username: string }) {
               return (
                 <li key={guide.slug}>
                   <button type="button" onClick={() => navigate(`#/guia/abertura/${guide.slug}`)} className="w-full rounded-md bg-surface p-3 text-left hover:bg-sunken">
-                    <span className="font-display block font-semibold">{guide.name}</span>
+                    <span className="block font-semibold">{guide.name}</span>
                     <span className="block text-sm text-muted">{guide.side === 'w' ? 'De brancas' : 'De pretas'}, {Math.round(progress * 100)}% das linhas praticadas</span>
                     <ProgressBar value={progress} label={`${Math.round(progress * 100)}% das linhas praticadas`} />
                   </button>
@@ -152,7 +153,7 @@ export function GuideHome({ username }: { username: string }) {
               <li key={`${item.guide.slug}-${item.color}`}>
                 <button type="button" onClick={() => navigate(`#/guia/abertura/${item.guide.slug}`)} className="flex min-h-12 w-full items-center justify-between gap-3 py-2 text-left hover:bg-sunken">
                   <span className="min-w-0">
-                    <span className="font-display block truncate font-semibold">{item.guide.name}</span>
+                    <span className="block truncate font-semibold">{item.guide.name}</span>
                     <span className="block text-sm text-muted">{item.color === 'w' ? 'De brancas' : 'De pretas'}, {item.totals.games} {item.totals.games === 1 ? 'partida' : 'partidas'}</span>
                   </span>
                   <span className="tabular shrink-0 font-semibold">{item.totals.score === null ? '–' : `${item.totals.score.toFixed(0)}%`}</span>
@@ -181,7 +182,7 @@ export function GuideHome({ username }: { username: string }) {
               ['systems', 'Sistemas'],
             ] as const
           ).map(([id, label]) => (
-            <button key={id} type="button" aria-pressed={kind === id} onClick={() => setKind(id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${kind === id ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}>
+            <button key={id} type="button" aria-pressed={kind === id} onClick={() => setKind(id)} className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${kind === id ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}>
               {label}
             </button>
           ))}
@@ -198,7 +199,7 @@ export function GuideHome({ username }: { username: string }) {
                 {matchedGuides.map((guide) => (
                   <li key={guide.slug}>
                     <button type="button" onClick={() => navigate(`#/guia/abertura/${guide.slug}`)} className="h-full min-h-16 w-full rounded-md bg-surface p-3 text-left hover:bg-sunken">
-                      <span className="font-display block font-semibold">{guide.name}</span>
+                      <span className="block font-semibold">{guide.name}</span>
                       <span className="block text-sm text-muted">Com explicação, {guide.side === 'w' ? 'de brancas' : 'de pretas'}</span>
                     </button>
                   </li>
@@ -242,7 +243,7 @@ export function GuideHome({ username }: { username: string }) {
                 {guides.map((guide) => (
                   <li key={guide.slug}>
                     <button type="button" onClick={() => navigate(`#/guia/abertura/${guide.slug}`)} className="h-full min-h-16 w-full rounded-md bg-surface p-3 text-left hover:bg-sunken">
-                      <span className="font-display block font-semibold">{guide.name}</span>
+                      <span className="block font-semibold">{guide.name}</span>
                       <span className="block text-sm text-muted">
                         {guide.side === 'w' ? 'De brancas' : 'De pretas'}, {guide.level}
                       </span>
@@ -263,7 +264,7 @@ export function GuideHome({ username }: { username: string }) {
                     <li key={lesson.id}>
                       <button type="button" onClick={() => navigate(`#/guia/licao/${lesson.id}`)} className="flex min-h-12 w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-sunken">
                         <span className="min-w-0 font-semibold">{lesson.title}</span>
-                        {lessonsDone.includes(lesson.id) && <span className="shrink-0 text-sm font-semibold text-(--text-best)">Feita</span>}
+                        {lessonsDone.includes(lesson.id) && <span className="shrink-0 text-sm font-semibold text-(--positive)">Feita</span>}
                       </button>
                     </li>
                   ))}
@@ -345,7 +346,7 @@ export function OpeningPage({ slug, username, onPlayFrom }: { slug: string; user
                 setRepertoire(toggleRepertoire(repertoire, guide.slug))
               }}
               aria-pressed={Boolean(entry)}
-              className={`min-h-11 rounded-md px-4 font-semibold ${entry ? 'bg-action text-on-action' : 'border border-line hover:bg-sunken'}`}
+              className={`min-h-11 rounded-md px-4 font-semibold ${entry ? 'bg-ink text-bg' : 'border border-line hover:bg-sunken'}`}
             >
               {entry ? 'No meu repertório' : 'Adicionar ao repertório'}
             </button>
@@ -364,7 +365,7 @@ export function OpeningPage({ slug, username, onPlayFrom }: { slug: string; user
                     setSelected(index)
                     setTrapOpen(null)
                   }}
-                  className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${selected === index && trapOpen === null ? 'bg-action text-on-action' : 'bg-surface hover:bg-sunken'}`}
+                  className={`min-h-10 rounded-sm px-4 text-sm font-semibold ${selected === index && trapOpen === null ? 'bg-ink text-bg' : 'bg-surface hover:bg-sunken'}`}
                 >
                   {item.name}
                 </button>
@@ -471,7 +472,7 @@ export function FamilyPage({ id, onPlayFrom }: { id: string; onPlayFrom: (start:
           <ul className="mt-3 divide-y divide-line overflow-hidden rounded-md bg-surface">
             {family.variants.slice(0, limit).map((item, index) => (
               <li key={`${item.name}-${index}`}>
-                <button type="button" onClick={() => setSelected(index)} aria-current={selected === index ? 'true' : undefined} className={`w-full px-3 py-2 text-left ${selected === index ? 'bg-action text-on-action' : 'hover:bg-sunken'}`}>
+                <button type="button" onClick={() => setSelected(index)} aria-current={selected === index ? 'true' : undefined} className={`w-full px-3 py-2 text-left ${selected === index ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}>
                   <span className="block font-semibold">{item.name.replace(`${family.name}: `, '') || item.name}</span>
                   <span className={`block text-sm ${selected === index ? 'opacity-80' : 'text-muted'}`}>{formatLinePt(START_FEN, item.moves)}</span>
                 </button>
@@ -503,7 +504,7 @@ function PracticeLine({ guide, lineIndex, onDone }: { guide: OpeningGuide; lineI
     <BoardScreen title={`${guide.name}, ${line.name}`} onBack={goBack} board={<PlayableBoard fen={practice.fen} orientation={color === 'w' ? 'white' : 'black'} canMove={practice.userTurn} onMove={practice.play} squareStyles={styles} arrows={arrows} celebrate={practice.done && practice.lastStep ? practice.lastStep.to : null} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {practice.done ? (
-          <h2 className="font-display text-xl font-semibold text-(--text-best)">{practice.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${practice.errors} ${practice.errors === 1 ? 'erro' : 'erros'}.`}</h2>
+          <h2 className="font-display text-xl font-semibold text-(--positive)">{practice.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${practice.errors} ${practice.errors === 1 ? 'erro' : 'erros'}.`}</h2>
         ) : practice.wrong ? (
           <h2 className="font-display text-xl font-semibold text-(--text-mistake)">{practice.wrong} não é o lance desta linha. Tente outro.</h2>
         ) : (
@@ -586,7 +587,7 @@ export function MyOpenings({ username }: { username: string }) {
                 {usage.map((item) => (
                   <tr key={`${item.guide.slug}-${item.color}`}>
                     <th scope="row" className="p-2 text-left font-normal">
-                      <button type="button" onClick={() => navigate(`#/guia/abertura/${item.guide.slug}`)} className="font-display min-h-9 text-left font-semibold underline">
+                      <button type="button" onClick={() => navigate(`#/guia/abertura/${item.guide.slug}`)} className="min-h-9 text-left font-semibold underline">
                         {item.guide.name}
                       </button>
                       <span className="block text-xs text-muted">{item.color === 'w' ? 'De brancas' : 'De pretas'}</span>

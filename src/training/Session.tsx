@@ -48,7 +48,7 @@ function LineItem({ card, title, status, nextLabel, onAnswered, onNext }: ItemPr
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         <p className="text-sm text-muted">{card.label}</p>
         {line.done ? (
-          <h2 className="font-display mt-1 text-xl font-semibold text-(--text-best)">{line.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${line.errors} ${line.errors === 1 ? 'erro' : 'erros'}.`}</h2>
+          <h2 className="font-display mt-1 text-xl font-semibold text-(--positive)">{line.errors === 0 ? 'Linha completa, sem erros!' : `Linha completa, com ${line.errors} ${line.errors === 1 ? 'erro' : 'erros'}.`}</h2>
         ) : line.wrong ? (
           <h2 className="font-display mt-1 text-xl font-semibold text-(--text-mistake)">{line.wrong} não é o lance desta linha. Tente outro.</h2>
         ) : (

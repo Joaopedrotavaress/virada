@@ -115,7 +115,7 @@ export function ErrorPanel({ card, exercise, nextLabel, onNext }: { card: Traini
       ) : phase === 'wrong' ? (
         <h2 className="font-display mt-1 text-xl leading-snug font-semibold text-(--text-mistake)">{tried ? `${sanToPt(tried.san)} não resolve.` : 'Não é esse.'} Olha de novo.</h2>
       ) : phase === 'found' ? (
-        <h2 className="font-display mt-1 text-xl leading-snug font-semibold text-(--text-best)">Achou! {tried ? sanToPt(tried.san) : best} era o caminho.</h2>
+        <h2 className="font-display mt-1 text-xl leading-snug font-semibold text-(--positive)">Achou! {tried ? sanToPt(tried.san) : best} era o caminho.</h2>
       ) : (
         <h2 className="font-display mt-1 text-xl leading-snug font-semibold">O melhor lance era {best}.</h2>
       )}

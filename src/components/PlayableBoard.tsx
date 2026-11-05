@@ -141,7 +141,7 @@ export function BoardScreen({ title, status, onBack, board, children }: { title:
           </svg>
           Voltar
         </button>
-        <h1 className="font-display min-w-0 flex-1 truncate text-right text-base font-semibold lg:text-lg">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-right text-sm font-semibold lg:text-base">{title}</h1>
         {status && <p className="tabular shrink-0 text-sm text-muted">{status}</p>}
       </header>
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:items-start lg:gap-6 lg:pb-6">

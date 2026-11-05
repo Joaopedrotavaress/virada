@@ -27,7 +27,7 @@ export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
-            <h2 className="font-display text-xl font-semibold text-(--text-best)">{hadTrouble ? 'Resolvido.' : 'Resolvido de primeira!'}</h2>
+            <h2 className="font-display text-xl font-semibold text-(--positive)">{hadTrouble ? 'Resolvido.' : 'Resolvido de primeira!'}</h2>
             <p className="mt-1 text-sm text-muted">
               Temas: {puzzle.themes.map(themeLabel).join(', ')}. Dificuldade {puzzle.rating}.
             </p>
@@ -143,7 +143,7 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
         <legend className="mb-1.5 text-sm font-semibold">Dificuldade</legend>
         <div className="grid grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
           {LEVELS.map((level) => (
-            <label key={level.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${levelId === level.id ? 'bg-action text-on-action' : 'bg-surface'}`}>
+            <label key={level.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${levelId === level.id ? 'bg-ink text-bg' : 'bg-surface'}`}>
               <input type="radio" name="dificuldade" checked={levelId === level.id} onChange={() => setLevelId(level.id)} className="sr-only" />
               {level.label}
             </label>

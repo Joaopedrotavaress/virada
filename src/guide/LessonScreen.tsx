@@ -141,7 +141,7 @@ function PositionExercise({ lesson, position, index, onNext }: { lesson: Lesson;
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
-            <h2 className="font-display text-xl font-semibold text-(--text-best)">{exercise.status === 'other-solution' ? 'Também resolve!' : 'Isso!'}</h2>
+            <h2 className="font-display text-xl font-semibold text-(--positive)">{exercise.status === 'other-solution' ? 'Também resolve!' : 'Isso!'}</h2>
             <p className="mt-1 max-w-prose text-base leading-relaxed">{position.after}</p>
             <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
               {hasNext ? 'Próximo exercício' : 'Terminar a lição'}
@@ -211,7 +211,7 @@ export function LessonScreen({ id }: { id: string }) {
         Voltar
       </button>
       <h1 className="font-display mt-1 text-3xl font-semibold">{lesson.title}</h1>
-      {finished && <p className="mt-2 rounded-md bg-surface p-3 font-semibold text-(--text-best)">Lição concluída.</p>}
+      {finished && <p className="mt-2 rounded-md bg-surface p-3 font-semibold text-(--positive)">Lição concluída.</p>}
       {lesson.paragraphs.map((paragraph) => (
         <p key={paragraph} className="mt-3 max-w-prose text-lg leading-relaxed">
           {paragraph}
