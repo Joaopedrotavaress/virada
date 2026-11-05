@@ -198,7 +198,8 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
 
   const walk = useCallback(
     (target: WalkTarget) => {
-      if (retry) return
+      // Andar pela partida encerra a tentativa: a pessoa nunca fica presa nela.
+      if (retry) exitRetry()
       setSelected(null)
       pauseReview()
       if (testing) {
@@ -216,7 +217,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
         return Math.max(0, Math.min(moves.length, next))
       })
     },
-    [exitVariant, moves.length, pauseReview, retry, testing, variant?.cursor, variantWalk],
+    [exitRetry, exitVariant, moves.length, pauseReview, retry, testing, variant?.cursor, variantWalk],
   )
 
   useEffect(() => {
@@ -398,8 +399,8 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     </div>
   )
 
-  const atStart = Boolean(retry) || (variant ? variant.cursor === -1 && ply === 0 : ply === 0)
-  const atEnd = Boolean(retry) || (variant ? variant.cursor === variant.steps.length - 1 : ply === moves.length)
+  const atStart = !retry && variant ? variant.cursor === -1 && ply === 0 : ply === 0
+  const atEnd = !retry && variant ? variant.cursor === variant.steps.length - 1 : ply === moves.length
   const details = [analysis.result === '*' ? '' : analysis.result, formatDate(analysis.date), formatTimeControl(analysis.timeControl)].filter(Boolean)
   const shortMeta = details.join(', ')
   const meta = [...details, `profundidade ${analysis.depth}`].join(', ')
@@ -665,20 +666,58 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
   )
 
   // O que os botões fixos podem fazer agora.
-  const coachShown = !retry && !variant && review.status !== 'done' && !(review.status === 'idle' && ply === 0)
-  const canShowBest = coachShown && !playing && Boolean((before ?? position).bestUci)
-  const canTryAgain = coachShown && !playing && Boolean(move && isErrorClass(move.cls))
-  const nextPlace = retry || variant || review.status === 'done'
-    ? null
-    : review.status === 'idle' && ply === 0
-      ? { label: 'Começar revisão', run: resumeReview }
-      : reviewing && !playing
-        ? { label: 'Continuar', run: resumeReview }
-        : review.nextMoment
-          ? { label: 'Próximo momento', run: () => jumpToMoment((review.nextMoment as { ply: number }).ply) }
-          : playing
-            ? { label: 'Ir para a conclusão', run: review.skip }
-            : null
+  // Na tentativa e no lance testado, eles continuam valendo: mudam de função ou levam de volta à partida.
+  const moveShown = !playing && review.status !== 'done' && !(review.status === 'idle' && ply === 0)
+  const canShowBest = retry ? retry.phase === 'playing' || retry.phase === 'wrong' || retry.phase === 'answer' : moveShown && Boolean((before ?? position).bestUci)
+  const canTryAgain = retry ? retry.phase !== 'evaluating' : moveShown && Boolean(move && isErrorClass(move.cls))
+  const bestPressed = retry ? retry.phase === 'answer' : revealed && !variant
+  const goToNextMoment = review.nextMoment && { label: 'Próximo momento', run: () => jumpToMoment((review.nextMoment as { ply: number }).ply) }
+  const nextPlace = retry || variant
+    ? (goToNextMoment ?? {
+        label: 'Voltar à partida',
+        run: () => {
+          exitRetry()
+          exitVariant()
+          setSelected(null)
+        },
+      })
+    : review.status === 'done'
+      ? null
+      : review.status === 'idle' && ply === 0
+        ? { label: 'Começar revisão', run: resumeReview }
+        : reviewing && !playing
+          ? { label: 'Continuar', run: resumeReview }
+          : (goToNextMoment ?? (playing ? { label: 'Ir para a conclusão', run: review.skip } : null))
+
+  const onBestAction = () => {
+    if (retry) {
+      if (retry.phase === 'answer') retryAgain()
+      else retryReveal()
+      return
+    }
+    setTab('coach')
+    if (variant) {
+      exitVariant()
+      setSelected(null)
+      setRevealed(true)
+      return
+    }
+    setRevealed((value) => !value)
+  }
+
+  const onTryAction = () => {
+    if (retry) {
+      if (retry.phase === 'playing') exitRetry()
+      else retryAgain()
+      return
+    }
+    exitVariant()
+    setRevealed(false)
+    setSelected(null)
+    setTab('coach')
+    pauseReview()
+    startRetry(ply)
+  }
 
   const tabs: { id: MobileTab; label: string }[] = [
     { id: 'coach', label: 'Treinador' },
@@ -756,29 +795,14 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
 
       <div role="group" aria-label="Ações da revisão" className="flex shrink-0 items-center gap-1 border-t border-line px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
         <ActionButton label={playing ? 'Pausar' : 'Tocar'} ariaLabel={playing ? 'Pausar revisão' : 'Tocar revisão'} icon={playing ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M5 4l15 8-15 8z'} onClick={togglePlay} />
-        <ActionButton
-          label="Melhor"
-          ariaLabel={revealed ? 'Esconder melhor' : 'Mostrar melhor'}
-          icon={ICON_PATHS.star}
-          pressed={revealed}
-          disabled={!canShowBest}
-          onClick={() => {
-            setTab('coach')
-            setRevealed((value) => !value)
-          }}
-        />
+        <ActionButton label="Melhor" ariaLabel={bestPressed ? 'Esconder melhor' : 'Mostrar melhor'} icon={ICON_PATHS.star} pressed={bestPressed} disabled={!canShowBest} onClick={onBestAction} />
         <ActionButton
           label="Tentar"
-          ariaLabel="Tentar de novo"
+          ariaLabel={!retry ? 'Tentar de novo' : retry.phase === 'playing' ? 'Parar de tentar' : 'Tentar mais uma vez'}
           icon="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"
+          pressed={retry?.phase === 'playing'}
           disabled={!canTryAgain}
-          onClick={() => {
-            setRevealed(false)
-            setSelected(null)
-            setTab('coach')
-            pauseReview()
-            startRetry(ply)
-          }}
+          onClick={onTryAction}
         />
         {nextPlace && (
           <button type="button" onClick={nextPlace.run} className="min-h-12 min-w-0 flex-1 truncate rounded-md bg-action px-2 text-sm font-semibold text-on-action">
