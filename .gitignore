@@ -1,0 +1,12 @@
+node_modules
+dist
+*.local
+.vercel
+# gerados pelo postinstall a partir de node_modules/stockfish
+public/engine
+# gerado por scripts/build-openings.mjs
+src/chess/openings.generated.json
+.playwright-mcp
+.playwright-mcp
+# banco do backend local
+data-local
