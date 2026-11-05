@@ -10,3 +10,5 @@ src/chess/openings.generated.json
 .playwright-mcp
 # banco do backend local
 data-local
+src/guide/catalog.generated.json
+claims.tmp.txt

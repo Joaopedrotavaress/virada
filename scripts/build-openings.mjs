@@ -50,6 +50,11 @@ const FAMILIAS = {
   'Old Indian Defense': 'Defesa Índia Antiga',
   'London System': 'Sistema Londres',
   'Ruy Lopez': 'Ruy Lopez',
+  'Philidor Defense': 'Defesa Filidor',
+  'Danish Gambit': 'Gambito Dinamarquês',
+  'Danish Gambit Accepted': 'Gambito Dinamarquês Aceito',
+  'Danish Gambit Declined': 'Gambito Dinamarquês Recusado',
+  'Ponziani Opening': 'Abertura Ponziani',
 }
 
 const PALAVRAS = [
@@ -92,6 +97,7 @@ const indiceDoNome = new Map()
 const posicoes = {}
 
 let linhas = 0
+const catalogo = []
 for (const letra of ['a', 'b', 'c', 'd', 'e']) {
   const texto = readFileSync(join(raiz, 'data', 'openings', `${letra}.tsv`), 'utf8')
   for (const linha of texto.split('\n').slice(1)) {
@@ -105,6 +111,7 @@ for (const letra of ['a', 'b', 'c', 'd', 'e']) {
       if (!(k in posicoes)) posicoes[k] = -1
     }
     const rotulo = `${eco}|${traduzir(nome)}`
+    catalogo.push([eco, traduzir(nome), lances.join(' ')])
     if (!indiceDoNome.has(rotulo)) {
       indiceDoNome.set(rotulo, nomes.length)
       nomes.push(rotulo)
@@ -118,4 +125,5 @@ for (const letra of ['a', 'b', 'c', 'd', 'e']) {
 
 const destino = join(raiz, 'src', 'chess', 'openings.generated.json')
 writeFileSync(destino, JSON.stringify({ names: nomes, positions: posicoes }))
+writeFileSync(join(raiz, 'src', 'guide', 'catalog.generated.json'), JSON.stringify(catalogo))
 console.log(`[aberturas] ${linhas} linhas, ${Object.keys(posicoes).length} posições, ${nomes.length} nomes`)

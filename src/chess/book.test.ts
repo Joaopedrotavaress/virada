@@ -65,7 +65,7 @@ describe('base de aberturas', async () => {
     const { bookMoves, opening } = findBookMoves(book, fensOf(SAMPLE_PGN))
     expect(bookMoves[0]).toBe(true)
     expect(bookMoves[bookMoves.length - 1]).toBe(false)
-    expect(opening?.name).toContain('Philidor')
+    expect(opening?.name).toContain('Filidor')
   })
 })
 
