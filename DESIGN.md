@@ -217,7 +217,7 @@ components:
 
 A partida sai do escuro, casa por casa, até o ponto em que virou, e uma placa amarela entrega a resposta. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.
 
-O tema da noite é aquele para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.
+O tema da noite é o padrão, e o do dia só vale quando a pessoa escolhe. É o tema para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.
 
 O carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um treinador que fala como amigo de clube e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.
 

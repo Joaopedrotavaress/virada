@@ -1,9 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-  color-scheme: light dark;
-
-  /* Dia: o tema claro. A noite, logo abaixo, é o tema para o qual o Virada foi desenhado. */
+  /* Dia: o tema claro, só quando a pessoa escolhe. A noite, logo abaixo, é o padrão do Virada. */
   --bg: #e6e6ea;
   --surface: #f7f7f8;
   --sunken: #d8d8de;
@@ -72,27 +70,28 @@
 }
 
 /* Peças pretas capturadas sumiriam no fundo escuro. */
-@media (prefers-color-scheme: dark) {
-  .captured-dark {
-    filter: drop-shadow(0 0 1px #f4f4f6);
-  }
+:root:not([data-theme='light']) .captured-dark {
+  filter: drop-shadow(0 0 1px #f4f4f6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0b0d;
-    --surface: #17171b;
-    --sunken: #26262c;
-    --ink: #eeeef1;
-    --muted: #a9a9b1;
-    --line: #34343b;
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-    --positive: #68d278;
-    --text-inaccuracy: #e6ae3a;
-    --text-mistake: #f5944c;
-    --text-blunder: #f97f8c;
-    --text-miss: #bb99f7;
-  }
+:root:not([data-theme='light']) {
+  color-scheme: dark;
+  --bg: #0b0b0d;
+  --surface: #17171b;
+  --sunken: #26262c;
+  --ink: #eeeef1;
+  --muted: #a9a9b1;
+  --line: #34343b;
+
+  --positive: #68d278;
+  --text-inaccuracy: #e6ae3a;
+  --text-mistake: #f5944c;
+  --text-blunder: #f97f8c;
+  --text-miss: #bb99f7;
 }
 
 @theme inline {

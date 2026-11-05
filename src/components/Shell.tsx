@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useQueue } from '../data/queue'
 import { Logo, ZoneRamp } from './Logo'
+import { ThemeToggle } from './ThemeToggle'
 import { navigate, type Route } from '../route'
 
 const ITEMS: { path: string; label: string; icon: string; active: Route['name'][] }[] = [
@@ -54,6 +55,7 @@ export function Shell({ route, children }: { route: Route; children: ReactNode }
           <nav aria-label="Seções" className="flex gap-1">
             {links}
           </nav>
+          <ThemeToggle className="ml-auto" />
         </div>
       </header>
 

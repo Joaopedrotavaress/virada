@@ -3,9 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e6e6ea" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0b0d" />
+    <meta name="theme-color" content="#0b0b0d" />
+    <script>
+      // Antes de desenhar a página, para o tema escolhido não piscar ao abrir.
+      try {
+        if (localStorage.getItem('treinador:tema') === 'light') {
+          document.documentElement.dataset.theme = 'light'
+          document.querySelector('meta[name="theme-color"]').content = '#e6e6ea'
+        }
+      } catch {}
+    </script>
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />

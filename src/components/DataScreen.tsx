@@ -3,6 +3,7 @@ import { BackupError, downloadJson, exportAll, mergeBackup, parseBackup } from '
 import { GistError, forgetGist, loadGistToken, loadLastGistSync, saveGistToken, syncGist } from '../data/gistSync'
 import { recordsFor, requestPersistence, useAllRecords } from '../data/library'
 import { useLocalBackend } from '../data/localBackend'
+import { useTheme } from '../theme'
 
 const formatBytes = (bytes: number) => (bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1).replace('.', ',')} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`)
 
@@ -16,6 +17,7 @@ export function DataScreen({ username }: { username: string }) {
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const backend = useLocalBackend()
+  const { theme, toggle } = useTheme()
   const [hasToken, setHasToken] = useState(() => Boolean(loadGistToken()))
   const [draftToken, setDraftToken] = useState('')
   const [lastGist, setLastGist] = useState(loadLastGistSync)
@@ -122,6 +124,13 @@ export function DataScreen({ username }: { username: string }) {
           </div>
         )}
       </dl>
+
+      <section className="mt-6">
+        <h2 className="font-display text-xl font-semibold">Aparência</h2>
+        <button type="button" onClick={toggle} className="mt-2 min-h-12 rounded-md border border-line px-5 font-semibold hover:bg-sunken">
+          {theme === 'dark' ? 'Usar tema claro' : 'Usar tema escuro'}
+        </button>
+      </section>
 
       <section className="mt-6">
         <h2 className="font-display text-xl font-semibold">Backup</h2>
