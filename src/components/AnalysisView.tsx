@@ -10,6 +10,7 @@ import { materialState } from '../chess/material'
 import { uciParts } from '../chess/notation'
 import { formatDate, formatTimeControl } from '../chess/pgn'
 import { REVIEW_SPEEDS, findKeyMoments, gameInsights } from '../chess/review'
+import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
 import { CapturedPieces } from './CapturedPieces'
 import { ClockChart } from './ClockChart'
@@ -325,6 +326,9 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     }
   }, [retry, positions, variant, variantStep, selected, move, position, revealed, shownBest])
 
+  // Com até 7 peças, o banco de finais dá a resposta exata. Sem internet, a linha só não aparece.
+  const tablebase = useTablebase(boardProps.fen)
+
   const barEval = retry
     ? (retry.after?.eval ?? positions[retry.ply - 1].eval)
     : variant
@@ -500,6 +504,17 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     />
   )
 
+  const coachWithTablebase = (
+    <>
+      {coach}
+      {tablebase && !playing && (
+        <p role="status" className="rounded-md bg-surface p-3 text-sm">
+          {tablebase}
+        </p>
+      )}
+    </>
+  )
+
   const chart = (
     <div className="flex flex-col gap-4">
       <EvalChart positions={positions} moves={moves} ply={ply} onSelect={go} showTitle={isDesktop} />
@@ -576,7 +591,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
           <div className="grid min-w-0 flex-1 gap-5 xl:min-h-0 xl:grid-cols-2">
             <div className="-m-1 flex min-w-0 flex-col gap-3 p-1 xl:overflow-y-auto">
               {reviewBar}
-              {coach}
+              {coachWithTablebase}
               <div className="mt-2">{chart}</div>
             </div>
             <div className="-m-1 flex min-w-0 flex-col gap-5 p-1 xl:overflow-y-auto">
@@ -646,7 +661,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       <div id="painel-analise" role="tabpanel" aria-labelledby={`aba-${tab}`} className="min-h-0 flex-1 overflow-y-auto p-2">
         {(tab === 'coach' || reviewing) && (
           <div className="flex flex-col gap-2">
-            {coach}
+            {coachWithTablebase}
             {!retry && !testing && !playing && <p className="px-1 text-sm text-muted">Toque numa peça e no destino para testar outro lance.</p>}
           </div>
         )}
