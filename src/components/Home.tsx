@@ -1,14 +1,20 @@
-import { useState } from 'react'
-import type { GameAnalysis } from '../chess/analyze'
-import { formatDate } from '../chess/pgn'
+import { useMemo, useState } from 'react'
+import { formatOpening } from '../chess/book'
+import { BOTS } from '../bots/bots'
+import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../data/library'
 import { useInstall } from '../pwa'
-import type { PendingGame } from '../storage'
+import { navigate } from '../route'
+import type { ActiveGame } from '../storage'
+import { TodayCard } from './TodayCard'
+import { viewRecord } from './Games'
 
 const DEPTHS = [
   { value: 12, label: 'Rápida', hint: 'Boa para uma olhada. Pode deixar passar táticas longas.' },
   { value: 15, label: 'Normal', hint: 'O equilíbrio para a maioria das partidas.' },
   { value: 18, label: 'Profunda', hint: 'Mais lenta e mais confiável nas táticas.' },
 ]
+
+const RECENT_LIMIT = 6
 
 interface HomeProps {
   pgn: string
@@ -18,223 +24,177 @@ interface HomeProps {
   username: string
   onUsernameChange: (username: string) => void
   error: string | null
-  recent: GameAnalysis[]
-  pending: PendingGame[]
+  activeGame: ActiveGame | null
+  onAbandonGame: () => void
   onAnalyze: () => void
   onSample: () => void
-  onOpen: (analysis: GameAnalysis) => void
-  onOpenPending: (game: PendingGame) => void
-  onRemove: (id: string) => void
-  onRemovePending: (id: string) => void
-  onPlayBot: () => void
-  onBrowse: () => void
+  onOpen: (record: GameRecord) => void
 }
 
 const inputClass =
   'w-full rounded-md border border-line bg-surface text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink'
 
-export function Home(props: HomeProps) {
-  const { pgn, depth, username, error, recent, pending } = props
-  const hint = DEPTHS.find((option) => option.value === depth)?.hint
+const OUTCOME_LABEL = { win: 'vitória', loss: 'derrota', draw: 'empate' }
+
+function UserForm({ username, onChange, onSubmit, autoFocus = false }: { username: string; onChange: (name: string) => void; onSubmit: () => void; autoFocus?: boolean }) {
   const [needsUser, setNeedsUser] = useState(false)
-  const { mode: installMode, install } = useInstall()
-
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-8 pb-12 lg:pt-16">
-      <div className="grid gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <main className="min-w-0">
-          <header className="mb-8 flex items-start gap-4 sm:gap-6">
-            <span aria-hidden="true" className="font-book -mt-2 text-6xl leading-none font-bold text-(--text-inaccuracy) sm:text-8xl sm:-mt-3">
-              ?!
-            </span>
-            <div>
-              <h1 className="font-book text-3xl leading-tight font-semibold sm:text-5xl">Onde a sua partida virou?</h1>
-              <p className="mt-3 max-w-prose text-base text-muted">
-                Cole o PGN e o Stockfish revisa cada lance aqui no seu navegador. Grátis, sem cadastro, e nada sai do seu aparelho.
-              </p>
-            </div>
-          </header>
-
-          <form
-            className="mb-8"
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (!username.trim()) {
-                setNeedsUser(true)
-                return
-              }
-              props.onBrowse()
-            }}
-          >
-            <label htmlFor="usuario" className="mb-1.5 block text-sm font-semibold">
-              Seu usuário do chess.com
-            </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                id="usuario"
-                type="text"
-                value={username}
-                onChange={(event) => {
-                  setNeedsUser(false)
-                  props.onUsernameChange(event.target.value)
-                }}
-                autoCapitalize="off"
-                autoCorrect="off"
-                autoComplete="username"
-                spellCheck={false}
-                aria-describedby="ajuda-usuario"
-                className={`${inputClass} min-h-12 min-w-0 flex-1 px-3 text-base`}
-              />
-              <button type="submit" className="min-h-12 shrink-0 rounded-md bg-ink px-6 font-semibold text-bg">
-                Buscar partidas
-              </button>
-            </div>
-            <p id="ajuda-usuario" role={needsUser ? 'alert' : undefined} className={`mt-2 text-sm ${needsUser ? 'font-medium text-(--text-blunder)' : 'text-muted'}`}>
-              {needsUser ? 'Digite seu usuário para buscar as partidas.' : 'Também serve para o tabuleiro abrir virado para o seu lado.'}
-            </p>
-          </form>
-
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              props.onAnalyze()
-            }}
-          >
-            <label htmlFor="pgn" className="mb-1.5 block text-sm font-semibold">
-              Ou cole o PGN da partida
-            </label>
-            <textarea
-              id="pgn"
-              value={pgn}
-              onChange={(event) => props.onPgnChange(event.target.value)}
-              rows={5}
-              spellCheck={false}
-              autoCapitalize="off"
-              autoCorrect="off"
-              aria-describedby={error ? 'erro-pgn' : 'ajuda-pgn'}
-              aria-invalid={Boolean(error)}
-              placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."
-              className={`${inputClass} font-book block resize-y p-3 text-base leading-relaxed`}
-            />
-            {error ? (
-              <p id="erro-pgn" role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
-                {error}
-              </p>
-            ) : (
-              <p id="ajuda-pgn" className="mt-2 text-sm text-muted">
-                No chess.com, abra a partida, toque em Compartilhar e copie o PGN.
-              </p>
-            )}
-
-            <fieldset className="mt-6">
-              <legend className="mb-1.5 text-sm font-semibold">Profundidade</legend>
-              <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line">
-                {DEPTHS.map((option) => (
-                  <label
-                    key={option.value}
-                    className={`flex min-h-11 cursor-pointer flex-col items-center justify-center px-1 py-1.5 text-center has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${
-                      depth === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="profundidade"
-                      value={option.value}
-                      checked={depth === option.value}
-                      onChange={() => props.onDepthChange(option.value)}
-                      className="sr-only"
-                    />
-                    <span className="text-sm font-semibold">{option.label}</span>
-                    <span className="tabular text-xs opacity-80">{option.value}</span>
-                  </label>
-                ))}
-              </div>
-              <p className="mt-2 text-sm text-muted">{hint}</p>
-            </fieldset>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button type="submit" className="min-h-12 flex-1 rounded-md border border-ink px-5 font-semibold sm:flex-none sm:px-8">
-                Analisar partida
-              </button>
-              <button type="button" onClick={props.onSample} className="min-h-12 rounded-md border border-line px-5 font-semibold text-ink hover:bg-sunken">
-                Partida de exemplo
-              </button>
-            </div>
-          </form>
-
-          <section className="mt-10 border-t border-line pt-6">
-            <h2 className="font-book text-xl font-semibold">Prefere jogar agora?</h2>
-            <p className="mt-1 max-w-prose text-muted">Enfrente um bot do seu nível, com o treinador avisando dos erros durante a partida. Depois, é só revisar.</p>
-            <button type="button" onClick={props.onPlayBot} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
-              Jogar contra um bot
-            </button>
-          </section>
-        </main>
-
-        <aside className="min-w-0 lg:pt-3">
-          <h2 className="font-book text-xl font-semibold">Partidas recentes</h2>
-          {recent.length === 0 && pending.length === 0 ? (
-            <p className="mt-2 max-w-prose text-sm text-muted">As partidas que você analisar ficam guardadas aqui, neste aparelho, para abrir de novo sem esperar.</p>
-          ) : (
-            <ul className="mt-3 divide-y divide-line border-y border-line">
-              {pending.map((game) => (
-                <li key={game.id} className="flex items-stretch">
-                  <button type="button" onClick={() => props.onOpenPending(game)} className="min-w-0 flex-1 py-3 pr-2 text-left hover:bg-sunken">
-                    <span className="block truncate font-semibold">{game.white}</span>
-                    <span className="block truncate font-semibold">{game.black}</span>
-                    <span className="tabular mt-0.5 block text-sm text-muted">{[game.result, formatDate(game.date), 'toque para analisar'].filter(Boolean).join(', ')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => props.onRemovePending(game.id)}
-                    aria-label={`Remover ${game.white} contra ${game.black}`}
-                    className="flex w-11 shrink-0 items-center justify-center text-xl text-muted hover:bg-sunken hover:text-ink"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-              {recent.map((game) => (
-                <li key={game.id} className="flex items-stretch">
-                  <button type="button" onClick={() => props.onOpen(game)} className="min-w-0 flex-1 py-3 pr-2 text-left hover:bg-sunken">
-                    <span className="block truncate font-semibold">{game.white}</span>
-                    <span className="block truncate font-semibold">{game.black}</span>
-                    <span className="tabular mt-0.5 block text-sm text-muted">
-                      {[game.result === '*' ? '' : game.result, formatDate(game.date), `profundidade ${game.depth}`].filter(Boolean).join(', ')}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => props.onRemove(game.id)}
-                    aria-label={`Remover ${game.white} contra ${game.black}`}
-                    className="flex w-11 shrink-0 items-center justify-center text-xl text-muted hover:bg-sunken hover:text-ink"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        if (!username.trim()) {
+          setNeedsUser(true)
+          return
+        }
+        onSubmit()
+      }}
+    >
+      <label htmlFor="usuario" className="mb-1.5 block text-sm font-semibold">
+        Seu usuário do chess.com
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          id="usuario"
+          type="text"
+          value={username}
+          autoFocus={autoFocus}
+          onChange={(event) => {
+            setNeedsUser(false)
+            onChange(event.target.value)
+          }}
+          autoCapitalize="off"
+          autoCorrect="off"
+          autoComplete="username"
+          spellCheck={false}
+          aria-describedby="ajuda-usuario"
+          className={`${inputClass} min-h-12 min-w-0 flex-1 px-3 text-base`}
+        />
+        <button type="submit" className="min-h-12 shrink-0 rounded-md bg-ink px-6 font-semibold text-bg">
+          Buscar partidas
+        </button>
       </div>
+      <p id="ajuda-usuario" role={needsUser ? 'alert' : undefined} className={`mt-2 text-sm ${needsUser ? 'font-medium text-(--text-blunder)' : 'text-muted'}`}>
+        {needsUser ? 'Digite seu usuário para buscar as partidas.' : 'Também serve para o tabuleiro abrir virado para o seu lado.'}
+      </p>
+    </form>
+  )
+}
 
-      {installMode !== 'none' && (
-        <section className="mt-12 border-t border-line pt-6">
-          <h2 className="font-book text-xl font-semibold">Use como um app</h2>
-          {installMode === 'prompt' ? (
-            <>
-              <p className="mt-1 max-w-prose text-muted">Instalado, ele abre direto da tela inicial e funciona sem internet.</p>
-              <button type="button" onClick={() => void install()} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
-                Instalar app
-              </button>
-            </>
-          ) : (
-            <p className="mt-1 max-w-prose text-muted">No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início. Assim ele abre como um app e funciona sem internet.</p>
-          )}
-        </section>
+function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onSample }: Pick<HomeProps, 'pgn' | 'depth' | 'error' | 'onPgnChange' | 'onDepthChange' | 'onAnalyze' | 'onSample'>) {
+  const hint = DEPTHS.find((option) => option.value === depth)?.hint
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        onAnalyze()
+      }}
+    >
+      <label htmlFor="pgn" className="mb-1.5 block text-sm font-semibold">
+        Cole o PGN da partida
+      </label>
+      <textarea
+        id="pgn"
+        value={pgn}
+        onChange={(event) => onPgnChange(event.target.value)}
+        rows={5}
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
+        aria-describedby={error ? 'erro-pgn' : 'ajuda-pgn'}
+        aria-invalid={Boolean(error)}
+        placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."
+        className={`${inputClass} font-book block resize-y p-3 text-base leading-relaxed`}
+      />
+      {error ? (
+        <p id="erro-pgn" role="alert" className="mt-2 text-sm font-medium text-(--text-blunder)">
+          {error}
+        </p>
+      ) : (
+        <p id="ajuda-pgn" className="mt-2 text-sm text-muted">
+          No chess.com, abra a partida, toque em Compartilhar e copie o PGN.
+        </p>
       )}
 
-      <footer className="mt-16 text-sm text-muted">
+      <fieldset className="mt-6">
+        <legend className="mb-1.5 text-sm font-semibold">Profundidade</legend>
+        <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line">
+          {DEPTHS.map((option) => (
+            <label
+              key={option.value}
+              className={`flex min-h-11 cursor-pointer flex-col items-center justify-center px-1 py-1.5 text-center has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${
+                depth === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink'
+              }`}
+            >
+              <input type="radio" name="profundidade" value={option.value} checked={depth === option.value} onChange={() => onDepthChange(option.value)} className="sr-only" />
+              <span className="text-sm font-semibold">{option.label}</span>
+              <span className="tabular text-xs opacity-80">{option.value}</span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-sm text-muted">{hint}</p>
+      </fieldset>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <button type="submit" className="min-h-12 flex-1 rounded-md border border-ink px-5 font-semibold sm:flex-none sm:px-8">
+          Analisar partida
+        </button>
+        <button type="button" onClick={onSample} className="min-h-12 rounded-md border border-line px-5 font-semibold text-ink hover:bg-sunken">
+          Partida de exemplo
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function RecentGames({ records, onOpen }: { records: GameRecord[]; onOpen: (record: GameRecord) => void }) {
+  return (
+    <ul className="mt-3 divide-y divide-line border-y border-line">
+      {records.map((record) => {
+        const view = viewRecord(record)
+        return (
+          <li key={record.key} className="flex items-stretch">
+            <button type="button" onClick={() => onOpen(record)} className="min-w-0 flex-1 py-3 pr-2 text-left hover:bg-sunken">
+              <span className="block truncate font-semibold">{view.title}</span>
+              {record.opening && <span className="font-book block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
+              <span className="tabular mt-0.5 block truncate text-sm text-muted">
+                {[record.outcome ? OUTCOME_LABEL[record.outcome] : record.result === '*' ? '' : record.result, new Date(record.playedAt).toLocaleDateString('pt-BR'), record.digest ? (view.accuracy !== null ? `precisão ${view.accuracy.toFixed(0)}%` : '') : 'toque para analisar'].filter(Boolean).join(', ')}
+              </span>
+            </button>
+            <button type="button" onClick={() => void removeRecord(record.key)} aria-label={`Apagar a partida contra ${view.title}`} className="flex w-11 shrink-0 items-center justify-center text-xl text-muted hover:bg-sunken hover:text-ink">
+              ×
+            </button>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+export function Home(props: HomeProps) {
+  const { username, activeGame } = props
+  const { mode: installMode, install } = useInstall()
+  const [changingUser, setChangingUser] = useState(false)
+  const all = useAllRecords()
+  const records = useMemo(() => recordsFor(all, username), [all, username])
+  // Recentes: o que a pessoa já olhou ou jogou aqui. As demais partidas do chess.com ficam em Partidas.
+  const recent = useMemo(() => records.filter((record) => record.digest || record.source !== 'chesscom').slice(0, RECENT_LIMIT), [records])
+  const returning = records.length > 0 || Boolean(username.trim())
+  const activeBot = activeGame && BOTS.find((bot) => bot.id === activeGame.botId)
+
+  const pgnForm = <PgnForm {...props} />
+  const footer = (
+    <footer className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+      <a
+        href="#/dados"
+        onClick={(event) => {
+          event.preventDefault()
+          navigate('#/dados')
+        }}
+        className="flex min-h-11 items-center font-semibold text-ink underline"
+      >
+        Seus dados e backup
+      </a>
+      <span>
         Análise feita pelo{' '}
         <a href="https://github.com/nmrugg/stockfish.js" className="underline" rel="noreferrer" target="_blank">
           Stockfish.js
@@ -244,7 +204,128 @@ export function Home(props: HomeProps) {
           GPLv3
         </a>
         ).
-      </footer>
+      </span>
+    </footer>
+  )
+  const installSection = installMode !== 'none' && (
+    <section className="mt-10 border-t border-line pt-6">
+      <h2 className="font-book text-xl font-semibold">Use como um app</h2>
+      {installMode === 'prompt' ? (
+        <>
+          <p className="mt-1 max-w-prose text-muted">Instalado, ele abre direto da tela inicial e funciona sem internet.</p>
+          <button type="button" onClick={() => void install()} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
+            Instalar app
+          </button>
+        </>
+      ) : (
+        <p className="mt-1 max-w-prose text-muted">No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início. Assim ele abre como um app e funciona sem internet.</p>
+      )}
+    </section>
+  )
+
+  if (!returning) {
+    return (
+      <div className="mx-auto w-full max-w-3xl px-4 pt-8 pb-12 lg:pt-16">
+        <header className="mb-8 flex items-start gap-4 sm:gap-6">
+          <span aria-hidden="true" className="font-book -mt-2 text-6xl leading-none font-bold text-(--text-inaccuracy) sm:-mt-3 sm:text-8xl">
+            ?!
+          </span>
+          <div>
+            <h1 className="font-book text-3xl leading-tight font-semibold sm:text-5xl">Onde a sua partida virou?</h1>
+            <p className="mt-3 max-w-prose text-base text-muted">Cole o PGN e o Stockfish revisa cada lance aqui no seu navegador. Grátis, sem cadastro, e nada sai do seu aparelho.</p>
+          </div>
+        </header>
+        <div className="mb-8">
+          <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} />
+        </div>
+        {pgnForm}
+        <section className="mt-10 border-t border-line pt-6">
+          <h2 className="font-book text-xl font-semibold">Prefere jogar agora?</h2>
+          <p className="mt-1 max-w-prose text-muted">Enfrente um bot do seu nível, com o treinador avisando dos erros durante a partida. Depois, é só revisar.</p>
+          <button type="button" onClick={() => navigate('#/jogar')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
+            Jogar contra um bot
+          </button>
+        </section>
+        {installSection}
+        {footer}
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 pt-5 pb-10 lg:pt-10">
+      <div className="grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <main className="min-w-0">
+          <h1 className="font-book text-3xl leading-tight font-semibold lg:text-4xl">{username.trim() ? `Olá, ${username.trim()}` : 'O que vamos fazer hoje?'}</h1>
+
+          {activeGame && (
+            <section aria-label="Partida em andamento" className="mt-4 rounded-md bg-ink p-4 text-bg">
+              <p className="font-semibold">Você tem uma partida em andamento{activeBot ? ` contra ${activeBot.name}` : ''}.</p>
+              <div className="mt-2 flex gap-2">
+                <button type="button" onClick={() => navigate('#/jogo')} className="min-h-11 flex-1 rounded-md bg-bg px-4 font-semibold text-ink sm:flex-none">
+                  Continuar
+                </button>
+                <button type="button" onClick={props.onAbandonGame} className="min-h-11 flex-1 rounded-md border border-bg/40 px-4 font-semibold sm:flex-none">
+                  Abandonar
+                </button>
+              </div>
+            </section>
+          )}
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            <button type="button" onClick={() => navigate('#/partidas')} className="min-h-14 rounded-md bg-ink px-5 text-left font-semibold text-bg">
+              Ver minhas partidas
+            </button>
+            <button type="button" onClick={() => navigate('#/jogar')} className="min-h-14 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
+              Jogar contra um bot
+            </button>
+          </div>
+
+          <TodayCard />
+
+          <details className="mt-6 border-t border-line pt-3" open={Boolean(props.error) || undefined}>
+            <summary className="flex min-h-11 cursor-pointer items-center font-semibold">Analisar um PGN</summary>
+            <div className="pt-2">{pgnForm}</div>
+          </details>
+
+          <div className="border-t border-line py-3 text-sm">
+            {changingUser ? (
+              <UserForm
+                username={username}
+                onChange={props.onUsernameChange}
+                autoFocus
+                onSubmit={() => {
+                  setChangingUser(false)
+                  navigate('#/partidas')
+                }}
+              />
+            ) : (
+              <p className="flex flex-wrap items-center gap-x-2 text-muted">
+                {username.trim() ? `Conta do chess.com: ${username.trim()}.` : 'Nenhuma conta do chess.com ligada.'}
+                <button type="button" onClick={() => setChangingUser(true)} className="min-h-11 font-semibold text-ink underline">
+                  {username.trim() ? 'Trocar' : 'Ligar conta'}
+                </button>
+              </p>
+            )}
+          </div>
+        </main>
+
+        <aside className="min-w-0">
+          <h2 className="font-book text-xl font-semibold">Partidas recentes</h2>
+          {recent.length === 0 ? (
+            <p className="mt-2 max-w-prose text-sm text-muted">As partidas que você analisar ou jogar aqui ficam guardadas neste aparelho, para abrir de novo sem esperar.</p>
+          ) : (
+            <RecentGames records={recent} onOpen={props.onOpen} />
+          )}
+          {records.length > recent.length && (
+            <button type="button" onClick={() => navigate('#/partidas')} className="mt-2 min-h-11 font-semibold underline">
+              Ver todas as {records.length} partidas
+            </button>
+          )}
+        </aside>
+      </div>
+      {installSection}
+      {footer}
     </div>
   )
 }
