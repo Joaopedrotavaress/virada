@@ -12,13 +12,16 @@ import { formatDate, formatTimeControl } from '../chess/pgn'
 import { REVIEW_SPEEDS, findKeyMoments, gameInsights, turningPoint } from '../chess/review'
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
+import { isErrorClass } from '../chess/classify'
 import { CapturedPieces } from './CapturedPieces'
 import { ClockChart } from './ClockChart'
 import { CoachCard, moveLabel } from './CoachCard'
 import { EvalBar } from './EvalBar'
 import { EvalChart } from './EvalChart'
 import { LegendButton } from './Legend'
+import { ICON_PATHS } from './Icons'
 import { MoveList } from './MoveList'
+import { MoveStrip } from './MoveStrip'
 import { RetryPanel } from './RetryPanel'
 import { ReviewBar, ReviewEnd, ReviewIntro } from './ReviewPanels'
 import { Summary, formatPercent } from './Summary'
@@ -67,9 +70,9 @@ function legalMoves(fen: string, from: string) {
 const arrowOf = (uci: string | null | undefined) => (uci ? [{ startSquare: uciParts(uci).from, endSquare: uciParts(uci).to, color: BEST_ARROW_COLOR }] : [])
 const tintOf = (cls: string) => `color-mix(in srgb, var(--fill-${cls}) 48%, transparent)`
 
-function Icon({ d }: { d: string }) {
+function Icon({ d, className = 'size-6' }: { d: string; className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6" fill="currentColor">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
       <path d={d} />
     </svg>
   )
@@ -85,6 +88,32 @@ function NavButton({ label, onClick, disabled, children }: { label: string; onCl
       disabled={disabled}
       className="flex min-h-11 flex-1 items-center justify-center rounded-md bg-surface text-ink hover:bg-sunken disabled:opacity-35 disabled:hover:bg-surface"
     >
+      {children}
+    </button>
+  )
+}
+
+/** Botão de ícone e rótulo da barra fixa do celular. */
+function ActionButton({ label, ariaLabel, icon, onClick, disabled, pressed }: { label: string; ariaLabel: string; icon: string; onClick: () => void; disabled?: boolean; pressed?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      aria-pressed={pressed}
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex h-12 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md text-[0.6875rem] font-semibold disabled:opacity-35 ${pressed ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}
+    >
+      <Icon d={icon} className="size-5" />
+      {label}
+    </button>
+  )
+}
+
+/** Botão baixo ao lado da fila de lances. */
+function StripButton({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: ReactNode }) {
+  return (
+    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled} className="flex size-9 shrink-0 items-center justify-center rounded-md hover:bg-sunken disabled:opacity-35">
       {children}
     </button>
   )
@@ -109,7 +138,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
   // A busca com 3 linhas pode discordar da análise. Mostrando as linhas, a primeira manda,
   // a não ser que o lance jogado já tenha sido o melhor: aí ele continua no topo.
   const storedBest = (before ?? position).bestUci
-  const shownBest = move?.cls === 'best' ? storedBest : (bestLines.lines?.[0]?.pvUci[0] ?? storedBest)
+  const shownBest = move?.cls === 'best' || move?.cls === 'brilliant' ? storedBest : (bestLines.lines?.[0]?.pvUci[0] ?? storedBest)
 
   const { retry, start: startRetry, exit: exitRetry, again: retryAgain, reveal: retryReveal, play: retryPlay } = useRetry(positions)
   const { variant, current: variantStep, baseFen, liveEval, error: variantError, play: variantPlay, playAfter: variantPlayAfter, select: variantSelect, walk: variantWalk, exit: exitVariant } = useVariant(positions)
@@ -306,7 +335,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       return {
         fen,
         squareStyles: withSelection(fen, squareStyles),
-        arrows: step?.cls && step.cls !== 'best' ? arrowOf(step.before?.bestUci) : [],
+        arrows: step?.cls && step.cls !== 'best' && step.cls !== 'brilliant' ? arrowOf(step.before?.bestUci) : [],
         badge: step?.cls ? { square: step.to, cls: step.cls } : null,
         animateArrow: false,
       }
@@ -386,10 +415,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     </p>
   )
 
-  const boardWithBar = (
-    <div className="flex gap-1 lg:gap-2">
-      <EvalBar evaluation={barEval} orientation={orientation} />
-      <div className="min-w-0 flex-1">
+  const boardAlone = (
         <Board
           fen={boardProps.fen}
           orientation={orientation}
@@ -403,7 +429,12 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
           onPieceDrop={attemptMove}
           onSquareClick={playableFen ? onSquareClick : undefined}
         />
-      </div>
+  )
+
+  const boardWithBar = (
+    <div className="flex gap-2">
+      <EvalBar evaluation={barEval} orientation={orientation} />
+      <div className="min-w-0 flex-1">{boardAlone}</div>
     </div>
   )
 
@@ -468,7 +499,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       }}
     />
   ) : review.status === 'idle' && ply === 0 ? (
-    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} turning={turning} />
+    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} turning={turning} hideStart={!isDesktop} />
   ) : review.status === 'done' ? (
     <ReviewEnd
       insights={insights}
@@ -502,6 +533,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       compact={playing}
       moment={moment && { title: moment.title, note: moment.note, index: momentIndex, total: moments.length }}
       onContinue={reviewing && !playing ? resumeReview : undefined}
+      dense={!isDesktop}
     />
   )
 
@@ -582,9 +614,9 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
         <div className="flex min-h-0 flex-1 items-start gap-6 pb-6 xl:items-stretch">
           {/* A largura vem da altura da tela: o tabuleiro e os botões sempre cabem sem rolar. */}
           <div className="shrink-0" style={{ width: 'min(max(calc(100dvh - 11rem), 18rem), 56vw)' }}>
-            <div className="ml-10">{playerStrip(top)}</div>
+            <div className="ml-8">{playerStrip(top)}</div>
             {boardWithBar}
-            <div className="ml-10">{playerStrip(bottom)}</div>
+            <div className="ml-8">{playerStrip(bottom)}</div>
             <div className="flex gap-1.5">{navButtons}</div>
             <p className="mt-1.5 text-xs text-muted">Arraste uma peça para testar outro lance. Setas ← → navegam; a barra de espaço toca e pausa a revisão.</p>
           </div>
@@ -617,6 +649,22 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
     </div>
   )
 
+  // O que os botões fixos podem fazer agora.
+  const coachShown = !retry && !variant && review.status !== 'done' && !(review.status === 'idle' && ply === 0)
+  const canShowBest = coachShown && !playing && Boolean((before ?? position).bestUci)
+  const canTryAgain = coachShown && !playing && Boolean(move && isErrorClass(move.cls))
+  const nextPlace = retry || variant || review.status === 'done'
+    ? null
+    : review.status === 'idle' && ply === 0
+      ? { label: 'Começar revisão', run: resumeReview }
+      : reviewing && !playing
+        ? { label: 'Continuar', run: resumeReview }
+        : review.nextMoment
+          ? { label: 'Próximo momento', run: () => jumpToMoment((review.nextMoment as { ply: number }).ply) }
+          : playing
+            ? { label: 'Ir para a conclusão', run: review.skip }
+            : null
+
   const tabs: { id: MobileTab; label: string }[] = [
     { id: 'coach', label: 'Treinador' },
     { id: 'chart', label: 'Gráfico' },
@@ -629,20 +677,40 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       <header className="flex h-11 shrink-0 items-center justify-between gap-2 px-2">
         {backButton}
         <p className={`ml-auto min-w-0 truncate text-right ${analysis.opening ? 'text-sm' : 'tabular text-xs text-muted'}`}>{analysis.opening ? formatOpening(analysis.opening) : shortMeta}</p>
+        <StripButton label="Virar o tabuleiro" onClick={() => setOrientation((value) => (value === 'white' ? 'black' : 'white'))}>
+          <Icon d="M7 3 3 7h3v8h2V7h3zm10 18 4-4h-3V9h-2v8h-3z" className="size-5" />
+        </StripButton>
         <LegendButton compact />
       </header>
       {noticeBox}
+      <EvalBar evaluation={barEval} orientation={orientation} horizontal />
 
       {/* O tabuleiro fica sempre à vista; só o painel abaixo dele muda ou rola. */}
-      <div className="mx-auto w-full shrink-0 px-2" style={{ maxWidth: 'max(16rem, calc(100dvh - 24rem))' }}>
-        <div className="ml-8">{mobileStrip(top)}</div>
-        {boardWithBar}
-        <div className="ml-8">{mobileStrip(bottom)}</div>
+      <div className="mx-auto w-full shrink-0" style={{ maxWidth: 'max(16rem, calc(100dvh - 21rem))' }}>
+        <div className="px-2">{mobileStrip(top)}</div>
+        {boardAlone}
+        <div className="px-2">{mobileStrip(bottom)}</div>
       </div>
+
+      <nav aria-label="Navegar pelos lances" className="flex shrink-0 items-center gap-0.5 border-y border-line px-1">
+        <StripButton label="Ir para o início" onClick={() => walk('start')} disabled={atStart}>
+          <Icon d="M6 5h2v14H6zm3.5 7L18 5.5v13z" className="size-5" />
+        </StripButton>
+        <StripButton label="Lance anterior" onClick={() => walk('back')} disabled={atStart}>
+          <Icon d="M7 12l9-7v14z" className="size-5" />
+        </StripButton>
+        <MoveStrip moves={moves} ply={ply} onSelect={go} variant={variant} onSelectVariant={variantSelect} />
+        <StripButton label="Próximo lance" onClick={() => walk('forward')} disabled={atEnd}>
+          <Icon d="M17 12 8 5v14z" className="size-5" />
+        </StripButton>
+        <StripButton label="Ir para o fim" onClick={() => walk('end')} disabled={atEnd}>
+          <Icon d="M16 5h2v14h-2zM14.5 12 6 5.5v13z" className="size-5" />
+        </StripButton>
+      </nav>
 
       {reviewing && <div className="mt-1 shrink-0 px-2">{reviewBar}</div>}
 
-      <div role="tablist" aria-label="Painéis da análise" className={`mt-1 shrink-0 border-b border-line px-2 ${reviewing ? 'hidden' : 'flex'}`}>
+      <div role="tablist" aria-label="Painéis da análise" className={`shrink-0 border-b border-line px-2 ${reviewing ? 'hidden' : 'flex'}`}>
         {tabs.map(({ id, label }) => (
           <button
             key={id}
@@ -652,7 +720,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
             aria-selected={tab === id}
             aria-controls="painel-analise"
             onClick={() => setTab(id)}
-            className={`-mb-px min-h-11 flex-1 border-b-2 text-sm font-semibold ${tab === id ? 'border-ink text-ink' : 'border-transparent text-muted'}`}
+            className={`-mb-px min-h-9 flex-1 border-b-2 text-sm font-semibold ${tab === id ? 'border-ink text-ink' : 'border-transparent text-muted'}`}
           >
             {label}
           </button>
@@ -663,7 +731,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
         {(tab === 'coach' || reviewing) && (
           <div className="flex flex-col gap-2">
             {coachWithTablebase}
-            {!retry && !testing && !playing && <p className="px-1 text-sm text-muted">Toque numa peça e no destino para testar outro lance.</p>}
+            {!retry && !testing && !playing && !revealed && <p className="px-1 text-xs text-muted">Toque numa peça e no destino para testar outro lance.</p>}
           </div>
         )}
         {!reviewing && tab === 'chart' && chart}
@@ -671,9 +739,38 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
         {!reviewing && tab === 'summary' && summary}
       </div>
 
-      <nav aria-label="Navegar pelos lances" className="flex shrink-0 gap-1 border-t border-line px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
-        {navButtons}
-      </nav>
+      <div role="group" aria-label="Ações da revisão" className="flex shrink-0 items-center gap-1 border-t border-line px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+        <ActionButton label={playing ? 'Pausar' : 'Tocar'} ariaLabel={playing ? 'Pausar revisão' : 'Tocar revisão'} icon={playing ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'M5 4l15 8-15 8z'} onClick={togglePlay} />
+        <ActionButton
+          label="Melhor"
+          ariaLabel={revealed ? 'Esconder melhor' : 'Mostrar melhor'}
+          icon={ICON_PATHS.star}
+          pressed={revealed}
+          disabled={!canShowBest}
+          onClick={() => {
+            setTab('coach')
+            setRevealed((value) => !value)
+          }}
+        />
+        <ActionButton
+          label="Tentar"
+          ariaLabel="Tentar de novo"
+          icon="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"
+          disabled={!canTryAgain}
+          onClick={() => {
+            setRevealed(false)
+            setSelected(null)
+            setTab('coach')
+            pauseReview()
+            startRetry(ply)
+          }}
+        />
+        {nextPlace && (
+          <button type="button" onClick={nextPlace.run} className="min-h-12 min-w-0 flex-1 truncate rounded-md bg-action px-2 text-sm font-semibold text-on-action">
+            {nextPlace.label}
+          </button>
+        )}
+      </div>
       {promotionDialog}
     </div>
   )

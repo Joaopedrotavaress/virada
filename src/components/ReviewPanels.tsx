@@ -46,10 +46,12 @@ interface IntroProps {
   onStart: () => void
   /** O lance em que a partida virou, quando houve um. */
   turning?: { moveNumber: number; san: string } | null
+  /** Celular: o botão de começar fica na barra fixa de baixo. */
+  hideStart?: boolean
 }
 
 /** O que aparece ao abrir a partida: o resumo e o convite para rever. */
-export function ReviewIntro({ insights, moments, onStart, turning }: IntroProps) {
+export function ReviewIntro({ insights, moments, onStart, turning, hideStart = false }: IntroProps) {
   return (
     <section aria-label="Resumo da revisão" className="shrink-0 rounded-md bg-surface p-4 sm:p-5">
       {turning && (
@@ -58,9 +60,11 @@ export function ReviewIntro({ insights, moments, onStart, turning }: IntroProps)
         </div>
       )}
       <h2 className="font-display text-2xl leading-tight font-semibold">Como foi a partida</h2>
-      <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">
-        Começar revisão
-      </button>
+      {!hideStart && (
+        <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">
+          Começar revisão
+        </button>
+      )}
       <p className="mt-2 text-sm text-muted">
         {moments.length === 0
           ? 'Passa pela partida inteira. Não há nenhum momento crítico para parar.'
