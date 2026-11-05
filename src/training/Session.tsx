@@ -10,6 +10,12 @@ import { type Answer, type TrainingCard, answerCard, loadCards, saveCards } from
 import { DAILY_GOAL, DAILY_KEY, type DailyState, EMPTY_DAILY, afterExercise, pickSession } from './daily'
 import { ErrorExercise, ErrorPanel, useErrorExercise } from './ErrorExercise'
 import { useLine } from './useLine'
+import { PuzzleBoard } from '../puzzles/PuzzleScreen'
+import { EMPTY_PUZZLE_STATS, PUZZLE_KEY, type Puzzle, type PuzzleStats, afterSolved, loadPuzzles, pickPuzzles, suggestedLevel } from '../puzzles/puzzles'
+import { allRecords } from '../data/library'
+
+/** Com poucos erros para rever, puzzles completam a sessão até este tamanho. */
+const SESSION_MINIMUM = 5
 
 const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -62,7 +68,10 @@ function LineItem({ card, title, status, nextLabel, onAnswered, onNext }: ItemPr
 
 /** A sessão do dia: os exercícios que venceram, um de cada vez. */
 export function Session({ theme }: { theme?: string }) {
-  const [items, setItems] = useState<TrainingCard[] | null>(null)
+  const [items, setItems] = useState<(TrainingCard | Puzzle)[] | null>(null)
+  const [puzzleStats, setPuzzleStats] = useKv<PuzzleStats>(PUZZLE_KEY, EMPTY_PUZZLE_STATS)
+  const puzzleStatsRef = useRef(puzzleStats)
+  puzzleStatsRef.current = puzzleStats
   const [remaining, setRemaining] = useState(0)
   const [index, setIndex] = useState(0)
   const [results, setResults] = useState<Answer[]>([])
@@ -82,8 +91,17 @@ export function Session({ theme }: { theme?: string }) {
         // Treinando um tema, vale praticar mesmo o que ainda não venceu.
         const pool = validTheme ? live.filter((card) => card.theme === validTheme) : live.filter((card) => new Date(card.schedule.due).getTime() <= now)
         const pick = pickSession(pool, DAILY_GOAL)
-        setItems(pick.items)
         setRemaining(pick.remaining)
+        if (validTheme || pick.items.length >= SESSION_MINIMUM) {
+          setItems(pick.items)
+          return
+        }
+        void loadPuzzles()
+          .then((puzzles) => pickPuzzles(puzzles, { levelId: suggestedLevel(allRecords()), solved: new Set(puzzleStatsRef.current.solved), limit: SESSION_MINIMUM - pick.items.length }))
+          .catch(() => [] as Puzzle[])
+          .then((extra) => {
+            if (alive) setItems([...pick.items, ...extra])
+          })
       })
     return () => {
       alive = false
@@ -133,7 +151,25 @@ export function Session({ theme }: { theme?: string }) {
     )
   }
 
-  const card = items[index]
+  const item = items[index]
+  if ('solution' in item) {
+    return (
+      <PuzzleBoard
+        key={item.id}
+        puzzle={item}
+        title={heading}
+        status={`${index + 1} de ${items.length}`}
+        nextLabel={index + 1 < items.length ? 'Próximo' : 'Terminar'}
+        onSolved={(clean) => {
+          setResults((list) => [...list, clean ? 'good' : 'again'])
+          setPuzzleStats(afterSolved(puzzleStatsRef.current, item.id))
+          setDaily(afterExercise(dailyRef.current))
+        }}
+        onNext={() => setIndex((value) => value + 1)}
+      />
+    )
+  }
+  const card = item
   const Item = card.kind === 'line' ? LineItem : ErrorItem
   return (
     <Item

@@ -13,21 +13,19 @@ export function TodaySummary({ compact = false }: { compact?: boolean }) {
   const [stored] = useKv<DailyState>(DAILY_KEY, EMPTY_DAILY)
   const daily = currentDaily(stored)
   const count = due.length
-  if (compact && loaded && cards.length === 0 && daily.total === 0) return null
+  if (compact && !loaded) return null
   return (
     <section aria-label="Treino de hoje" className={`rounded-md bg-surface p-4 ${compact ? 'mt-4' : 'mt-3'}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="font-book text-xl font-semibold">{count > 0 ? `${count} ${count === 1 ? 'exercício' : 'exercícios'} para hoje` : daily.doneToday > 0 ? 'Treino de hoje em dia' : 'Nenhum exercício vencido'}</h2>
+          <h2 className="font-book text-xl font-semibold">{count > 0 ? `${count} ${count === 1 ? 'exercício' : 'exercícios'} para hoje` : daily.doneToday > 0 ? 'Treino de hoje em dia' : 'Treino de hoje'}</h2>
           <p className="text-sm text-muted">
-            {[daily.streak > 0 ? `${daily.streak} ${daily.streak === 1 ? 'dia' : 'dias'} seguidos` : '', daily.doneToday > 0 ? `${daily.doneToday} feitos hoje` : '', count > 0 ? 'Leva uns minutos' : ''].filter(Boolean).join(', ') || 'Os erros das partidas analisadas viram exercícios.'}
+            {[daily.streak > 0 ? `${daily.streak} ${daily.streak === 1 ? 'dia' : 'dias'} seguidos` : '', daily.doneToday > 0 ? `${daily.doneToday} feitos hoje` : '', count > 0 ? 'Leva uns minutos' : ''].filter(Boolean).join(', ') || cards.length === 0 ? 'Os erros das partidas analisadas viram exercícios. Enquanto isso, há puzzles.' : 'Nenhum exercício vencido agora.'}
           </p>
         </div>
-        {count > 0 && (
-          <button type="button" onClick={() => navigate('#/treino/sessao')} className="min-h-12 w-full shrink-0 rounded-md bg-ink px-5 font-semibold text-bg sm:w-auto">
-            Começar
-          </button>
-        )}
+        <button type="button" onClick={() => navigate('#/treino/sessao')} className={`min-h-12 w-full shrink-0 rounded-md px-5 font-semibold sm:w-auto ${count > 0 ? 'bg-ink text-bg' : 'border border-line hover:bg-sunken'}`}>
+          {count > 0 ? 'Começar' : 'Treinar com puzzles'}
+        </button>
       </div>
     </section>
   )
