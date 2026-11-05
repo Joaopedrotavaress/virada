@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { Chess } from 'chess.js'
+import { useEffect, useMemo, useState } from 'react'
 import { formatOpening } from '../chess/book'
 import { BOTS } from '../bots/bots'
 import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../data/library'
@@ -7,6 +8,7 @@ import { navigate } from '../route'
 import type { ActiveGame } from '../storage'
 import { Icon } from './Icons'
 import { Logo } from './Logo'
+import { ThemeToggle } from './ThemeToggle'
 import { OPERA_FEN, OPERA_MATED, OPERA_MOVES, Placa, RevelationBoard } from './Revelation'
 import { TodayCard } from './TodayCard'
 import { viewRecord } from './Games'
@@ -173,6 +175,51 @@ function RecentGames({ records, onOpen }: { records: GameRecord[]; onOpen: (reco
   )
 }
 
+/** A Revelação toca uma vez por visita: voltar para o início não repete. */
+let heroPlayed = false
+
+const finishAnimations = (element: HTMLElement) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish())
+
+/** O tabuleiro e a placa. Com uma partida analisada, mostra onde ela virou. Sem nenhuma, o mate de Morphy. */
+function HomeHero({ record, onOpen }: { record?: GameRecord; onOpen: (record: GameRecord) => void }) {
+  const [animate] = useState(() => !heroPlayed)
+  useEffect(() => {
+    heroPlayed = true
+  }, [])
+  const real = useMemo(() => {
+    const error = record?.digest?.errors.reduce((worst, item) => (item.loss > worst.loss ? item : worst))
+    if (!record || !error) return null
+    try {
+      return { error, uci: [new Chess(error.fen).move(error.san).lan], to: new Chess(error.fen).move(error.san).to }
+    } catch {
+      return null
+    }
+  }, [record])
+  if (!real || !record) {
+    return (
+      <div onClick={(event) => finishAnimations(event.currentTarget)}>
+        <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
+          <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" matedSquare={OPERA_MATED} animate={animate} />
+        </div>
+        <div className="mt-3 overflow-hidden">
+          <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={3300} animate={animate} />
+        </div>
+      </div>
+    )
+  }
+  const opponent = record.userColor === 'b' ? record.white : record.black
+  return (
+    <div onClick={(event) => finishAnimations(event.currentTarget)}>
+      <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
+        <RevelationBoard fen={real.error.fen} moves={real.uci} focus={real.to} orientation={record.userColor === 'b' ? 'black' : 'white'} animate={animate} />
+      </div>
+      <button type="button" onClick={() => onOpen(record)} className="mt-3 block w-full overflow-hidden text-left">
+        <Placa number={real.error.moveNumber} title={`Foi aqui que virou contra ${opponent}.`} note="Sua última partida analisada. Toque para rever." delayMs={1900} animate={animate} />
+      </button>
+    </div>
+  )
+}
+
 export function Home(props: HomeProps) {
   const { username, activeGame } = props
   const { mode: installMode, install } = useInstall()
@@ -231,17 +278,12 @@ export function Home(props: HomeProps) {
     return (
       <div className="mx-auto w-full max-w-5xl pb-12 lg:px-4 lg:pt-8">
         <div className="lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
-          {/* Um toque termina a animação na hora. */}
-          <div onClick={(event) => event.currentTarget.getAnimations({ subtree: true }).forEach((animation) => animation.finish())}>
-            <div className="px-5 py-2.5 lg:hidden">
+          <div>
+            <div className="flex items-center justify-between py-1 pr-2 pl-5 lg:hidden">
               <Logo />
+              <ThemeToggle />
             </div>
-            <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
-              <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" matedSquare={OPERA_MATED} />
-            </div>
-            <div className="mt-3 overflow-hidden">
-              <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={3300} />
-            </div>
+            <HomeHero onOpen={props.onOpen} />
           </div>
           <main className="flex min-w-0 flex-col px-5 pt-4 lg:px-0 lg:pt-0">
             <div className="order-1 lg:order-2 lg:mt-5">
@@ -276,23 +318,20 @@ export function Home(props: HomeProps) {
   }
 
   const latest = records.find((record) => record.digest && record.digest.errors.length > 0)
-  const latestError = latest?.digest?.errors.reduce((worst, error) => (error.loss > worst.loss ? error : worst))
-  const latestOpponent = latest && (latest.userColor === 'b' ? latest.white : latest.black)
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-3 pb-10 lg:pt-10">
-      <div className="mb-2 lg:hidden">
-        <Logo />
-      </div>
-      <div className="grid gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <main className="min-w-0">
-          <h1 className="font-display text-4xl leading-none font-extrabold lg:text-5xl">{username.trim() ? `E aí, ${username.trim()}?` : 'O que vamos fazer hoje?'}</h1>
+    <div className="mx-auto w-full max-w-5xl pb-10 lg:px-4 lg:pt-8">
+      <div className="lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
+        <div className="lg:sticky lg:top-4">
+          <div className="flex items-center justify-between py-1 pr-2 pl-5 lg:hidden">
+            <Logo />
+            <ThemeToggle />
+          </div>
+          <HomeHero record={latest} onOpen={props.onOpen} />
+        </div>
 
-          {latest && latestError && (
-            <button type="button" onClick={() => props.onOpen(latest)} className="-mx-4 mt-4 block w-[calc(100%+2rem)] overflow-hidden text-left sm:mx-0 sm:w-full">
-              <Placa number={latestError.moveNumber} title={`Foi aqui que virou contra ${latestOpponent}.`} note="Sua última partida analisada. Toque para rever." animate={false} />
-            </button>
-          )}
+        <main className="min-w-0 px-5 pt-5 lg:px-0 lg:pt-0">
+          <h1 className="font-display text-4xl leading-none font-extrabold lg:text-5xl">{username.trim() ? `E aí, ${username.trim()}?` : 'O que vamos fazer hoje?'}</h1>
 
           {activeGame && (
             <section aria-label="Partida em andamento" className="mt-4 rounded-md bg-action p-4 text-on-action">
@@ -309,7 +348,7 @@ export function Home(props: HomeProps) {
           )}
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <button type="button" onClick={() => navigate('#/partidas')} className={`min-h-14 rounded-md px-5 font-semibold ${latest ? 'border border-line hover:bg-sunken' : 'bg-action text-on-action'}`}>
+            <button type="button" onClick={() => navigate('#/partidas')} className="min-h-14 rounded-md bg-action px-5 font-semibold text-on-action">
               Ver minhas partidas
             </button>
             <button type="button" onClick={() => navigate('#/jogar')} className="min-h-14 rounded-md border border-line px-5 font-semibold hover:bg-sunken">
@@ -318,6 +357,20 @@ export function Home(props: HomeProps) {
           </div>
 
           <TodayCard />
+
+          <section className="mt-6">
+            <h2 className="font-display text-2xl font-bold">Partidas recentes</h2>
+            {recent.length === 0 ? (
+              <p className="mt-2 max-w-prose text-sm text-muted">As partidas que você analisar ou jogar aqui ficam guardadas neste aparelho, para abrir de novo sem esperar.</p>
+            ) : (
+              <RecentGames records={recent} onOpen={props.onOpen} />
+            )}
+            {records.length > recent.length && (
+              <button type="button" onClick={() => navigate('#/partidas')} className="mt-2 min-h-11 font-semibold underline">
+                Ver todas as {records.length} partidas
+              </button>
+            )}
+          </section>
 
           <details className="mt-6 border-t border-line pt-3" open={Boolean(props.error) || undefined}>
             <summary className="flex min-h-11 cursor-pointer items-center font-semibold">Analisar um PGN</summary>
@@ -344,24 +397,10 @@ export function Home(props: HomeProps) {
               </p>
             )}
           </div>
+          {installSection}
+          {footer}
         </main>
-
-        <aside className="min-w-0">
-          <h2 className="font-display text-xl font-semibold">Partidas recentes</h2>
-          {recent.length === 0 ? (
-            <p className="mt-2 max-w-prose text-sm text-muted">As partidas que você analisar ou jogar aqui ficam guardadas neste aparelho, para abrir de novo sem esperar.</p>
-          ) : (
-            <RecentGames records={recent} onOpen={props.onOpen} />
-          )}
-          {records.length > recent.length && (
-            <button type="button" onClick={() => navigate('#/partidas')} className="mt-2 min-h-11 font-semibold underline">
-              Ver todas as {records.length} partidas
-            </button>
-          )}
-        </aside>
       </div>
-      {installSection}
-      {footer}
     </div>
   )
 }
