@@ -120,12 +120,12 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
         className="size-3 shrink-0 rounded-full border border-muted"
         style={{ backgroundColor: side === 'w' ? 'var(--share-white)' : 'var(--share-black)' }}
       />
-      {!you && <BotAvatar id={bot.id} name={bot.name} className="size-6" />}
+      {!you && <BotAvatar id={bot.id} className="size-6" />}
       <span className="min-w-0 truncate font-semibold">{name}</span>
       {you && name !== 'Você' && <span className="shrink-0 text-muted">(você)</span>}
       <CapturedPieces color={side} pieces={material.captured[side]} advantage={material.advantage[side]} />
       {game.clocks && (
-        <span className={`tabular ml-auto shrink-0 rounded-sm px-1.5 font-semibold ${game.turn === side && game.phase !== 'over' ? 'bg-action text-on-action' : 'bg-surface'} ${game.clocks[side] < 20_000 ? 'text-(--text-blunder)' : ''}`}>
+        <span className={`tabular ml-auto shrink-0 rounded-sm px-1.5 font-semibold ${game.turn === side && game.phase !== 'over' ? 'bg-ink text-bg' : 'bg-surface'} ${game.clocks[side] < 20_000 ? 'text-(--text-blunder)' : ''}`}>
           {formatClock(game.clocks[side] / 1000)}
         </span>
       )}

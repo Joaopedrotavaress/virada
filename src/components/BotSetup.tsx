@@ -85,9 +85,9 @@ export function BotSetup({ start, onStart, onBack }: { start?: StartPoint | null
           <legend className="sr-only">Bot</legend>
           <div className="divide-y divide-line overflow-hidden rounded-md bg-surface">
             {BOTS.map((bot) => (
-              <label key={bot.id} className={`flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${botId === bot.id ? 'bg-action text-on-action' : 'hover:bg-sunken'}`}>
+              <label key={bot.id} className={`flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${botId === bot.id ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}>
                 <input type="radio" name="bot" value={bot.id} checked={botId === bot.id} onChange={() => setBotId(bot.id)} className="sr-only" />
-                <BotAvatar id={bot.id} name={bot.name} />
+                <BotAvatar id={bot.id} />
                 <span className="min-w-0 flex-1">
                   <span className="font-display block text-lg leading-tight font-semibold">{bot.name}</span>
                   <span className={`block text-sm ${botId === bot.id ? 'opacity-80' : 'text-muted'}`}>{bot.description}</span>
@@ -103,7 +103,7 @@ export function BotSetup({ start, onStart, onBack }: { start?: StartPoint | null
           <legend className="mb-1.5 text-sm font-semibold">Sua cor</legend>
           <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line">
             {COLORS.map((option) => (
-              <label key={option.value} className={`flex min-h-11 cursor-pointer items-center justify-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${color === option.value ? 'bg-action text-on-action' : 'bg-surface'}`}>
+              <label key={option.value} className={`flex min-h-11 cursor-pointer items-center justify-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${color === option.value ? 'bg-ink text-bg' : 'bg-surface'}`}>
                 <input type="radio" name="cor" checked={color === option.value} onChange={() => setColor(option.value)} className="sr-only" />
                 {option.label}
               </label>
@@ -115,7 +115,7 @@ export function BotSetup({ start, onStart, onBack }: { start?: StartPoint | null
           <legend className="mb-1.5 text-sm font-semibold">Relógio</legend>
           <div className="grid grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
             {TIME_OPTIONS.map((option) => (
-              <label key={option.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${timeId === option.id ? 'bg-action text-on-action' : 'bg-surface'}`}>
+              <label key={option.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${timeId === option.id ? 'bg-ink text-bg' : 'bg-surface'}`}>
                 <input type="radio" name="relogio" checked={timeId === option.id} onChange={() => setTimeId(option.id)} className="sr-only" />
                 {option.label}
               </label>
