@@ -11,7 +11,7 @@ import { EMPTY_PUZZLE_STATS, LEVELS, PUZZLE_KEY, type Puzzle, type PuzzleStats, 
 const LAST_MOVE_TINT = 'color-mix(in srgb, #d4a900 42%, transparent)'
 
 /** Um puzzle no tabuleiro. Também aparece dentro da sessão de treino. */
-export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext }: { puzzle: Puzzle; title: string; status?: string; nextLabel: string; onSolved: (clean: boolean) => void; onNext: () => void }) {
+export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext, onBack = goBack }: { puzzle: Puzzle; title: string; status?: string; nextLabel: string; onSolved: (clean: boolean) => void; onNext: () => void; onBack?: () => void }) {
   const [hadTrouble, setHadTrouble] = useState(false)
   const exercise = useSolution({ fen: puzzle.fen, solution: puzzle.solution }, () => onSolved(!hadTrouble))
   const last = exercise.last ?? puzzle.setup
@@ -23,7 +23,7 @@ export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext
     if (exercise.status === 'wrong' || exercise.expectedStep) setHadTrouble(true)
   }, [exercise.expectedStep, exercise.status])
   return (
-    <BoardScreen title={title} status={status} onBack={goBack} board={<PlayableBoard fen={exercise.fen} orientation={puzzle.fen.split(' ')[1] === 'w' ? 'white' : 'black'} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} />}>
+    <BoardScreen title={title} status={status} onBack={onBack} board={<PlayableBoard fen={exercise.fen} orientation={puzzle.fen.split(' ')[1] === 'w' ? 'white' : 'black'} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
@@ -110,8 +110,11 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
     const current = run.items[run.index]
     if (current) {
       return (
+        // Cobre a barra de navegação: com o tabuleiro em uso, a tela é toda dele.
+        <div className="fixed inset-0 z-20 overflow-hidden bg-bg">
         <PuzzleBoard
           key={current.id}
+          onBack={() => (theme ? goBack() : setRun(null))}
           puzzle={current}
           title={run.title}
           status={run.items.length > 1 ? `${run.index + 1} de ${run.items.length}` : undefined}
@@ -126,6 +129,7 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
             else setRun(null)
           }}
         />
+        </div>
       )
     }
   }
