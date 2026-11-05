@@ -105,7 +105,7 @@ export function MoveList({ moves, ply, onSelect, showTitle = true, variant, onSe
                 </span>
                 {step.cls && (
                   <span className="font-sans text-xs font-bold not-italic" style={{ color: `var(--text-${step.cls})` }} title={CLASS_INFO[step.cls].label}>
-                    {CLASS_INFO[step.cls].symbol}
+                    <ClassSymbol cls={step.cls} iconClassName="inline size-3.5" />
                   </span>
                 )}
               </button>

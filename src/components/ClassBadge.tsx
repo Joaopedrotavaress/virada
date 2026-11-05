@@ -1,4 +1,5 @@
 import { CLASS_INFO, type MoveClass } from '../chess/classify'
+import { Icon, ICON_PATHS } from './Icons'
 
 const BOOK_PATH = 'M11 6.2C9 4.9 6.3 4.2 2.5 4.2V18c3.8 0 6.5.7 8.5 2zM13 6.2c2-1.3 4.7-2 8.5-2V18c-3.8 0-6.5.7-8.5 2z'
 
@@ -13,7 +14,11 @@ export function BookIcon({ className }: { className?: string }) {
 
 /** O sinal do lance como texto ou, no livro, como ícone. */
 export function ClassSymbol({ cls, iconClassName }: { cls: MoveClass; iconClassName?: string }) {
-  return cls === 'book' ? <BookIcon className={iconClassName} /> : <>{CLASS_INFO[cls].symbol}</>
+  if (cls === 'book') return <BookIcon className={iconClassName} />
+  if (cls === 'best') return <Icon name="star" className={iconClassName ?? 'inline size-[1em]'} />
+  if (cls === 'good') return <Icon name="check" className={iconClassName ?? 'inline size-[1em]'} />
+  if (cls === 'miss') return <Icon name="close" className={iconClassName ?? 'inline size-[1em]'} />
+  return <>{CLASS_INFO[cls].symbol}</>
 }
 
 /** Sinal da classificação em SVG: escala com a casa do tabuleiro em qualquer tamanho de tela. */
@@ -21,10 +26,10 @@ export function ClassBadge({ cls, className }: { cls: MoveClass; className?: str
   const { symbol, label } = CLASS_INFO[cls]
   return (
     <svg viewBox="0 0 100 100" role="img" aria-label={label} className={className}>
-      <circle cx="50" cy="50" r="46" fill={`var(--fill-${cls})`} stroke="var(--on-fill)" strokeWidth="7" />
-      {cls === 'book' ? (
-        <g transform="translate(20 20) scale(2.5)" fill="var(--on-fill)">
-          <path d={BOOK_PATH} />
+      <rect x="4" y="4" width="92" height="92" rx="6" fill={`var(--fill-${cls})`} stroke="var(--zone-0)" strokeWidth="5" />
+      {cls === 'book' || cls === 'best' || cls === 'good' || cls === 'miss' ? (
+        <g transform="translate(20 20) scale(2.5)" fill={cls === 'best' ? 'var(--on-fill-best)' : 'var(--on-fill)'}>
+          <path d={cls === 'book' ? BOOK_PATH : cls === 'best' ? ICON_PATHS.star : cls === 'good' ? ICON_PATHS.check : ICON_PATHS.close} />
         </g>
       ) : (
         <text
