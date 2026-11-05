@@ -11,7 +11,7 @@ import { recordsFor, useAllRecords } from '../data/library'
 import { goBack, navigate } from '../route'
 import { type TrainingCard, lineCard, loadCards, saveCards } from '../training/cards'
 import { useLine } from '../training/useLine'
-import { FAMILY_GROUPS, type OpeningFamily, filterFamilies, loadFamilies } from './catalog'
+import { FAMILY_GROUPS, type OpeningFamily, filterFamilies, filterGuides, loadFamilies } from './catalog'
 import { LESSONS, LESSON_GROUPS } from './lessons'
 import { OPENING_GUIDES, guideBySlug, splitSans } from './openings'
 import { LESSONS_KEY, REPERTOIRE_KEY, type Repertoire, progressOf, recordLineDone, toggleRepertoire, usageByGuide, usageSentence } from './repertoire'
@@ -115,6 +115,7 @@ export function GuideHome({ username }: { username: string }) {
 
   const visible = useMemo(() => (families ? filterFamilies(families, { query, kind }) : []), [families, kind, query])
   const searching = query.trim() !== '' || kind !== 'all'
+  const matchedGuides = useMemo(() => filterGuides(query), [query])
   const groups = useMemo(() => (Object.keys(GROUP_LABEL) as GuideGroup[]).map((group) => ({ group, guides: OPENING_GUIDES.filter((guide) => guide.group === group).sort((a, b) => LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]) })), [])
   const myGuides = Object.keys(repertoire).flatMap((slug) => guideBySlug(slug) ?? [])
 
@@ -192,6 +193,18 @@ export function GuideHome({ username }: { username: string }) {
         )}
         {searching && families && (
           <>
+            {matchedGuides.length > 0 && (
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {matchedGuides.map((guide) => (
+                  <li key={guide.slug}>
+                    <button type="button" onClick={() => navigate(`#/guia/abertura/${guide.slug}`)} className="h-full min-h-16 w-full rounded-md bg-surface p-3 text-left hover:bg-sunken">
+                      <span className="font-book block font-semibold">{guide.name}</span>
+                      <span className="block text-sm text-muted">Com explicação, {guide.side === 'w' ? 'de brancas' : 'de pretas'}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
             <p className="mt-3 text-sm text-muted">
               {visible.length} {visible.length === 1 ? 'família' : 'famílias'}
             </p>
