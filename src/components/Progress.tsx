@@ -244,7 +244,7 @@ export function Progress({ username }: { username: string }) {
               )}
               {totals.analyzed < totals.games && (
                 <p className="mt-3 max-w-prose text-sm text-muted">
-                  {totals.games - totals.analyzed} partidas ainda sem análise ficam fora dos erros graves.{' '}
+                  {totals.games - totals.analyzed === 1 ? '1 partida ainda sem análise fica fora dos erros graves.' : `${totals.games - totals.analyzed} partidas ainda sem análise ficam fora dos erros graves.`}{' '}
                   <button type="button" onClick={() => navigate('#/partidas')} className="font-semibold text-ink underline">
                     Analisar em Partidas
                   </button>

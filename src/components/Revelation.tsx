@@ -115,7 +115,6 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
 
     let clock = 1250
     const pieceElement = (key: string) => element.querySelector<HTMLElement>(`[data-piece-key="${key}"]`)
-    const startSquare = new Map(pieces.map((piece) => [piece.key, piece.square]))
 
     for (const piece of pieces) {
       const node = pieceElement(piece.key)
@@ -128,7 +127,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
       const duration = index === plan.length - 1 ? 300 : 400
       const node = pieceElement(step.key)
       if (node) {
-        const from = place(startSquare.get(step.key) === step.from ? step.from : step.from, orientation)
+        const from = place(step.from, orientation)
         const final = place(finalSquare.get(step.key) as string, orientation)
         const to = place(step.to, orientation)
         const at = (square: { x: number; y: number }, scale = 1) => `translate(${(square.x - final.x) * 100}%, ${(square.y - final.y) * 100}%) scale(${scale})`
@@ -163,7 +162,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
     }
     const wave = element.querySelector<HTMLElement>('[data-wave]')
     if (wave) {
-      animations.push(wave.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(4.5)' }], { duration: 750, delay: impact, easing: EASE_OUT, fill: 'both' }))
+      animations.push(wave.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(4.5)' }], { duration: 750, delay: impact, easing: EASE_OUT }))
     }
     animations.push(element.animate([{ translate: '0 0' }, { translate: '0 5px', offset: 0.3 }, { translate: '0 0' }], { duration: 320, delay: impact, easing: 'ease-out' }))
 
