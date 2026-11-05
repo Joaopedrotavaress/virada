@@ -1,6 +1,8 @@
 import { Chess } from 'chess.js'
 import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import type { GameAnalysis } from '../chess/analyze'
+import type { GameRecord } from '../data/library'
+import type { StartPoint } from './BotSetup'
 import { formatOpening } from '../chess/book'
 import type { Color } from '../chess/evaluation'
 import { clocksAt, formatClock } from '../chess/clock'
@@ -31,6 +33,9 @@ interface AnalysisViewProps {
   userColor: Color | null
   notice: string | null
   onBack: () => void
+  record?: GameRecord
+  /** Continua jogando contra um bot a partir da posição na tela. */
+  onPlayFrom?: (start: StartPoint) => void
 }
 
 interface PendingPromotion {
@@ -84,7 +89,7 @@ function NavButton({ label, onClick, disabled, children }: { label: string; onCl
   )
 }
 
-export function AnalysisView({ analysis, userColor, notice, onBack }: AnalysisViewProps) {
+export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }: AnalysisViewProps) {
   const { positions, moves } = analysis
   const isDesktop = useIsDesktop()
   const [ply, setPly] = useState(0)
@@ -366,7 +371,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack }: AnalysisVi
   const backButton = (
     <button type="button" onClick={onBack} className="-ml-1 flex min-h-11 shrink-0 items-center gap-1 rounded-md pr-3 pl-1 font-semibold hover:bg-sunken">
       <Icon d="M15.4 6.4 14 5l-7 7 7 7 1.4-1.4L9.8 12z" />
-      Nova partida
+      Voltar
     </button>
   )
 
@@ -502,7 +507,21 @@ export function AnalysisView({ analysis, userColor, notice, onBack }: AnalysisVi
     </div>
   )
   const moveList = <MoveList moves={moves} ply={ply} onSelect={go} showTitle={isDesktop} variant={variant} onSelectVariant={variantSelect} spent={analysis.clock?.spent} />
-  const summary = <Summary analysis={analysis} showTitle={isDesktop} userColor={userColor} />
+  const canPlayFrom = onPlayFrom && !new Chess(boardProps.fen).isGameOver()
+  const summary = (
+    <>
+      <Summary analysis={analysis} showTitle={isDesktop} userColor={userColor} />
+      {canPlayFrom && (
+        <button
+          type="button"
+          onClick={() => onPlayFrom({ label: `a posição do tabuleiro em ${analysis.white} x ${analysis.black}`, fen: boardProps.fen, color: boardProps.fen.split(' ')[1] as Color })}
+          className="mt-3 min-h-11 w-full rounded-md border border-line px-4 font-semibold hover:bg-sunken"
+        >
+          Jogar desta posição
+        </button>
+      )}
+    </>
+  )
 
   const promotionDialog = promotion && (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Promover o peão">
