@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { BackupError, downloadJson, exportAll, mergeBackup, parseBackup } from '../data/backup'
+import { GistError, forgetGist, loadGistToken, loadLastGistSync, saveGistToken, syncGist } from '../data/gistSync'
 import { recordsFor, requestPersistence, useAllRecords } from '../data/library'
+import { useLocalBackend } from '../data/localBackend'
 
 const formatBytes = (bytes: number) => (bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1).replace('.', ',')} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`)
 
@@ -13,6 +15,12 @@ export function DataScreen({ username }: { username: string }) {
   const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null)
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
+  const backend = useLocalBackend()
+  const [hasToken, setHasToken] = useState(() => Boolean(loadGistToken()))
+  const [draftToken, setDraftToken] = useState('')
+  const [lastGist, setLastGist] = useState(loadLastGistSync)
+  const [gistBusy, setGistBusy] = useState(false)
+  const [gistMessage, setGistMessage] = useState<{ text: string; error?: boolean } | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -57,6 +65,20 @@ export function DataScreen({ username }: { username: string }) {
     } finally {
       setBusy(false)
       if (fileInput.current) fileInput.current.value = ''
+    }
+  }
+
+  const runGist = async () => {
+    setGistBusy(true)
+    setGistMessage(null)
+    try {
+      const report = await syncGist()
+      setLastGist(loadLastGistSync())
+      setGistMessage({ text: report.created ? 'Gist privado criado, e seus dados foram enviados.' : `Sincronizado: ${report.received} itens vieram do gist.` })
+    } catch (failure) {
+      setGistMessage({ text: failure instanceof GistError ? failure.message : 'Não consegui sincronizar. Seus dados aqui continuam intactos.', error: true })
+    } finally {
+      setGistBusy(false)
     }
   }
 
@@ -133,6 +155,86 @@ export function DataScreen({ username }: { username: string }) {
           </p>
         )}
       </section>
+
+      <section className="mt-8">
+        <h2 className="font-book text-xl font-semibold">Sincronizar entre aparelhos</h2>
+        <p className="mt-1 max-w-prose text-sm text-muted">
+          Opcional. Usa um gist secreto na sua conta do GitHub, sem nenhum servidor nosso. Partidas, notas e treino vão junto; as análises são refeitas no outro aparelho. Um gist secreto não aparece em buscas, mas quem tiver o link consegue ler.
+        </p>
+        {hasToken ? (
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button type="button" disabled={gistBusy} onClick={() => void runGist()} className="min-h-12 rounded-md bg-ink px-5 font-semibold text-bg disabled:opacity-60">
+              {gistBusy ? 'Sincronizando…' : 'Sincronizar agora'}
+            </button>
+            <button
+              type="button"
+              disabled={gistBusy}
+              onClick={() => {
+                forgetGist()
+                setHasToken(false)
+                setLastGist(null)
+                setGistMessage({ text: 'Token apagado deste aparelho. O gist continua na sua conta do GitHub.' })
+              }}
+              className="min-h-12 rounded-md border border-line px-5 font-semibold hover:bg-sunken disabled:opacity-60"
+            >
+              Desligar
+            </button>
+          </div>
+        ) : (
+          <form
+            className="mt-3"
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (!draftToken.trim()) return
+              saveGistToken(draftToken)
+              setDraftToken('')
+              setHasToken(true)
+              void runGist()
+            }}
+          >
+            <label htmlFor="token-gist" className="mb-1 block text-sm font-semibold">
+              Token do GitHub
+            </label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input id="token-gist" type="password" autoComplete="off" spellCheck={false} value={draftToken} onChange={(event) => setDraftToken(event.target.value)} className="min-h-12 min-w-0 flex-1 rounded-md border border-line bg-surface px-3 text-base" />
+              <button type="submit" disabled={!draftToken.trim()} className="min-h-12 shrink-0 rounded-md bg-ink px-5 font-semibold text-bg disabled:opacity-60">
+                Ligar
+              </button>
+            </div>
+            <p className="mt-2 max-w-prose text-sm text-muted">
+              <a href="https://github.com/settings/tokens/new?scopes=gist&description=Treinador%20de%20Xadrez" target="_blank" rel="noreferrer" className="font-semibold text-ink underline">
+                Criar um token no GitHub
+              </a>{' '}
+              com a permissão gist. Ele fica guardado só neste aparelho e só é enviado ao GitHub.
+            </p>
+          </form>
+        )}
+        {lastGist && <p className="mt-2 text-sm text-muted">Última sincronização: {new Date(lastGist).toLocaleString('pt-BR')}.</p>}
+        {gistMessage && (
+          <p role={gistMessage.error ? 'alert' : 'status'} className={`mt-3 rounded-md bg-surface p-3 ${gistMessage.error ? 'font-medium text-(--text-blunder)' : ''}`}>
+            {gistMessage.text}
+          </p>
+        )}
+      </section>
+
+      {backend.info && (
+        <section className="mt-8">
+          <h2 className="font-book text-xl font-semibold">Computador local</h2>
+          <p className="mt-1 max-w-prose text-muted">
+            Conectado ao banco deste computador. Cada alteração também fica guardada lá{backend.info.engine ? ', e a análise em lote usa o motor completo.' : '.'}
+          </p>
+          {backend.lastSync && <p className="mt-1 text-sm text-muted">Última cópia: {new Date(backend.lastSync).toLocaleTimeString('pt-BR')}.</p>}
+          {backend.error && (
+            <p role="alert" className="mt-2 font-medium text-(--text-blunder)">
+              A cópia falhou: {backend.error}. Os dados aqui continuam intactos.
+            </p>
+          )}
+        </section>
+      )}
+
+      <p className="mt-8 text-sm text-muted">
+        Código aberto sob a licença GPL-3.0. Puzzles e nomes de aberturas vêm das bases abertas do Lichess (CC0).
+      </p>
     </main>
   )
 }
