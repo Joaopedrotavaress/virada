@@ -1,5 +1,5 @@
 // Gera os ícones do app em public/icons. Rode uma vez: node scripts/generate-icons.mjs
-// Desenho simples e próprio: um peão claro sobre o azul-ardósia do tabuleiro.
+// O símbolo do Virada: um V de casas de tabuleiro, com a casa do ponto de virada em amarelo.
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -8,35 +8,32 @@ import { deflateSync } from 'node:zlib'
 const destino = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'icons')
 mkdirSync(destino, { recursive: true })
 
-const FUNDO = [22, 32, 43]
-const CASA = [111, 141, 161]
-const PECA = [244, 246, 248]
+const FUNDO = [11, 11, 13]
 const SUPERAMOSTRAS = 4
-
-const dentroDoCirculo = (x, y, cx, cy, r) => (x - cx) ** 2 + (y - cy) ** 2 <= r ** 2
-
-/** Coordenadas de 0 a 1 dentro da área do desenho. */
-function noPeao(x, y) {
-  if (dentroDoCirculo(x, y, 0.5, 0.27, 0.13)) return true // cabeça
-  if (y >= 0.38 && y <= 0.42 && Math.abs(x - 0.5) <= 0.14) return true // colarinho
-  if (y >= 0.42 && y <= 0.74) {
-    // corpo: afina no meio e abre na base
-    const t = (y - 0.42) / 0.32
-    const meia = 0.075 + 0.145 * t ** 2
-    if (Math.abs(x - 0.5) <= meia) return true
-  }
-  if (y >= 0.74 && y <= 0.86 && Math.abs(x - 0.5) <= 0.27) return true // base
-  return false
-}
+const LADO = 9.6
+const PASSO = 10.4
+const CASAS = [
+  [0, 0, [106, 106, 115]],
+  [0, 1, [106, 106, 115]],
+  [1, 2, [134, 134, 144]],
+  [1, 3, [134, 134, 144]],
+  [3, 3, [216, 216, 222]],
+  [3, 2, [216, 216, 222]],
+  [4, 1, [244, 244, 246]],
+  [4, 0, [244, 244, 246]],
+  [2, 4, [255, 209, 0]],
+]
 
 function cor(x, y, escala) {
-  // x e y de 0 a 1 no ícone inteiro. "escala" reduz o peão para caber na zona segura.
-  const px = 0.5 + (x - 0.5) / escala
-  const py = 0.5 + (y - 0.5) / escala
-  if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && noPeao(px, py)) return PECA
-  const coluna = x < 0.5 ? 0 : 1
-  const linha = y < 0.5 ? 0 : 1
-  return (coluna + linha) % 2 === 1 ? CASA : FUNDO
+  // x e y de 0 a 1 no ícone inteiro. "escala" reduz o desenho para caber na zona segura.
+  const px = (0.5 + (x - 0.5) / escala) * 64
+  const py = (0.5 + (y - 0.5) / escala) * 64
+  for (const [coluna, linha, tom] of CASAS) {
+    const cx = 7 + coluna * PASSO
+    const cy = 7 + linha * PASSO
+    if (px >= cx && px < cx + LADO && py >= cy && py < cy + LADO) return tom
+  }
+  return FUNDO
 }
 
 const TABELA = Array.from({ length: 256 }, (_, n) => {
