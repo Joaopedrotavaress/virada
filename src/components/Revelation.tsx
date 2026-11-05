@@ -206,7 +206,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
 }
 
 /** A placa amarela: o número grande e o que ele quer dizer. Sobe de baixo no fim da revelação. */
-export function Placa({ number, title, note, delayMs = 0, animate = true }: { number: ReactNode; title: string; note?: string; delayMs?: number; animate?: boolean }) {
+export function Placa({ number, title, note, delayMs = 0, animate = true, compact = false }: { number: ReactNode; title: string; note?: string; delayMs?: number; animate?: boolean; compact?: boolean }) {
   const root = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!animate || !root.current || reducedMotion()) return
@@ -214,10 +214,10 @@ export function Placa({ number, title, note, delayMs = 0, animate = true }: { nu
     return () => animation.cancel()
   }, [animate, delayMs])
   return (
-    <div ref={root} className="flex items-center gap-3 bg-action px-5 py-3 text-on-action">
-      <div className="font-display tabular shrink-0 text-[6.5rem] leading-[0.8] font-extrabold tracking-tighter">{number}</div>
+    <div ref={root} className={`flex items-center bg-action text-on-action ${compact ? 'gap-2.5 px-4 py-2' : 'gap-3 px-5 py-3'}`}>
+      <div className={`font-display tabular shrink-0 leading-[0.85] font-extrabold tracking-tighter ${compact ? 'text-6xl' : 'text-[6.5rem]'}`}>{number}</div>
       <div className="min-w-0">
-        <p className="font-display text-[1.75rem] leading-none font-extrabold text-balance">{title}</p>
+        <p className={`font-display leading-none font-extrabold text-balance ${compact ? 'text-2xl' : 'text-[1.75rem]'}`}>{title}</p>
         {note && <p className="mt-1.5 text-sm font-semibold">{note}</p>}
       </div>
     </div>
@@ -234,14 +234,20 @@ export function RevelationOverlay({ fen, uci, san, moveNumber, isUserMove, label
   useEffect(() => {
     button.current?.focus()
     if (reducedMotion()) {
-      const timer = setTimeout(() => done.current(), 1800)
+      const timer = setTimeout(() => done.current(), 5000)
       return () => clearTimeout(timer)
     }
-    const timer = setTimeout(() => done.current(), 4300)
+    const timer = setTimeout(() => done.current(), 7000)
     return () => clearTimeout(timer)
   }, [])
   return (
-    <button ref={button} type="button" onClick={onDone} aria-label="Pular e ver a análise" className="fixed inset-0 z-30 flex flex-col bg-bg text-left text-ink">
+    <button
+      ref={button}
+      type="button"
+      onClick={onDone}
+      aria-label={`${isUserMove ? 'Foi aqui que a sua partida virou' : 'Foi aqui que a partida virou'}: lance ${moveNumber}, ${sanToPt(san)}, ${label}. Toque para ver a análise.`}
+      className="fixed inset-0 z-30 flex flex-col bg-(--zone-0) text-left text-(--zone-10)"
+    >
       <ZoneRamp />
       <div className="mx-auto flex min-h-0 w-full max-w-[min(100%,calc(100dvh-14rem))] flex-1 flex-col justify-center px-4 lg:max-w-[min(32rem,calc(100dvh-14rem))]">
         <RevelationBoard fen={fen} moves={moves} orientation={orientation} focus={to} />
