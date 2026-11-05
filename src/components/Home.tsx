@@ -39,7 +39,7 @@ const inputClass =
 
 const OUTCOME_LABEL = { win: 'vitória', loss: 'derrota', draw: 'empate' }
 
-function UserForm({ username, onChange, onSubmit, autoFocus = false, submitLabel = 'Buscar partidas' }: { username: string; onChange: (name: string) => void; onSubmit: () => void; autoFocus?: boolean; submitLabel?: string }) {
+function UserForm({ username, onChange, onSubmit, autoFocus = false, submitLabel = 'Buscar partidas', help = 'Também serve para o tabuleiro abrir virado para o seu lado.' }: { username: string; onChange: (name: string) => void; onSubmit: () => void; autoFocus?: boolean; submitLabel?: string; help?: string }) {
   const [needsUser, setNeedsUser] = useState(false)
   return (
     <form
@@ -77,7 +77,7 @@ function UserForm({ username, onChange, onSubmit, autoFocus = false, submitLabel
         </button>
       </div>
       <p id="ajuda-usuario" role={needsUser ? 'alert' : undefined} className={`mt-2 text-sm ${needsUser ? 'font-medium text-(--text-blunder)' : 'text-muted'}`}>
-        {needsUser ? 'Digite seu usuário para buscar as partidas.' : 'Também serve para o tabuleiro abrir virado para o seu lado.'}
+        {needsUser ? 'Digite seu usuário para buscar as partidas.' : help}
       </p>
     </form>
   )
@@ -245,10 +245,10 @@ export function Home(props: HomeProps) {
           </div>
           <main className="flex min-w-0 flex-col px-5 pt-4 lg:px-0 lg:pt-0">
             <div className="order-1 lg:order-2 lg:mt-5">
-              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} submitLabel="Achar a virada" />
+              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} submitLabel="Achar a virada" help="Suas partidas públicas, sem cadastro." />
             </div>
-            <div className="order-2 mt-6 lg:order-1 lg:mt-0">
-              <h1 className="font-display text-4xl leading-none font-extrabold lg:text-6xl">
+            <div className="order-2 mt-4 lg:order-1 lg:mt-0">
+              <h1 className="font-display text-3xl leading-none font-extrabold lg:text-6xl">
                 Toda partida tem
                 <br />
                 um ponto de virada.
