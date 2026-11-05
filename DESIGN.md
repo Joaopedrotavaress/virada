@@ -221,7 +221,7 @@ A partida sai do escuro, casa por casa, até o ponto em que virou, e uma placa a
 
 O tema da noite é o padrão, e o do dia só vale quando a pessoa escolhe. É o tema para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.
 
-O carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um treinador que fala como amigo de clube e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.
+O carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um professor de boteco e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.
 
 **Key Characteristics:**
 - Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao ponto de virada.
@@ -432,10 +432,14 @@ Quando a pessoa acha o lance, sai uma onda amarela da casa dele. É decorativa, 
 Peças deslizam em 140ms no tabuleiro de jogo e param de animar com menos movimento. A barra de avaliação muda de tamanho em 200ms e a barra de análise em 150ms. A regra global de menos movimento reduz qualquer transição ou animação de CSS a 0.01ms.
 
 ### Voz do treinador
-Um amigo de clube que joga melhor que você: direto, com humor leve e sem julgar. A voz faz parte do acabamento, então vale para todo texto novo.
+Seu Nonato, um velho de boteco que joga xadrez no bar há décadas: direto, com humor de balcão e sem humilhar. Chama todo mundo de "chefia", palavra que serve para qualquer pessoa. A voz faz parte do acabamento, então vale para todo texto novo.
+
+- **Quem fala o quê:** a abertura da fala e a lição são dele. O que aconteceu na posição continua vindo do Stockfish, sem floreio. A lição é geral, nunca cita lance da posição, para não estragar o "Tentar de novo".
+- **Boteco sem exagero:** balcão, conta, mesa, dono do bar. Sem bebedeira e sem xingar.
+- **Retrato:** 12 por 12 casas, careca, bigode branco e palito na boca, com quatro caras: neutra, feliz, brava e espantada. Fica ao lado do cartão, que vira balão de fala, com 44px no celular e 64px com o nome na tela larga.
 
 - **Frases curtas, falando com "você":** "Não é esse. Olha de novo.", "Achou! ... era o caminho.", "Esse volta logo, para fixar."
-- **Coloquial sem exagero:** "Opa, calma. Tem um lance bem melhor aqui.", "Deixa eu ver esse lance…", "Olha o garfo: ...", "Xeque-mate. Fim de papo: ...", "Teoria pura: esse lance está nos livros."
+- **Coloquial sem exagero:** "Ô, chefia, calma. Tem lance bem melhor aqui.", "Deixa eu ver esse lance…", "Olha o garfo: ...", "Xeque-mate. Fim de papo: ...", "Teoria pura: esse lance está nos livros."
 - **Abordagem de amigo:** "E aí, [usuário]?", "Quem vai sentar do outro lado?", "O adversário vacilou no lance anterior e a chance passou."
 - **Honesta:** não elogia lance em posição perdida ("Era o melhor, mas já não tinha salvação"), e diz que a força dos bots é aproximada.
 - **Concreta:** explica pelo motivo tático quando existe e, se não, pela avaliação e pelo lance do adversário. Lances em notação portuguesa.
@@ -473,7 +477,7 @@ A tela inicial termina com "Feito com carinho no Brasil" em Barlow Condensed 700
 - **Do** coloque símbolo junto de toda cor de classificação.
 - **Do** desenhe novos ícones em SVG e novos retratos na mesma grade de 8 por 8 casas, com os quatro tons da escala.
 - **Do** faça toda animação nova terminar no estado de repouso certo e respeitar a preferência por menos movimento, sem perder informação.
-- **Do** escreva como amigo de clube: curto, direto, com "você".
+- **Do** escreva como o Seu Nonato: curto, direto, com "você" e "chefia".
 - **Do** deixe o símbolo, os retratos e a Revelação sobre tons escuros fixos nos dois temas.
 
 ### Don't:

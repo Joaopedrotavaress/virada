@@ -36,7 +36,7 @@ A sessão típica começa logo depois de uma partida online, com o celular na m�
 - Nome: Virada. Slogan: "Toda partida tem um ponto de virada. Ache o seu."
 - Idioma: português do Brasil.
 - Sensação: profissional e confiável, mas acolhedor, próximo e com personalidade. Precisa dar para ver que foi feito com amor e carinho, não por uma empresa fria.
-- Voz do treinador: um amigo de clube, que joga melhor que você, é direto e tem humor leve.
+- Voz do treinador: Seu Nonato, um velho de boteco que joga melhor que você, é direto e tem humor de balcão, sem humilhar.
 - Bots: personagens brasileiros divertidos, com nome, personalidade e avatar próprios, caricaturas com bordões.
 - Rodapé: "Feito com carinho no Brasil".
 - Não parecer: template genérico, "feito por IA", cópia do chess.com ou do Lichess, jogo infantil, site de aposta ou livro escolar.

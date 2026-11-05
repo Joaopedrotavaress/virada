@@ -20,7 +20,7 @@ Sem cadastro. Sem assinatura. Sem servidor. Seus dados ficam com você.
 
 Você acabou de perder. Ainda está com o celular na mão e só quer saber uma coisa: **onde foi que a partida virou?**
 
-O Virada acha esse lance, explica em português o que aconteceu, como um amigo de clube que joga melhor que você, e transforma o seu erro em exercício. Da próxima vez, você reconhece a posição.
+O Virada acha esse lance, explica em português o que aconteceu, com a voz do Seu Nonato, um velho de boteco que joga melhor que você, e transforma o seu erro em exercício. Da próxima vez, você reconhece a posição.
 
 ## O que ele faz
 
