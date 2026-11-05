@@ -8,7 +8,24 @@ export interface BotChoice {
   color: Color
   coachOn: boolean
   allowUndo: boolean
+  time?: { base: number; increment: number }
 }
+
+/** De onde a partida começa, quando não é da posição inicial. */
+export interface StartPoint {
+  label: string
+  fen?: string
+  sans?: string[]
+  /** Cor sugerida pela linha ou pela posição. */
+  color?: Color
+}
+
+export const TIME_OPTIONS: { id: string; label: string; time?: { base: number; increment: number } }[] = [
+  { id: 'none', label: 'Sem relógio' },
+  { id: '3+2', label: '3 + 2', time: { base: 180, increment: 2 } },
+  { id: '5+0', label: '5 + 0', time: { base: 300, increment: 0 } },
+  { id: '10+0', label: '10 + 0', time: { base: 600, increment: 0 } },
+]
 
 type ColorChoice = 'w' | 'b' | 'random'
 
@@ -33,12 +50,14 @@ function Toggle({ label, hint, checked, onChange }: { label: string; hint: strin
   )
 }
 
-export function BotSetup({ onStart, onBack }: { onStart: (choice: BotChoice) => void; onBack: () => void }) {
+export function BotSetup({ start, onStart, onBack }: { start?: StartPoint | null; onStart: (choice: BotChoice) => void; onBack: () => void }) {
   const [prefs] = useState(loadBotPrefs)
   const [botId, setBotId] = useState(prefs.botId)
-  const [color, setColor] = useState<ColorChoice>(prefs.color)
+  const [color, setColor] = useState<ColorChoice>(start?.color ?? prefs.color)
+  const [timeId, setTimeId] = useState(prefs.timeId ?? 'none')
   const [coachOn, setCoachOn] = useState(prefs.coachOn)
   const [allowUndo, setAllowUndo] = useState(prefs.allowUndo)
+  const time = TIME_OPTIONS.find((option) => option.id === timeId)?.time
 
   return (
     <main className="mx-auto w-full max-w-xl px-4 pt-2 pb-10 lg:pt-8">
@@ -46,18 +65,19 @@ export function BotSetup({ onStart, onBack }: { onStart: (choice: BotChoice) => 
         <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6" fill="currentColor">
           <path d="M15.4 6.4 14 5l-7 7 7 7 1.4-1.4L9.8 12z" />
         </svg>
-        Início
+        Voltar
       </button>
       <h1 className="font-book mt-2 text-3xl font-semibold">Contra quem você quer jogar?</h1>
       <p className="mt-1 text-sm text-muted">As forças são aproximadas: servem para comparar um nível com o outro.</p>
+      {start && <p className="mt-3 rounded-md bg-surface p-3 text-sm">A partida começa de: <span className="font-semibold">{start.label}</span></p>}
 
       <form
         className="mt-5"
         onSubmit={(event) => {
           event.preventDefault()
           const bot = BOTS.find((item) => item.id === botId) ?? BOTS[0]
-          saveBotPrefs({ botId, color, coachOn, allowUndo })
-          onStart({ bot, color: color === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : color, coachOn, allowUndo })
+          saveBotPrefs({ botId, color: start ? prefs.color : color, coachOn, allowUndo, timeId })
+          onStart({ bot, color: color === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : color, coachOn, allowUndo: allowUndo && !time, time })
         }}
       >
         <fieldset>
@@ -88,9 +108,22 @@ export function BotSetup({ onStart, onBack }: { onStart: (choice: BotChoice) => 
           </div>
         </fieldset>
 
+        <fieldset className="mt-5">
+          <legend className="mb-1.5 text-sm font-semibold">Relógio</legend>
+          <div className="grid grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
+            {TIME_OPTIONS.map((option) => (
+              <label key={option.id} className={`flex min-h-11 cursor-pointer items-center justify-center px-1 text-center text-sm font-semibold has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ink ${timeId === option.id ? 'bg-ink text-bg' : 'bg-surface'}`}>
+                <input type="radio" name="relogio" checked={timeId === option.id} onChange={() => setTimeId(option.id)} className="sr-only" />
+                {option.label}
+              </label>
+            ))}
+          </div>
+          {time && <p className="mt-2 text-sm text-muted">Com relógio não dá para voltar lance. O tempo fica parado enquanto o treinador confere seu lance.</p>}
+        </fieldset>
+
         <div className="mt-3 divide-y divide-line">
           <Toggle label="Treinador ligado" hint="Avisa dos erros e libera a dica e a ameaça." checked={coachOn} onChange={setCoachOn} />
-          <Toggle label="Permitir voltar lance" hint="Deixa desfazer um lance durante a partida." checked={allowUndo} onChange={setAllowUndo} />
+          {!time && <Toggle label="Permitir voltar lance" hint="Deixa desfazer um lance durante a partida." checked={allowUndo} onChange={setAllowUndo} />}
         </div>
 
         <div className="sticky bottom-0 -mx-4 mt-3 bg-bg px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
