@@ -40,7 +40,7 @@ export function ClassBadge({ cls, className }: { cls: MoveClass; className?: str
           fontFamily="var(--font-sans)"
           fontWeight="800"
           fontSize={symbol.length > 1 ? 50 : 60}
-          fill={cls === 'inaccuracy' ? 'var(--on-fill-inaccuracy)' : 'var(--on-fill)'}
+          fill={cls === 'inaccuracy' ? 'var(--on-fill-inaccuracy)' : cls === 'brilliant' ? 'var(--on-fill-brilliant)' : 'var(--on-fill)'}
         >
           {symbol}
         </text>

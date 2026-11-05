@@ -431,6 +431,9 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
                       </span>
                       {record.opening && <span className="block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
                       {record.digest && record.digest.errors.length > 0 && <span className="block text-sm font-semibold">Virou no lance {record.digest.errors.reduce((worst, error) => (error.loss > worst.loss ? error : worst)).moveNumber}</span>}
+                      {record.digest && record.userColor && (record.digest.counts[record.userColor].brilliant ?? 0) > 0 && (
+                        <span className="block text-sm font-bold text-(--text-brilliant)">{record.digest.counts[record.userColor].brilliant === 1 ? '!! 1 lance brilhante' : `!! ${record.digest.counts[record.userColor].brilliant} lances brilhantes`}</span>
+                      )}
                       {(record.tags.length > 0 || record.note) && <span className="block truncate text-sm text-muted">{[...record.tags, record.note].filter(Boolean).join(', ')}</span>}
                     </span>
                     <span className="shrink-0 text-right">

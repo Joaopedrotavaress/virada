@@ -6,6 +6,7 @@ import { CLASS_INFO } from '../chess/classify'
 import { ClassBadge } from './ClassBadge'
 
 const MEANINGS: { cls: MoveClass; text: string }[] = [
+  { cls: 'brilliant', text: 'O raro: entrega material de verdade, é o melhor lance ou quase, e a posição continua boa.' },
   { cls: 'book', text: 'Lance conhecido da teoria de aberturas. Não conta para a precisão nem para os erros.' },
   { cls: 'best', text: 'O melhor lance da posição, segundo o Stockfish.' },
   { cls: 'excellent', text: 'Quase igual ao melhor: perde menos de 2% de chance de vitória.' },

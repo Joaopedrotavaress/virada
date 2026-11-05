@@ -39,10 +39,11 @@
   --board-mated: #c81e3a;
 
   /* Fundo dos sinais e pontos do gráfico (validados para daltonismo). */
-  /* Lance bom é neutro. Cor só onde há erro; o símbolo garante a leitura sem cor. */
+  /* Lance comum é neutro. Cor só no erro e no que merece festa; o símbolo garante a leitura sem cor. */
+  --fill-brilliant: #16c2bb;
   --fill-book: #74747d;
   --fill-best: #f4f4f6;
-  --fill-excellent: #3a3a41;
+  --fill-excellent: #1f8a45;
   --fill-good: #6a6a73;
   --fill-inaccuracy: #c28a00;
   --fill-mistake: #bd5206;
@@ -51,11 +52,13 @@
   --on-fill: #ffffff;
   --on-fill-inaccuracy: #0b0b0d;
   --on-fill-best: #0b0b0d;
+  --on-fill-brilliant: #04201f;
 
   /* Mesmas categorias como texto: contraste AA sobre a superfície. */
+  --text-brilliant: #0a7470;
   --text-book: var(--muted);
   --text-best: var(--ink);
-  --text-excellent: var(--ink);
+  --text-excellent: #1f7a33;
   --text-good: var(--ink);
   --positive: #1f7a33;
   --text-inaccuracy: #7a5a00;
@@ -88,6 +91,8 @@
   --line: #34343b;
 
   --positive: #68d278;
+  --text-brilliant: #4fe3dc;
+  --text-excellent: #68d278;
   --text-inaccuracy: #e6ae3a;
   --text-mistake: #f5944c;
   --text-blunder: #f97f8c;
@@ -212,7 +217,7 @@ a {
   z-index: 3;
   width: 12.5%;
   height: 12.5%;
-  border: 4px solid var(--action);
+  border: 4px solid var(--onda, var(--action));
   pointer-events: none;
   animation: acerto-onda 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
