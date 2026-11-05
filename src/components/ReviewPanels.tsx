@@ -1,3 +1,6 @@
+import { sanToPt } from '../chess/notation'
+import { Icon } from './Icons'
+import { Placa } from './Revelation'
 import type { AnalyzedMove } from '../chess/analyze'
 import { type KeyMoment, REVIEW_SPEEDS, type ReviewSpeedId } from '../chess/review'
 import { ClassSymbol } from './ClassBadge'
@@ -41,12 +44,19 @@ interface IntroProps {
   insights: string[]
   moments: KeyMoment[]
   onStart: () => void
+  /** O lance em que a partida virou, quando houve um. */
+  turning?: { moveNumber: number; san: string } | null
 }
 
 /** O que aparece ao abrir a partida: o resumo e o convite para rever. */
-export function ReviewIntro({ insights, moments, onStart }: IntroProps) {
+export function ReviewIntro({ insights, moments, onStart, turning }: IntroProps) {
   return (
-    <section aria-label="Resumo da revisão" className="rounded-md bg-surface p-4 sm:p-5">
+    <section aria-label="Resumo da revisão" className="overflow-hidden rounded-md bg-surface p-4 sm:p-5">
+      {turning && (
+        <div className="-mx-4 -mt-4 mb-4 sm:-mx-5 sm:-mt-5">
+          <Placa number={turning.moveNumber} title={`Virou aqui: ${sanToPt(turning.san)}`} animate={false} compact />
+        </div>
+      )}
       <h2 className="font-display text-2xl leading-tight font-semibold">Como foi a partida</h2>
       <button type="button" onClick={onStart} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 font-semibold text-on-action">
         Começar revisão
@@ -152,7 +162,7 @@ export function ReviewBar({ status, ply, total, moments, moves, speed, hasNext, 
               aria-pressed={speed === item.id}
               aria-label={`Velocidade ${item.label}`}
               onClick={() => onSpeed(item.id)}
-              className={`tabular min-h-9 w-8 text-sm font-semibold ${speed === item.id ? 'bg-action text-on-action' : 'hover:bg-sunken'}`}
+              className={`tabular min-h-9 w-8 text-sm font-semibold ${speed === item.id ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}
             >
               {item.label}
             </button>
@@ -162,7 +172,7 @@ export function ReviewBar({ status, ply, total, moments, moves, speed, hasNext, 
           {hasNext ? 'Próximo momento' : 'Ir para a conclusão'}
         </button>
         <button type="button" onClick={onExit} aria-label="Sair da revisão" title="Sair da revisão" className="flex size-9 shrink-0 items-center justify-center rounded-md text-xl hover:bg-sunken">
-          ×
+          <Icon name="close" />
         </button>
       </div>
     </div>

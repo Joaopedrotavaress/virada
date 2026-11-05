@@ -9,7 +9,7 @@ import { clocksAt, formatClock } from '../chess/clock'
 import { materialState } from '../chess/material'
 import { uciParts } from '../chess/notation'
 import { formatDate, formatTimeControl } from '../chess/pgn'
-import { REVIEW_SPEEDS, findKeyMoments, gameInsights } from '../chess/review'
+import { REVIEW_SPEEDS, findKeyMoments, gameInsights, turningPoint } from '../chess/review'
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
 import { CapturedPieces } from './CapturedPieces'
@@ -117,6 +117,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
 
   const moments = useMemo(() => findKeyMoments(analysis, userColor), [analysis, userColor])
   const insights = useMemo(() => gameInsights(analysis, userColor), [analysis, userColor])
+  const turning = useMemo(() => turningPoint(moves), [moves])
   const moveTo = useCallback((next: number) => {
     setRevealed(false)
     setSelected(null)
@@ -467,7 +468,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       }}
     />
   ) : review.status === 'idle' && ply === 0 ? (
-    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} />
+    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} turning={turning} />
   ) : review.status === 'done' ? (
     <ReviewEnd
       insights={insights}
