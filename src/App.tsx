@@ -6,6 +6,9 @@ import type { Color } from './chess/evaluation'
 import { PgnError, type ParsedGame, parsePgn } from './chess/pgn'
 import { SAMPLE_PGN } from './chess/sample'
 import { Analyzing } from './components/Analyzing'
+import { RevelationOverlay } from './components/Revelation'
+import { CLASS_INFO } from './chess/classify'
+import { turningPoint } from './chess/review'
 import { BotGame } from './components/BotGame'
 import { type BotChoice, BotSetup, type StartPoint } from './components/BotSetup'
 import { DataScreen } from './components/DataScreen'
@@ -57,7 +60,7 @@ const loading = (
 )
 
 /** Abre a análise pelo endereço. Sem análise guardada, mas com o PGN, analisa de novo. */
-function GameRoute({ gameKey, username, notice, onAnalyze, onPlayFrom }: { gameKey: string; username: string; notice: string | null; onAnalyze: (record: GameRecord) => void; onPlayFrom: (start: StartPoint) => void }) {
+function GameRoute({ gameKey, username, notice, reveal, onRevealDone, onAnalyze, onPlayFrom }: { gameKey: string; username: string; notice: string | null; reveal: boolean; onRevealDone: () => void; onAnalyze: (record: GameRecord) => void; onPlayFrom: (start: StartPoint) => void }) {
   const [analysis, setAnalysis] = useState<GameAnalysis | null | undefined>(undefined)
   const records = useAllRecords()
   const record = records.find((item) => item.key === gameKey)
@@ -85,21 +88,35 @@ function GameRoute({ gameKey, username, notice, onAnalyze, onPlayFrom }: { gameK
     if (record && !record.deletedAt) return loading
     return (
       <main className="mx-auto max-w-md p-6">
-        <h1 className="font-book text-3xl font-semibold">Partida não encontrada</h1>
+        <h1 className="font-display text-3xl font-semibold">Partida não encontrada</h1>
         <p className="mt-2 text-muted">Ela não está guardada neste aparelho. Pode ter sido apagada, ou o link veio de outro aparelho.</p>
-        <button type="button" onClick={() => navigate('#/partidas', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+        <button type="button" onClick={() => navigate('#/partidas', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
           Ver minhas partidas
         </button>
       </main>
     )
   }
+  const userColor = record?.userColor ?? analysis.userColor ?? colorOfUser(username, analysis.white, analysis.black)
+  const turning = reveal ? turningPoint(analysis.moves) : null
   return (
     <Suspense fallback={loading}>
+      {turning && (
+        <RevelationOverlay
+          fen={analysis.positions[turning.ply - 1].fen}
+          uci={turning.uci}
+          san={turning.san}
+          moveNumber={turning.moveNumber}
+          isUserMove={turning.color === userColor}
+          label={CLASS_INFO[turning.cls].label}
+          orientation={userColor === 'b' ? 'black' : 'white'}
+          onDone={onRevealDone}
+        />
+      )}
       <AnalysisView
         key={analysis.id}
         analysis={analysis}
         record={record}
-        userColor={record?.userColor ?? analysis.userColor ?? colorOfUser(username, analysis.white, analysis.black)}
+        userColor={userColor}
         notice={notice}
         onBack={goBack}
         onPlayFrom={onPlayFrom}
@@ -118,6 +135,7 @@ export default function App() {
   const [notice, setNotice] = useState<string | null>(null)
   const [activeGame, setActiveGame] = useState(loadActiveGame)
   const [startPoint, setStartPoint] = useState<StartPoint | null>(null)
+  const [revealKey, setRevealKey] = useState<string | null>(null)
   const running = useRef<AbortController | null>(null)
 
   const setUsername = useCallback((next: string) => {
@@ -194,6 +212,7 @@ export default function App() {
         if (controller.signal.aborted) return
         if (!persisted) setNotice('Esta análise não foi salva: o navegador está sem espaço para guardar partidas.')
         running.current = null
+        setRevealKey(record.key)
         navigate(gamePath(record.key), { replace: true })
       } catch (failure) {
         if (controller.signal.aborted || failure instanceof EngineAbortError) return
@@ -268,7 +287,7 @@ export default function App() {
   }
 
   if (route.name === 'game') {
-    return <GameRoute gameKey={route.key} username={username} notice={notice} onAnalyze={(record) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace: true })} onPlayFrom={playFrom} />
+    return <GameRoute gameKey={route.key} username={username} notice={notice} reveal={revealKey === route.key} onRevealDone={() => setRevealKey(null)} onAnalyze={(record) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace: true })} onPlayFrom={playFrom} />
   }
 
   if (route.name === 'bot-game') {
@@ -276,8 +295,8 @@ export default function App() {
     if (!activeGame || !bot) {
       return (
         <main className="mx-auto max-w-md p-6">
-          <h1 className="font-book text-3xl font-semibold">Nenhuma partida em andamento</h1>
-          <button type="button" onClick={() => navigate('#/jogar', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
+          <h1 className="font-display text-3xl font-semibold">Nenhuma partida em andamento</h1>
+          <button type="button" onClick={() => navigate('#/jogar', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
             Começar uma partida
           </button>
         </main>
