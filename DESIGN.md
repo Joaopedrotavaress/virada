@@ -400,16 +400,19 @@ A resposta do app. Bloco amarelo sem canto, com o número gigante à esquerda, a
 - **Movimento:** sobe de fora da tela (de 110vh ao lugar) em 550ms. Na última partida da tela inicial e na compacta, já aparece parada.
 
 ### A Revelação
-O movimento próprio do Virada: a partida se acende a partir da casa-chave, os lances acontecem, a casa-chave fica amarela e a placa sobe. Na primeira visita usa a Partida da Ópera, e ao fim de uma análise usa a posição real da partida, em tela cheia sobre zona 0.
+O movimento próprio do Virada: a partida se acende a partir da casa-chave, 3 lances acontecem, a casa-chave fica amarela, as peças derrubadas saem voando e a placa sobe. Na primeira visita usa a Partida da Ópera, e ao fim de uma análise usa a posição real da partida, em tela cheia sobre zona 0.
+
+- **Quais lances:** o da virada e os dois seguintes. Se a partida acaba em mate até 3 lances depois da virada, mostra os 3 últimos, para terminar no mate. Se a virada ficar antes deles, a casa amarela já começa acesa.
 
 - **Casas:** acendem em onda a partir da casa-chave, com atraso de 150ms mais 85ms por casa de distância. Em 650ms, a opacidade vai de 0 a 1 e o brilho vai de 0.2 a 1.6 e volta a 1.
 - **Tabuleiro:** assenta de -1.6 graus e 97% para o lugar, em 900ms, a partir de 700ms.
 - **Peças:** surgem em 280ms, 200ms depois da própria casa.
-- **Lances:** começam em 1250ms, com 400ms cada (300ms o último) e pausa de 300ms entre eles. A peça cresce até 120% no caminho, e a capturada some em 60ms quando a outra chega.
-- **Impacto:** as marcas (origem, casa amarela e rei em mate) aparecem em 160ms no começo do último lance. Quando ele termina, sai uma onda amarela (borda de 4px, de 100% a 450%, em 750ms) e o tabuleiro desce 5px e volta, em 320ms.
-- **Placa:** sobe 350ms depois do impacto (3300ms na Ópera, 1900ms na tela final).
-- **Pular:** um toque encerra tudo. Na tela inicial, as animações vão direto ao fim. Na tela final, o toque abre a análise, que também abre sozinha depois de 7 segundos.
-- **Menos movimento:** nenhuma animação roda. O tabuleiro já mostra a posição final com as marcas, a placa aparece no lugar e a tela final fica 5 segundos. O estado de repouso é sempre o certo.
+- **Lances:** começam em 1250ms, com 400ms cada (300ms o último) e pausa de 300ms entre eles. A peça cresce até 120% no caminho.
+- **Voo:** quando a outra peça chega, a capturada sai em arco por 1000ms, girando duas voltas, para o lado mais perto da borda: sobe quase 2 casas, anda 8 e cresce até 150%. Se o último lance é mate, o rei voa igual, no impacto. O arco evita que a peça suma logo, já que o tabuleiro da tela inicial fica no topo da página. A página recorta a largura em `#root`, porque no celular a peça encolheria a tela inteira.
+- **Impacto:** a casa amarela acende em 160ms quando o lance da virada está chegando, e a onda amarela (borda de 4px, de 100% a 450%, em 750ms) sai dela nesse instante. A origem e o rei em mate aparecem no começo do último lance. Quando ele termina, o tabuleiro desce 5px e volta, em 320ms.
+- **Placa:** sobe 500ms depois do impacto, com a peça ainda no ar (3450ms com 3 lances).
+- **Pular:** um toque encerra tudo. Na tela inicial, as animações vão direto ao fim. Na tela final, o toque abre a análise, que também abre sozinha 5 segundos depois de a placa subir.
+- **Menos movimento:** nenhuma animação roda. O tabuleiro já mostra a posição final com as marcas e o rei em mate parado na casa vermelha, a placa aparece no lugar e a tela final fica 5 segundos. O estado de repouso é sempre o certo.
 
 ### O acerto de exercício
 Quando a pessoa acha o lance, sai uma onda amarela da casa dele. É decorativa, escondida de leitores de tela e some sozinha.
