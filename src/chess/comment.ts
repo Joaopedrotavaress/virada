@@ -33,25 +33,25 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
   const moverKeepsMate = after.eval.kind === 'mate' && after.eval.winner === color && after.eval.moves > 0
   const opponentHasMate = after.eval.kind === 'mate' && after.eval.winner !== color && after.eval.moves > 0
 
-  if (after.terminal === 'checkmate') return `Xeque-mate! ${sideName(color)} vencem a partida.`
-  if (cls === 'book') return 'Lance de livro: faz parte da teoria de aberturas. A avaliação fica em ' + to + '.'
+  if (after.terminal === 'checkmate') return `Xeque-mate. Fim de papo: ${sideName(color).toLowerCase()} vencem.`
+  if (cls === 'book') return 'Teoria pura: esse lance está nos livros. A avaliação fica em ' + to + '.'
 
   const ending = after.terminal === 'stalemate' ? ' A partida termina em afogamento.' : after.terminal === 'draw' ? ' A partida termina empatada.' : ''
 
   if (cls === 'best') {
-    if (moverKeepsMate && after.eval.kind === 'mate') return `O melhor lance: mantém o mate forçado em ${after.eval.moves}.`
-    if (opponentHasMate && after.eval.kind === 'mate') return `O melhor lance, mas a posição já estava perdida: o adversário tem mate em ${after.eval.moves}.`
-    return `O melhor lance da posição. A avaliação fica em ${to}.${ending}`
+    if (moverKeepsMate && after.eval.kind === 'mate') return `Perfeito: o mate em ${after.eval.moves} continua de pé.`
+    if (opponentHasMate && after.eval.kind === 'mate') return `Era o melhor, mas já não tinha salvação: o adversário tem mate em ${after.eval.moves}.`
+    return `Não tinha lance melhor. A avaliação fica em ${to}.${ending}`
   }
 
   // A perda é pequena porque já não havia o que perder: elogiar o lance seria enganoso.
   if ((cls === 'excellent' || cls === 'good') && opponentHasMate && after.eval.kind === 'mate') {
     const resisted = best ? ` ${best} resistia mais.` : ''
-    return `A posição já estava perdida, e agora o adversário tem mate em ${after.eval.moves}${reply ? `, começando com ${reply}` : ''}.${resisted}`
+    return `Já estava difícil, e agora o adversário tem mate em ${after.eval.moves}${reply ? `, começando com ${reply}` : ''}.${resisted}`
   }
 
   if (cls === 'excellent') {
-    return `Lance muito bom, quase igual ao melhor${best ? ` (${best})` : ''}. A avaliação fica em ${to}.${ending}`
+    return `Muito bom, quase o melhor${best ? ` (${best})` : ''}. A avaliação fica em ${to}.${ending}`
   }
 
   if (cls === 'good') {
@@ -76,7 +76,7 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
     )
     if (explanation) {
       const previous = previousMove ? ` (${sanToPt(previousMove.san)})` : ''
-      const intro = cls === 'miss' ? `O adversário errou no lance anterior${previous} e a chance passou. ` : ''
+      const intro = cls === 'miss' ? `O adversário vacilou no lance anterior${previous} e a chance passou. ` : ''
       const mentionsBest = best ? explanation.includes(best) : true
       const closing = revealBest && best && !mentionsBest ? ` O melhor era ${best}.` : ''
       return `${intro}${explanation}${closing}${ending}`
@@ -106,7 +106,7 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
 
   if (cls === 'miss') {
     const previous = previousMove ? ` (${sanToPt(previousMove.san)})` : ''
-    return `O adversário errou no lance anterior${previous} e a chance passou. ${change}${bestSentence}${replySentence}${ending}`
+    return `O adversário vacilou no lance anterior${previous} e a chance passou. ${change}${bestSentence}${replySentence}${ending}`
   }
 
   return `${change}${bestSentence}${replySentence}${ending}`
@@ -115,5 +115,5 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
 /** Mensagem do card quando ainda não há lance: a posição inicial. */
 export function startComment(position: AnalyzedPosition): string {
   const best = bestSanPt(position)
-  return `Posição inicial, avaliada em ${formatEval(position.eval)}.${best ? ` O motor começaria com ${best}.` : ''} Use as setas para acompanhar a partida.`
+  return `Posição inicial, em ${formatEval(position.eval)}.${best ? ` O Stockfish começaria com ${best}.` : ''} Use as setas para acompanhar a partida.`
 }

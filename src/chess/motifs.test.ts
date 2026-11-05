@@ -24,7 +24,7 @@ describe('peça pendurada', () => {
   it('aponta a peça atacada e sem defesa', () => {
     const motifs = detectMotifs(blunder)
     expect(motifs[0]).toEqual({ kind: 'hanging', piece: 'n', square: 'd5' })
-    expect(explainMotifs(motifs, { color: 'w' })).toBe('O cavalo em d5 ficou pendurado: está atacado e sem defesa.')
+    expect(explainMotifs(motifs, { color: 'w' })).toBe('O cavalo em d5 ficou sozinho: atacado e sem ninguém defendendo.')
   })
 
   it('não aponta se a peça está defendida', () => {
@@ -109,7 +109,7 @@ describe('garfo', () => {
     )
     const fork = motifs.find((motif) => motif.kind === 'fork')
     expect(fork).toEqual({ kind: 'fork', san: 'Nc2+', targets: ['k', 'r'] })
-    expect(explainMotifs(fork ? [fork] : [], { color: 'w' })).toBe('Cc2+ é um garfo: ataca o rei e a torre ao mesmo tempo.')
+    expect(explainMotifs(fork ? [fork] : [], { color: 'w' })).toBe('Olha o garfo: Cc2+ ataca o rei e a torre de uma vez.')
   })
 
   it('não é garfo se a peça atacante pode ser capturada', () => {
@@ -220,6 +220,6 @@ describe('explicação', () => {
 
   it('junta no máximo três frases', () => {
     const many = Array.from({ length: 5 }, () => ({ kind: 'hanging' as const, piece: 'n' as const, square: 'd5' }))
-    expect(explainMotifs(many, { color: 'w' })?.match(/pendurado/g)).toHaveLength(3)
+    expect(explainMotifs(many, { color: 'w' })?.match(/sozinho/g)).toHaveLength(3)
   })
 })

@@ -344,13 +344,13 @@ export function explainMotifs(motifs: Motif[], { color, isUser = false, revealBe
         break
       }
       case 'hanging':
-        sentences.push(`${capitalized(NAMES[motif.piece].the)} em ${motif.square} ficou pendurad${motif.piece === 'r' || motif.piece === 'q' ? 'a' : 'o'}: está atacad${motif.piece === 'r' || motif.piece === 'q' ? 'a' : 'o'} e sem defesa.`)
+        sentences.push(`${capitalized(NAMES[motif.piece].the)} em ${motif.square} ficou sozinh${motif.piece === 'r' || motif.piece === 'q' ? 'a' : 'o'}: atacad${motif.piece === 'r' || motif.piece === 'q' ? 'a' : 'o'} e sem ninguém defendendo.`)
         break
       case 'material':
         sentences.push(`A melhor resposta ${opponentName} ganha ${motif.description}: ${motif.line.map(sanToPt).join(' ')}.`)
         break
       case 'fork':
-        sentences.push(`${sanToPt(motif.san)} é um garfo: ataca ${NAMES[motif.targets[0]].the} e ${NAMES[motif.targets[1]].the} ao mesmo tempo.`)
+        sentences.push(`Olha o garfo: ${sanToPt(motif.san)} ataca ${NAMES[motif.targets[0]].the} e ${NAMES[motif.targets[1]].the} de uma vez.`)
         break
       case 'pin': {
         const pinned = `${NAMES[motif.pinned].the} em ${motif.square}`

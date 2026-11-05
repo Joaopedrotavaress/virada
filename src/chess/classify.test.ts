@@ -180,13 +180,13 @@ describe('comentário do treinador', () => {
       before: position(START, mate(1, 'w'), 'f2f3'),
       after: { ...position(AFTER_F3, mate(0, 'w'), null), terminal: 'checkmate' },
     })
-    expect(checkmate).toBe('Xeque-mate! As brancas vencem a partida.')
+    expect(checkmate).toBe('Xeque-mate. Fim de papo: as brancas vencem.')
     const miss = coachComment({
       move: move({ cls: 'miss' }),
       before: position(START, cp(300), 'g1f3'),
       after: position(AFTER_F3, cp(0), 'g8f6'),
       previousMove: move({ san: 'Qh5', color: 'b' }),
     })
-    expect(miss).toContain('O adversário errou no lance anterior (Dh5) e a chance passou.')
+    expect(miss).toContain('O adversário vacilou no lance anterior (Dh5) e a chance passou.')
   })
 })
