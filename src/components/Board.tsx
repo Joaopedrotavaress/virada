@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { type CSSProperties, useEffect, useRef } from 'react'
 import { type Arrow, Chessboard } from 'react-chessboard'
 import type { MoveClass } from '../chess/classify'
 import { ClassBadge } from './ClassBadge'
@@ -26,8 +26,13 @@ interface BoardProps {
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 export function Board({ fen, orientation, arrows = [], squareStyles = {}, badge, animateArrow = false, animationMs = 140, interactive = false, turn, onPieceDrop, onSquareClick }: BoardProps) {
+  const container = useRef<HTMLDivElement>(null)
+  // A biblioteca deixa cada peça focável, mesmo sem nome: 32 paradas de Tab inúteis antes dos botões.
+  useEffect(() => {
+    for (const element of container.current?.querySelectorAll('[tabindex="0"]') ?? []) element.setAttribute('tabindex', '-1')
+  })
   return (
-    <div className={`w-full overflow-hidden rounded-sm ${animateArrow ? 'arrow-pop' : ''}`}>
+    <div ref={container} className={`w-full overflow-hidden rounded-sm ${animateArrow ? 'arrow-pop' : ''}`}>
       <Chessboard
         options={{
           id: 'tabuleiro',
