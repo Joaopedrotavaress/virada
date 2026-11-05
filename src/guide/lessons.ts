@@ -111,7 +111,7 @@ export const LESSONS: Lesson[] = [
         prompt: 'O seu rei já está no lugar certo. Dê o mate.',
         solution: ['Qh8#'],
         goal: 'mate',
-        after: 'O rei branco tira as casas a7 e b7, e a dama cuida da oitava fileira. Dh1–a1 também seria mate.',
+        after: 'O rei branco tira as casas a7 e b7, e a dama cuida da oitava fileira. Db7 também seria mate.',
       },
       {
         fen: 'k7/8/2K5/8/8/8/8/1Q6 w - - 0 1',
@@ -409,7 +409,7 @@ export const LESSONS: Lesson[] = [
     group: 'finais',
     title: 'Posição de Philidor: como empatar',
     paragraphs: [
-      'O final de torre mais importante para quem defende. A torre fica na terceira fileira do adversário e impede o rei inimigo de avançar.',
+      'O final de torre mais importante para quem defende. A torre fica na sua própria terceira fileira e impede o rei inimigo de avançar.',
       'Assim que o peão avança, ele deixa de proteger o rei. É a hora de mudar de lugar: a torre vai para longe, atrás, e dá xeques sem parar. Como o rei não tem mais onde se esconder, a partida empata.',
     ],
     positions: [

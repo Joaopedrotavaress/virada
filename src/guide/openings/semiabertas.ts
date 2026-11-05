@@ -124,7 +124,7 @@ export const SEMIABERTAS: OpeningGuide[] = [
         sans: 'e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Qc7 O-O Nf6 Qe2 Ng4 h3 Nd4 Nxd4 Qh2#',
         who: 'b',
         errorAt: 16,
-        text: 'Esta é contra quem joga no piloto automático. O cavalo em g4 mira h2, e o lance h3 parece expulsá-lo. Só que ...Cd4 ataca a dama em e2 e, se o cavalo branco captura, a diagonal da dama preta abre e o mate em h2 é imediato. Depois de ...Cg4, as brancas precisam de g3 ou Cb5, nunca de h3.',
+        text: 'Esta pega quem joga no piloto automático. O cavalo em g4 mira h2, e o lance h3 parece expulsá-lo. Só que ...Cd4 ataca a dama em e2 e, se o cavalo branco captura, a diagonal da dama preta abre e o mate em h2 é imediato. Depois de ...Cg4, as brancas precisam de g3 ou Cb5, nunca de h3.',
       },
     ],
     mistakes: ['Pelas brancas, entrar no gambito e jogar sem pressa: sem ataque, falta só o peão.', 'Pelas pretas, tentar manter o peão a qualquer custo e atrasar o roque.'],

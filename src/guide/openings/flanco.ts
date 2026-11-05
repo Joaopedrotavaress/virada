@@ -61,7 +61,7 @@ export const FLANCO: OpeningGuide[] = [
       black: ['Jogar ...d5, ...g6 e ...Bg7, ou tentar punir o lance de cara com o Gambito From.'],
     },
     lines: [
-      { name: 'Formação com ...g6', sans: 'f4 d5 Nf3 Nf6 e3 g6 Be2 Bg7 O-O O-O', note: 'As brancas têm uma formação Stonewall ou com o bispo em b2, com uma luta ainda em aberto.' },
+      { name: 'Formação com ...g6', sans: 'f4 d5 Nf3 Nf6 e3 g6 Be2 Bg7 O-O O-O', note: 'As brancas ainda escolhem entre b3 com o bispo em b2, ou d3 e a pressão em e4.' },
       { name: 'Gambito From', sans: 'f4 e5 fxe5 d6 exd6 Bxd6 Nf3 g5', note: 'As pretas entregam um peão para atacar a ala do rei. O melhor é conhecer a resposta precisa.', sharp: true },
     ],
     traps: [

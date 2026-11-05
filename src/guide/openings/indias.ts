@@ -149,8 +149,8 @@ export const INDIAS: OpeningGuide[] = [
       black: ['Aceitar o peão em c4 e devolvê-lo na hora certa, ou manter a estrutura com ...Be7 e ...c6.', 'Liberar o bispo de c8 por b7, depois de ...b6.'],
     },
     lines: [
-      { name: 'Catalã fechada', sans: 'd4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O dxc4 Qc2 a6', note: 'As brancas entregam o peão por pouco tempo. A dama recupera c4, e a pressão continua.' },
-      { name: 'Catalã aberta', sans: 'd4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Nc6', note: 'As pretas capturam logo e tentam atrapalhar o desenvolvimento branco com ...Cc6.' },
+      { name: 'Com 4...Be7 e captura depois', sans: 'd4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O dxc4 Qc2 a6', note: 'As brancas entregam o peão por pouco tempo. A dama recupera c4, e a pressão continua.' },
+      { name: 'Com captura imediata', sans: 'd4 Nf6 c4 e6 g3 d5 Bg2 dxc4 Nf3 Nc6', note: 'As pretas capturam logo e tentam atrapalhar o desenvolvimento branco com ...Cc6.' },
     ],
     traps: [],
     mistakes: ['Pelas brancas, entrar no meio-jogo sem saber como recuperar c4.', 'Pelas pretas, deixar o bispo de c8 sem saída.'],
