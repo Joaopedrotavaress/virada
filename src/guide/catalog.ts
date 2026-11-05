@@ -33,6 +33,30 @@ export interface OpeningFamily {
 const SYSTEM_WORDS = /Sistema|Ataque (Torre|Trompowsky|Índio|Índio do Rei)|Colle|Londres|Stonewall/
 const normalize = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
+// A base mantém em inglês os nomes de muitas variantes. Quem procura em português também precisa achar.
+const SYNONYMS: Record<string, string> = {
+  dragao: 'dragon',
+  espanhola: 'ruy lopez',
+  filidor: 'philidor',
+  eslava: 'slav',
+  semieslava: 'semi-slav',
+  india: 'indian',
+  catala: 'catal',
+  inglesa: 'english',
+  holandesa: 'dutch',
+  escocesa: 'scotch',
+  vienense: 'vienna',
+  gambito: 'gambit',
+  variante: 'variation',
+  avanco: 'advance',
+  trocas: 'exchange',
+  classica: 'classical',
+  ataque: 'attack',
+  defesa: 'defense',
+}
+
+const matchesWord = (haystack: string, word: string) => haystack.includes(word) || (SYNONYMS[word] !== undefined && haystack.includes(SYNONYMS[word]))
+
 const groupOf = (moves: string[]): FamilyGroup => {
   if (moves[0] === 'e4') return moves[1] === 'e5' ? 'e4-e5' : 'e4-outras'
   if (moves[0] === 'd4') return moves[1] === 'd5' ? 'd4-d5' : 'd4-indias'
@@ -99,7 +123,17 @@ export function filterFamilies(families: OpeningFamily[], { query, kind }: Catal
     if (kind === 'guide' && !family.guide) return false
     if (words.length === 0) return true
     const haystack = normalize([family.name, family.eco, ...family.variants.map((variant) => `${variant.name} ${variant.eco}`)].join(' '))
-    return words.every((word) => haystack.includes(word))
+    return words.every((word) => matchesWord(haystack, word))
+  })
+}
+
+/** Aberturas com texto cujo nome combina com a busca. */
+export function filterGuides(query: string): OpeningGuide[] {
+  const words = normalize(query).split(/\s+/).filter(Boolean)
+  if (words.length === 0) return []
+  return OPENING_GUIDES.filter((guide) => {
+    const haystack = normalize(`${guide.name} ${guide.eco}`)
+    return words.every((word) => matchesWord(haystack, word))
   })
 }
 

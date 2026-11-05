@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Chess } from 'chess.js'
-import { type CatalogLine, buildFamilies, familyId, familyOf, filterFamilies, loadFamilies } from './catalog'
+import { type CatalogLine, buildFamilies, familyId, familyOf, filterFamilies, filterGuides, loadFamilies } from './catalog'
 
 const LINES: CatalogLine[] = [
   ['B90', 'Defesa Siciliana: Najdorf', 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6'],
@@ -44,6 +44,16 @@ describe('catálogo de aberturas', () => {
     expect(names('', 'systems')).toEqual(['sistema-londres'])
     expect(names('', 'guide')).not.toContain('abertura-grob')
     expect(names('nada-disso')).toEqual([])
+  })
+
+  it('acha em português o que a base guarda em inglês', async () => {
+    const families = await loadFamilies()
+    const names = (query: string) => filterFamilies(families, { query, kind: 'all' }).map((family) => family.id)
+    expect(names('dragão')).toContain('defesa-siciliana')
+    expect(names('espanhola')).toContain('ruy-lopez')
+    expect(filterGuides('dragão').map((guide) => guide.slug)).toEqual(['dragao'])
+    expect(filterGuides('espanhola').map((guide) => guide.slug)).toEqual(['espanhola'])
+    expect(filterGuides('')).toEqual([])
   })
 
   it('a base inteira carrega, e todas as linhas são legais', async () => {
