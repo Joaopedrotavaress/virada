@@ -51,9 +51,9 @@ interface IntroProps {
 /** O que aparece ao abrir a partida: o resumo e o convite para rever. */
 export function ReviewIntro({ insights, moments, onStart, turning }: IntroProps) {
   return (
-    <section aria-label="Resumo da revisão" className="overflow-hidden rounded-md bg-surface p-4 sm:p-5">
+    <section aria-label="Resumo da revisão" className="shrink-0 rounded-md bg-surface p-4 sm:p-5">
       {turning && (
-        <div className="-mx-4 -mt-4 mb-4 sm:-mx-5 sm:-mt-5">
+        <div className="-mx-4 -mt-4 mb-4 overflow-hidden rounded-t-md sm:-mx-5 sm:-mt-5">
           <Placa number={turning.moveNumber} title={`Virou aqui: ${sanToPt(turning.san)}`} animate={false} compact />
         </div>
       )}
