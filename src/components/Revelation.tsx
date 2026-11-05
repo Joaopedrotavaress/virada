@@ -1,10 +1,14 @@
-import { Chess, type Square } from 'chess.js'
+import { Chess } from 'chess.js'
 import { type ReactNode, useEffect, useMemo, useRef } from 'react'
 import { defaultPieces } from 'react-chessboard'
 import { sanToPt, uciParts } from '../chess/notation'
 import { ZoneRamp } from './Logo'
 
 const FILES = 'abcdefgh'
+const FIRST_MOVE_AT = 1250
+
+/** Quando a placa sobe: depois do último lance e de a peça sair voando. */
+export const placaDelay = (moveCount: number) => FIRST_MOVE_AT + (Math.max(1, moveCount) - 1) * 700 + 300 + 500
 const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 interface Step {
@@ -25,10 +29,10 @@ interface RevelationBoardProps {
   /** Lances a mostrar, em notação UCI. */
   moves: string[]
   orientation?: 'white' | 'black'
-  /** A casa de onde a luz parte e que termina em amarelo. */
+  /** A casa de onde a luz parte e que fica amarela. */
   focus: string
-  /** Rei em xeque-mate, quando o último lance for mate. */
-  matedSquare?: string
+  /** Qual lance acende a casa amarela. Padrão: o último. Negativo: ela já começa acesa. */
+  focusAt?: number
   /** Falso mostra direto a posição final. */
   animate?: boolean
   /** Quando a última peça para de mexer, em ms. */
@@ -42,10 +46,13 @@ function place(square: string, orientation: 'white' | 'black') {
 }
 
 /** O tabuleiro da Revelação. Sem animação, mostra direto a posição final: o estado de repouso é sempre o certo. */
-export function RevelationBoard({ fen, moves, orientation = 'white', focus, matedSquare, animate = true, onSettled }: RevelationBoardProps) {
+export function RevelationBoard({ fen, moves: moveList, orientation = 'white', focus, focusAt, animate = true, onSettled }: RevelationBoardProps) {
   const root = useRef<HTMLDivElement>(null)
+  // Compara pelo conteúdo: uma lista nova com os mesmos lances não reinicia a animação.
+  const line = moveList.join(' ')
+  const moves = useMemo(() => line.split(' ').filter(Boolean), [line])
 
-  const { pieces, plan } = useMemo(() => {
+  const { pieces, plan, matedSquare, matedKey } = useMemo(() => {
     const chess = new Chess(fen)
     const views: PieceView[] = []
     for (const row of chess.board()) {
@@ -74,7 +81,12 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
       }
       steps.push({ key, from: move.from, to: move.to, captured, rook })
     }
-    return { pieces: views, plan: steps }
+    // Se a sequência termina em mate, o rei de quem levou o mate também voa.
+    let mated: string | undefined
+    if (chess.isCheckmate()) {
+      for (const row of chess.board()) for (const cell of row) if (cell?.type === 'k' && cell.color === chess.turn()) mated = cell.square
+    }
+    return { pieces: views, plan: steps, matedSquare: mated, matedKey: mated ? whereIs.get(mated) : undefined }
   }, [fen, moves])
 
   const last: Step | undefined = plan[plan.length - 1]
@@ -115,14 +127,29 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
     }
     animations.push(element.animate([{ transform: 'rotate(-1.6deg) scale(0.97)' }, { transform: 'none' }], { duration: 900, delay: 700, easing: EASE_OUT, fill: 'backwards' }))
 
-    let clock = 1250
+    /** A peça sai em arco, girando: sobe, cruza o tabuleiro e cai para o lado mais perto da borda. */
+    const flyAway = (node: HTMLElement, square: string, delay: number) => {
+      const side = place(square, orientation).x < 4 ? -1 : 1
+      const path = Array.from({ length: 21 }, (_, index) => {
+        const t = index / 20
+        const x = side * 800 * t
+        const y = 300 * t - 1200 * t * (1 - t)
+        const scale = 1 + 0.5 * Math.min(t / 0.3, 1)
+        return { transform: `translate(${x}%, ${y}%) rotate(${side * 720 * t}deg) scale(${scale})`, opacity: t < 0.85 ? 1 : (1 - t) / 0.15, zIndex: 20 }
+      })
+      return node.animate(path, { duration: 1000, delay, fill: 'forwards' })
+    }
+
+    const arrivals: number[] = []
+    let clock = FIRST_MOVE_AT
     const pieceElement = (key: string) => element.querySelector<HTMLElement>(`[data-piece-key="${key}"]`)
 
     for (const piece of pieces) {
       const node = pieceElement(piece.key)
       if (!node) continue
       const here = place(piece.square, orientation)
-      animations.push(node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280, delay: delayOf(here.x, here.y) + 200, fill: 'backwards' }))
+      // A peça capturada termina invisível: ela precisa continuar acesa até sair voando.
+      animations.push(node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280, delay: delayOf(here.x, here.y) + 200, fill: capturedKeys.has(piece.key) ? 'both' : 'backwards' }))
     }
 
     plan.forEach((step, index) => {
@@ -141,11 +168,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
       }
       if (step.captured) {
         const taken = pieceElement(step.captured)
-        if (taken) {
-          // A peça capturada some no lance: fica visível até a outra chegar.
-          animations.push(taken.animate([{ opacity: 1 }, { opacity: 1 }], { duration: clock + duration, fill: 'backwards' }))
-          animations.push(taken.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 60, delay: clock + duration, fill: 'forwards' }))
-        }
+        if (taken) animations.push(flyAway(taken, finalSquare.get(step.captured) as string, clock + duration))
       }
       if (step.rook) {
         const rook = pieceElement(step.rook.key)
@@ -155,16 +178,23 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
           animations.push(rook.animate([{ transform: `translate(${(a.x - b.x) * 100}%, ${(a.y - b.y) * 100}%)` }, { transform: 'none' }], { duration, delay: clock, fill: 'backwards' }))
         }
       }
+      arrivals.push(clock + duration)
       clock += duration + 300
     })
     const impact = clock - 300
+    const focusArrival = focusAt === undefined ? impact : (arrivals[focusAt] ?? FIRST_MOVE_AT)
 
     for (const mark of element.querySelectorAll<HTMLElement>('[data-mark]')) {
-      animations.push(mark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, delay: impact - 280, fill: 'backwards' }))
+      const delay = mark.dataset.mark === 'focus' ? focusArrival - 120 : impact - 280
+      animations.push(mark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, delay, fill: 'backwards' }))
+    }
+    if (matedKey) {
+      const king = pieceElement(matedKey)
+      if (king && matedSquare) animations.push(flyAway(king, matedSquare, impact))
     }
     const wave = element.querySelector<HTMLElement>('[data-wave]')
     if (wave) {
-      animations.push(wave.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(4.5)' }], { duration: 750, delay: impact, easing: EASE_OUT }))
+      animations.push(wave.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(4.5)' }], { duration: 750, delay: focusArrival, easing: EASE_OUT }))
     }
     animations.push(element.animate([{ translate: '0 0' }, { translate: '0 5px', offset: 0.3 }, { translate: '0 0' }], { duration: 320, delay: impact, easing: 'ease-out' }))
 
@@ -174,7 +204,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
     }
     // Roda uma vez para cada posição.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fen, moves, orientation, focus, animate])
+  }, [fen, moves, orientation, focus, focusAt, animate])
 
   const percent = (square: string) => {
     const { x, y } = place(square, orientation)
@@ -182,7 +212,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
   }
 
   return (
-    <div ref={root} className="relative aspect-square w-full" role="img" aria-label={last ? `Tabuleiro: o lance foi de ${last.from} para ${last.to}.` : 'Tabuleiro'}>
+    <div ref={root} className="relative z-20 aspect-square w-full" role="img" aria-label={last ? `Tabuleiro: o lance foi de ${last.from} para ${last.to}.` : 'Tabuleiro'}>
       <div className="absolute inset-0 grid grid-cols-8 grid-rows-8">
         {Array.from({ length: 64 }, (_, index) => {
           const x = index % 8
@@ -191,7 +221,7 @@ export function RevelationBoard({ fen, moves, orientation = 'white', focus, mate
         })}
       </div>
       {last && <div data-mark className="absolute" style={{ ...percent(last.from), background: 'var(--board-from)' }} />}
-      <div data-mark className="absolute" style={{ ...percent(focus), background: 'var(--action)' }} />
+      <div data-mark="focus" className="absolute" style={{ ...percent(focus), background: 'var(--action)' }} />
       {matedSquare && <div data-mark className="absolute" style={{ ...percent(matedSquare), background: 'var(--board-mated)' }} />}
       {pieces.map((piece) => {
         const Piece = defaultPieces[piece.code as keyof typeof defaultPieces]
@@ -227,9 +257,7 @@ export function Placa({ number, title, note, delayMs = 0, animate = true, compac
 }
 
 /** Tela cheia ao terminar uma análise: mostra onde a partida virou e sai sozinha. Um toque pula. */
-export function RevelationOverlay({ fen, uci, san, moveNumber, isUserMove, label, orientation, onDone }: { fen: string; uci: string; san: string; moveNumber: number; isUserMove: boolean; label: string; orientation: 'white' | 'black'; onDone: () => void }) {
-  const moves = useMemo(() => [uci], [uci])
-  const { to } = uciParts(uci)
+export function RevelationOverlay({ fen, moves, focus, focusAt, san, moveNumber, isUserMove, label, orientation, onDone }: { fen: string; moves: string[]; focus: string; focusAt: number; san: string; moveNumber: number; isUserMove: boolean; label: string; orientation: 'white' | 'black'; onDone: () => void }) {
   const done = useRef(onDone)
   done.current = onDone
   const button = useRef<HTMLButtonElement>(null)
@@ -239,26 +267,25 @@ export function RevelationOverlay({ fen, uci, san, moveNumber, isUserMove, label
       const timer = setTimeout(() => done.current(), 5000)
       return () => clearTimeout(timer)
     }
-    const timer = setTimeout(() => done.current(), 7000)
+    const timer = setTimeout(() => done.current(), placaDelay(moves.length) + 5000)
     return () => clearTimeout(timer)
-  }, [])
+  }, [moves.length])
   return (
     <button
       ref={button}
       type="button"
       onClick={onDone}
       aria-label={`${isUserMove ? 'Foi aqui que a sua partida virou' : 'Foi aqui que a partida virou'}: lance ${moveNumber}, ${sanToPt(san)}, ${label}. Toque para ver a análise.`}
-      className="fixed inset-0 z-30 flex flex-col bg-(--zone-0) text-left text-(--zone-10)"
+      className="fixed inset-0 z-30 flex flex-col overflow-clip bg-(--zone-0) text-left text-(--zone-10)"
     >
       <ZoneRamp />
       <div className="mx-auto flex min-h-0 w-full max-w-[min(100%,calc(100dvh-14rem))] flex-1 flex-col justify-center px-4 lg:max-w-[min(32rem,calc(100dvh-14rem))]">
-        <RevelationBoard fen={fen} moves={moves} orientation={orientation} focus={to} />
+        <RevelationBoard fen={fen} moves={moves} orientation={orientation} focus={focus} focusAt={focusAt} />
       </div>
-      <Placa number={moveNumber} title={isUserMove ? 'Foi aqui que a sua partida virou.' : 'Foi aqui que a partida virou.'} note={`${sanToPt(san)}, ${label}. Toque para ver a análise.`} delayMs={1900} />
+      <Placa number={moveNumber} title={isUserMove ? 'Foi aqui que a sua partida virou.' : 'Foi aqui que a partida virou.'} note={`${sanToPt(san)}, ${label}. Toque para ver a análise.`} delayMs={placaDelay(moves.length)} />
     </button>
   )
 }
 
 export const OPERA_FEN = '4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16'
 export const OPERA_MOVES = ['b3b8', 'd7b8', 'd1d8']
-export const OPERA_MATED: Square = 'e8'

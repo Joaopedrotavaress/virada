@@ -8,7 +8,7 @@ import { SAMPLE_PGN } from './chess/sample'
 import { Analyzing } from './components/Analyzing'
 import { RevelationOverlay } from './components/Revelation'
 import { CLASS_INFO } from './chess/classify'
-import { turningPoint } from './chess/review'
+import { revelationLine, turningPoint } from './chess/review'
 import { BotGame } from './components/BotGame'
 import { type BotChoice, BotSetup, type StartPoint } from './components/BotSetup'
 import { DataScreen } from './components/DataScreen'
@@ -98,12 +98,15 @@ function GameRoute({ gameKey, username, notice, reveal, onRevealDone, onAnalyze,
   }
   const userColor = record?.userColor ?? analysis.userColor ?? colorOfUser(username, analysis.white, analysis.black)
   const turning = reveal ? turningPoint(analysis.moves) : null
+  const line = turning && revelationLine(analysis.moves, turning.ply)
   return (
     <Suspense fallback={loading}>
-      {turning && (
+      {turning && line && (
         <RevelationOverlay
-          fen={analysis.positions[turning.ply - 1].fen}
-          uci={turning.uci}
+          fen={analysis.positions[line.start].fen}
+          moves={line.moves}
+          focus={line.focus}
+          focusAt={line.focusAt}
           san={turning.san}
           moveNumber={turning.moveNumber}
           isUserMove={turning.color === userColor}

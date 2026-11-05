@@ -1,6 +1,8 @@
 import { Chess } from 'chess.js'
 import { useEffect, useMemo, useState } from 'react'
 import { formatOpening } from '../chess/book'
+import { parsePgn } from '../chess/pgn'
+import { revelationLine } from '../chess/review'
 import { BOTS } from '../bots/bots'
 import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../data/library'
 import { useInstall } from '../pwa'
@@ -9,7 +11,7 @@ import type { ActiveGame } from '../storage'
 import { Icon } from './Icons'
 import { Logo } from './Logo'
 import { ThemeToggle } from './ThemeToggle'
-import { OPERA_FEN, OPERA_MATED, OPERA_MOVES, Placa, RevelationBoard } from './Revelation'
+import { OPERA_FEN, OPERA_MOVES, Placa, RevelationBoard, placaDelay } from './Revelation'
 import { TodayCard } from './TodayCard'
 import { viewRecord } from './Games'
 
@@ -187,10 +189,21 @@ function HomeHero({ record, onOpen }: { record?: GameRecord; onOpen: (record: Ga
     heroPlayed = true
   }, [])
   const real = useMemo(() => {
-    const error = record?.digest?.errors.reduce((worst, item) => (item.loss > worst.loss ? item : worst))
-    if (!record || !error) return null
+    const errors = record?.digest?.errors ?? []
+    if (!record || errors.length === 0) return null
+    const error = errors.reduce((worst, item) => (item.loss > worst.loss ? item : worst))
     try {
-      return { error, uci: [new Chess(error.fen).move(error.san).lan], to: new Chess(error.fen).move(error.san).to }
+      const single = new Chess(error.fen).move(error.san)
+      try {
+        const game = parsePgn(record.pgn)
+        if (game.moves[error.ply - 1]?.uci === single.lan) {
+          const line = revelationLine(game.moves, error.ply)
+          return { error, fen: game.positions[line.start].fen, moves: line.moves, focusAt: line.focusAt, to: line.focus }
+        }
+      } catch {
+        // Sem o PGN, mostra só o lance da virada.
+      }
+      return { error, fen: error.fen, moves: [single.lan], focusAt: 0, to: single.to }
     } catch {
       return null
     }
@@ -199,10 +212,10 @@ function HomeHero({ record, onOpen }: { record?: GameRecord; onOpen: (record: Ga
     return (
       <div onClick={(event) => finishAnimations(event.currentTarget)}>
         <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
-          <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" matedSquare={OPERA_MATED} animate={animate} />
+          <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" animate={animate} />
         </div>
         <div className="mt-3 overflow-hidden">
-          <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={3300} animate={animate} />
+          <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={placaDelay(OPERA_MOVES.length)} animate={animate} />
         </div>
       </div>
     )
@@ -211,10 +224,10 @@ function HomeHero({ record, onOpen }: { record?: GameRecord; onOpen: (record: Ga
   return (
     <div onClick={(event) => finishAnimations(event.currentTarget)}>
       <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
-        <RevelationBoard fen={real.error.fen} moves={real.uci} focus={real.to} orientation={record.userColor === 'b' ? 'black' : 'white'} animate={animate} />
+        <RevelationBoard fen={real.fen} moves={real.moves} focus={real.to} focusAt={real.focusAt} orientation={record.userColor === 'b' ? 'black' : 'white'} animate={animate} />
       </div>
       <button type="button" onClick={() => onOpen(record)} className="mt-3 block w-full overflow-hidden text-left">
-        <Placa number={real.error.moveNumber} title={`Foi aqui que virou contra ${opponent}.`} note="Sua última partida analisada. Toque para rever." delayMs={1900} animate={animate} />
+        <Placa number={real.error.moveNumber} title={`Foi aqui que virou contra ${opponent}.`} note="Sua última partida analisada. Toque para rever." delayMs={placaDelay(real.moves.length)} animate={animate} />
       </button>
     </div>
   )

@@ -123,6 +123,11 @@ body {
   caret-color: var(--action);
 }
 
+/* A peça que sai voando não pode alargar a página: no celular, ela encolheria a tela inteira. */
+#root {
+  overflow-x: clip;
+}
+
 ::selection {
   background: var(--action);
   color: var(--on-action);
