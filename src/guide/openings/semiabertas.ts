@@ -1,0 +1,285 @@
+import type { OpeningGuide } from '../types'
+
+export const SEMIABERTAS: OpeningGuide[] = [
+  {
+    slug: 'siciliana',
+    name: 'Defesa Siciliana',
+    eco: 'B20–B99',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'intermediário',
+    root: 'e4 c5',
+    summary:
+      'A resposta mais popular a 1.e4. O peão de c controla d4 de lado, sem criar uma posição simétrica. Depois de Cf3 e d4, as pretas trocam um peão lateral por um central, e os lados costumam atacar em alas opostas. É uma partida de ambição dos dois lados.',
+    ideas: ['A troca em d4 deixa as pretas com mais peões centrais e a coluna c semiaberta.', 'As brancas ganham espaço e tempo de desenvolvimento, e costumam atacar na ala do rei.', 'As pretas fazem seu jogo na ala da dama, muitas vezes com ...b5 e pressão em c3.'],
+    plans: {
+      white: ['Abrir com Cf3 e d4, desenvolver depressa e atacar o rei preto.', 'Quem prefere evitar a teoria tem a Alapin (2.c3) e outras opções laterais.'],
+      black: ['Escolher uma estrutura: Najdorf, Dragão, Clássica, Sveshnikov e assim por diante.', 'Usar a coluna c e preparar a ruptura ...d5.'],
+    },
+    lines: [
+      { name: 'Clássica', sans: 'e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6', note: 'Desenvolvimento natural. Daqui saem vários sistemas, como o ataque Richter-Rauzer.' },
+      { name: 'Variante Kan', sans: 'e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6', note: 'As pretas deixam as peças flexíveis e controlam b5 antes de decidir o resto.' },
+      { name: 'Sveshnikov', sans: 'e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6', note: 'As pretas aceitam uma casa fraca em d5 em troca de espaço e peças muito ativas.' },
+    ],
+    traps: [],
+    mistakes: ['Pelas pretas, jogar na ala do rei e esquecer o próprio contra-ataque na ala da dama.', 'Pelas brancas, abrir o centro sem rocar ou sem plano de ataque.'],
+  },
+  {
+    slug: 'najdorf',
+    name: 'Siciliana Najdorf',
+    eco: 'B90–B99',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'avançado',
+    root: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6',
+    summary:
+      'O pequeno lance 5...a6 tira a casa b5 das peças brancas e prepara ...e5 ou ...b5. A Najdorf é uma das defesas mais estudadas de toda a teoria, escolhida por campeões mundiais que queriam jogar para ganhar com as pretas.',
+    ideas: ['O lance ...a6 é modesto, mas mantém as opções abertas: as pretas decidem depois a estrutura central.', 'Muitas linhas têm roques opostos, e aí a corrida de ataque decide.'],
+    plans: {
+      white: ['Com Be3, f3 e Dd2, rocar grande e avançar os peões g e h.', 'Com Bg5 e f4, entrar em linhas muito concretas.'],
+      black: ['Jogar ...e5 ou ...e6, depois ...b5, ...Bb7 e pressionar e4 e c3.', 'Na ala da dama, usar a coluna c contra o roque branco.'],
+    },
+    lines: [
+      { name: 'Ataque Inglês', sans: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3', note: 'As brancas preparam Dd2 e o roque grande. Os dois lados vão atacar o rei adversário.' },
+      { name: 'Variante 6.Bg5', sans: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4', note: 'A linha mais afiada. O centro branco cresce depressa, e cada lance pede precisão.', sharp: true },
+      { name: 'Variante 6.Be2', sans: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7', note: 'Versão mais calma. As brancas rocam pequeno e a disputa gira em torno da casa d5.' },
+    ],
+    traps: [],
+    mistakes: ['Pelas pretas, jogar ...e5 e deixar d5 cair nas mãos de um cavalo branco sem resposta.', 'Copiar lances sem entender: nesta abertura, a ordem dos lances muda tudo.'],
+  },
+  {
+    slug: 'dragao',
+    name: 'Siciliana do Dragão',
+    eco: 'B70–B79',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'avançado',
+    root: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6',
+    summary:
+      'As pretas colocam o bispo em g7, numa diagonal longa que atravessa o tabuleiro até b2. No Ataque Iugoslavo, com os roques em lados opostos, a partida vira uma corrida: as brancas abrem a coluna h e as pretas atacam pela coluna c.',
+    ideas: ['O bispo de g7 é a alma da defesa: trocá-lo enfraquece muito o rei preto.', 'Os sacrifícios de qualidade em c3 são um tema típico das pretas.', 'As brancas querem trocar esse bispo com Be3, Dd2 e Bh6.'],
+    plans: {
+      white: ['Be3, f3, Dd2, roque grande, depois h4 e h5 para abrir a coluna h.'],
+      black: ['Rocar, levar a torre para c8, colocar o cavalo em e5 ou c4 e atacar c3.'],
+    },
+    lines: [
+      { name: 'Ataque Iugoslavo', sans: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O', note: 'A posição mais famosa do Dragão. Os dois lados atacam, e cada tempo conta.' },
+      { name: 'Variante Clássica', sans: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2 Bg7 O-O O-O', note: 'As brancas rocam pequeno. A partida é mais lenta e mais fácil para as pretas.' },
+    ],
+    traps: [
+      {
+        name: 'Armadilha de Magnus Smith',
+        sans: 'e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Bc4 g6 Nxc6 bxc6 e5 dxe5 Bxf7+ Kxf7 Qxd8',
+        who: 'w',
+        errorAt: 15,
+        text: 'Numa ordem de lances parecida com o Dragão, o avanço e5 pega de surpresa. Se as pretas capturam em e5 sem pensar, o bispo sacrifica em f7 e a dama preta fica sem defesa na coluna d. A resposta certa a 8.e5 é 8...Cg4 ou 8...Cd7.',
+      },
+    ],
+    mistakes: ['Pelas pretas, deixar trocar o bispo de g7 sem reação.', 'Pelas brancas, atrasar o ataque e deixar o contra-ataque chegar primeiro.'],
+  },
+  {
+    slug: 'alapin',
+    name: 'Siciliana Alapin',
+    eco: 'B22',
+    group: 'semiabertas',
+    side: 'w',
+    level: 'iniciante',
+    root: 'e4 c5 c3',
+    summary:
+      'Em vez de entrar na teoria pesada da Siciliana, as brancas preparam d4 com o peão de c. Assim, se as pretas capturam em d4, as brancas retomam com peão e ficam com o centro. É uma forma prática de evitar os sistemas mais estudados.',
+    ideas: ['O lance c3 prepara d4 mantendo o peão central.', 'As pretas respondem com ...d5 ou ...Cf6, atacando e4 antes que o centro se forme.'],
+    plans: {
+      white: ['Jogar d4 e, se aparecer um peão isolado, usar a atividade das peças.', 'Se as pretas jogam ...Cf6, avançar e5 e ganhar tempo sobre o cavalo.'],
+      black: ['Atacar logo o centro com ...d5 ou ...Cf6, e não deixar as brancas com dois peões centrais estáveis.'],
+    },
+    lines: [
+      { name: 'Com 2...d5', sans: 'e4 c5 c3 d5 exd5 Qxd5 d4 Nf6 Nf3 e6', note: 'A dama preta sai cedo, e como o cavalo não pode ir a c3, ela não sofre ataque imediato.' },
+      { name: 'Com 2...Cf6', sans: 'e4 c5 c3 Nf6 e5 Nd5 d4 cxd4 Nf3 Nc6', note: 'As brancas ganham espaço e as pretas pressionam o centro de peões avançado.' },
+    ],
+    traps: [],
+    mistakes: ['Pelas brancas, jogar com o peão isolado de d4 como se fosse um final: a chance está no ataque.', 'Pelas pretas, jogar devagar e deixar o centro branco se firmar.'],
+  },
+  {
+    slug: 'smith-morra',
+    name: 'Gambito Smith-Morra',
+    eco: 'B21',
+    group: 'semiabertas',
+    side: 'w',
+    level: 'intermediário',
+    root: 'e4 c5 d4 cxd4 c3',
+    summary:
+      'As brancas entregam um peão para abrir as colunas c e d e desenvolver tudo muito rápido. O gambito é popular entre jogadores de clube, porque a teoria é menor e o ataque é simples de conduzir. Contra defesa precisa, as pretas mantêm uma pequena vantagem.',
+    ideas: ['O peão entregue paga desenvolvimento: as brancas têm cavalos, bispo e torres ativos antes do adversário.', 'As torres vão para c1 e d1, de frente para a dama e o rei pretos.'],
+    plans: {
+      white: ['Cf3, Bc4, roque, De2, Td1 e pressão nas colunas abertas.', 'Abrir com e5 ou sacrificar em e6 ou d5 quando o rei preto ficar no centro.'],
+      black: ['Devolver o peão na hora certa, rocar e não deixar o bispo de c8 preso.', 'Quem não quer complicação pode recusar logo com 3...Cf6 ou 3...d3.'],
+    },
+    lines: [
+      { name: 'Aceito', sans: 'e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 e6 O-O Nf6 Qe2 Be7 Rd1', note: 'A posição típica: as pretas têm um peão a mais e as brancas, todas as peças em jogo.', sharp: true },
+      { name: 'Recusado com 3...Cf6', sans: 'e4 c5 d4 cxd4 c3 Nf6 e5 Nd5 Nf3 Nc6', note: 'As pretas evitam o gambito e entram numa posição parecida com a Alapin.' },
+    ],
+    traps: [
+      {
+        name: 'Armadilha Siberiana',
+        sans: 'e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Qc7 O-O Nf6 Qe2 Ng4 h3 Nd4 Nxd4 Qh2#',
+        who: 'b',
+        errorAt: 16,
+        text: 'Esta é contra quem joga no piloto automático. O cavalo em g4 mira h2, e o lance h3 parece expulsá-lo. Só que ...Cd4 ataca a dama em e2 e, se o cavalo branco captura, a diagonal da dama preta abre e o mate em h2 é imediato. Depois de ...Cg4, as brancas precisam de g3 ou Cb5, nunca de h3.',
+      },
+    ],
+    mistakes: ['Pelas brancas, entrar no gambito e jogar sem pressa: sem ataque, falta só o peão.', 'Pelas pretas, tentar manter o peão a qualquer custo e atrasar o roque.'],
+  },
+  {
+    slug: 'francesa',
+    name: 'Defesa Francesa',
+    eco: 'C00–C19',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'iniciante',
+    root: 'e4 e6',
+    summary:
+      'As pretas preparam ...d5 com o peão de e6, formando uma cadeia firme. O preço é o bispo de c8, preso atrás dos próprios peões. É uma defesa sólida e combativa: as brancas ganham espaço, e as pretas atacam a base da cadeia com ...c5 e ...f6.',
+    ideas: ['A cadeia branca costuma ter a base em d4. Por isso as pretas jogam ...c5 e pressionam d4.', 'O bispo ruim de c8 pode sair por a6 ou d7–b5, ou ser trocado.', 'Com o centro fechado, as brancas atacam na ala do rei, e as pretas na ala da dama.'],
+    plans: {
+      white: ['Avançar e5, ganhar espaço e atacar na ala do rei.', 'Manter o peão de d4 bem apoiado com c3 e Cf3.'],
+      black: ['Jogar ...c5, ...Cc6 e ...Db6 contra d4.', 'Quando for o caso, romper com ...f6 para atacar e5.'],
+    },
+    lines: [
+      { name: 'Variante do Avanço', sans: 'e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6', note: 'As brancas fecham o centro. As pretas juntam todas as forças contra o peão de d4.' },
+      { name: 'Winawer', sans: 'e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7', note: 'As pretas entregam o bom bispo para estragar os peões brancos. O jogo fica muito desequilibrado.' },
+      { name: 'Tarrasch', sans: 'e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6', note: 'O cavalo em d2 não bloqueia o peão de c e evita a cravada em b4.' },
+    ],
+    traps: [
+      {
+        name: 'Armadilha de Milner-Barry',
+        sans: 'e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Nxd4 Nxd4 Qxd4 Bb5+',
+        who: 'w',
+        errorAt: 13,
+        text: 'O peão de d4 parece estar caindo, porque o bispo em d3 fecha a defesa da dama. Mas, se as pretas pegam duas vezes, o bispo sai de d3 com xeque em b5, a coluna d abre e a dama preta cai. Antes de capturar em d4, as pretas devem jogar ...Bd7.',
+      },
+    ],
+    mistakes: ['Pelas pretas, deixar o bispo de c8 fechado para sempre.', 'Esquecer a ruptura ...f6 ou ...c5: sem elas, a posição fica só passiva.', 'Pelas brancas, abandonar o apoio de d4 ao atacar na ala do rei.'],
+  },
+  {
+    slug: 'caro-kann',
+    name: 'Defesa Caro-Kann',
+    eco: 'B10–B19',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'iniciante',
+    root: 'e4 c6',
+    summary:
+      'Como na Francesa, as pretas preparam ...d5, mas com o peão de c. A vantagem é não prender o bispo de c8, que costuma sair para f5 ou g4 antes de ...e6. O resultado é uma posição sólida, com poucas fraquezas e finais confortáveis.',
+    ideas: ['O bispo sai primeiro e só depois o peão vai para e6.', 'A estrutura é muito resistente, mas as pretas costumam ter menos espaço e um pouco menos de atividade.'],
+    plans: {
+      white: ['Usar o espaço: com e5 fechar o centro, ou trocar em d5 e jogar com o peão isolado da variante Panov.', 'Perseguir o bispo de f5 com Cg3 e h4 na variante clássica.'],
+      black: ['Desenvolver o bispo para fora da cadeia, jogar ...e6, ...Cd7 e depois ...c5 para atacar d4.'],
+    },
+    lines: [
+      { name: 'Clássica', sans: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3', note: 'As brancas ganham espaço na ala do rei perseguindo o bispo. As pretas permanecem sólidas.' },
+      { name: 'Variante do Avanço', sans: 'e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5', note: 'O bispo já está fora. As pretas atacam d4, como na Francesa, mas em versão melhorada.' },
+      { name: 'Ataque Panov', sans: 'e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3', note: 'As brancas aceitam um possível peão isolado em troca de jogo aberto e peças ativas.' },
+    ],
+    traps: [
+      {
+        name: 'Mate sufocado em d6',
+        sans: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Qe2 Ngf6 Nd6#',
+        who: 'w',
+        errorAt: 9,
+        text: 'Um dos mates mais curtos da teoria. Depois de 5.De2, parece natural trazer o outro cavalo, mas o peão de e7 fica cravado pela dama. O cavalo salta para d6, o rei não tem casa e a peça não pode ser capturada.',
+      },
+    ],
+    mistakes: ['Jogar ...e6 antes de tirar o bispo de c8, e cair numa Francesa pior.', 'Trazer o cavalo de g8 para f6 sem olhar a cravada do peão de e7.'],
+  },
+  {
+    slug: 'escandinava',
+    name: 'Defesa Escandinava',
+    eco: 'B01',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'iniciante',
+    root: 'e4 d5',
+    summary:
+      'As pretas atacam o peão de e4 já no primeiro lance. Depois de exd5 e ...Dxd5, a dama sai cedo e sofre com Cc3, mas a estrutura fica sadia e o plano é simples. É uma boa escolha para quem quer evitar a teoria das outras defesas.',
+    ideas: ['A dama perde um tempo depois de Cc3, mas encontra casas seguras em a5 ou d6.', 'O bispo de c8 sai por f5 ou g4 antes de ...e6, deixando uma estrutura parecida com a Caro-Kann.'],
+    plans: {
+      white: ['Ganhar tempo sobre a dama, desenvolver rápido e usar o peão de d4 como base.'],
+      black: ['Jogar ...Cf6, ...c6, ...Bf5, ...e6 e rocar. A estrutura é firme e sem fraquezas.'],
+    },
+    lines: [
+      { name: 'Com ...Da5', sans: 'e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 c6 Bc4 Bf5', note: 'A linha tradicional. A dama em a5 fica ativa e a peça sai antes de ...e6.' },
+      { name: 'Com ...Dd6', sans: 'e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Nf3 a6', note: 'Linha moderna. A dama fica mais perto do centro, e ...a6 evita Cb5.' },
+      { name: 'Com 2...Cf6', sans: 'e4 d5 exd5 Nf6 d4 Nxd5 c4 Nb6', note: 'As pretas capturam com o cavalo. As brancas ganham espaço com c4 e as pretas atacam esse centro depois.' },
+    ],
+    traps: [],
+    mistakes: ['Colocar a dama em casas onde ela leva novo ataque e perde mais tempo.', 'Trocar o bispo de c8 sem necessidade: ele é o grande trunfo da defesa.'],
+  },
+  {
+    slug: 'pirc',
+    name: 'Defesa Pirc',
+    eco: 'B07–B09',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'intermediário',
+    root: 'e4 d6 d4 Nf6',
+    summary:
+      'As pretas deixam as brancas ocuparem o centro e só depois o atacam. O bispo vai para g7, numa diagonal longa, e as rupturas ...c5 ou ...e5 vêm mais tarde. É uma defesa hipermoderna: o centro branco é forte, mas também pode virar alvo.',
+    ideas: ['O centro não é ocupado, e sim atacado de longe.', 'O bispo de g7 pressiona d4 e, se o centro abrir, toda a diagonal.'],
+    plans: {
+      white: ['Aproveitar o espaço: Be3, Dd2 e Bh6 para trocar o bispo, ou f4 e e5 para atacar.'],
+      black: ['Rocar e, no momento certo, romper com ...c5 ou ...e5, sem esperar tempo demais.'],
+    },
+    lines: [
+      { name: 'Ataque 150', sans: 'e4 d6 d4 Nf6 Nc3 g6 Be3 Bg7 Qd2 c6 f3', note: 'Sistema simples para as brancas: trocar o bispo de g7 e, muitas vezes, rocar grande.' },
+      { name: 'Ataque Austríaco', sans: 'e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Bd3 Na6', note: 'As brancas vão direto com quatro peões à frente. O ataque é forte, mas as pretas contam com o contra-golpe no centro.', sharp: true },
+      { name: 'Clássica', sans: 'e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O', note: 'Desenvolvimento calmo. A partida é mais lenta e fica fácil montar o plano.' },
+    ],
+    traps: [],
+    mistakes: ['Esperar demais: sem ...c5 ou ...e5, as pretas são simplesmente esmagadas.', 'Pelas brancas, avançar todos os peões sem antes desenvolver as peças.'],
+  },
+  {
+    slug: 'alekhine',
+    name: 'Defesa Alekhine',
+    eco: 'B02–B05',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'intermediário',
+    root: 'e4 Nf6',
+    summary:
+      'As pretas provocam os peões brancos com o cavalo. A ideia é que os peões avancem demais, e o centro enorme vire um alvo. É uma defesa provocadora: se o centro branco resistir, as pretas ficam sem espaço; se ele cair, sobra uma posição excelente.',
+    ideas: ['O cavalo é perseguido de propósito, para esticar os peões.', 'Depois, as pretas atacam o centro com ...d6, ...c5 ou ...Bg4 contra a defesa do peão de d4.'],
+    plans: {
+      white: ['Manter o centro apoiado com calma, como em 4.Cf3 com Be2 e O-O, sem avançar à toa.'],
+      black: ['Atacar a cadeia com ...d6, cravar o cavalo de f3 com ...Bg4 e pressionar d4.'],
+    },
+    lines: [
+      { name: 'Variante Moderna', sans: 'e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4 Be2 e6 O-O Be7', note: 'A linha mais comum. As brancas têm um pouco mais de espaço, sem exagero.' },
+      { name: 'Ataque dos Quatro Peões', sans: 'e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3 Bf5 Nc3 e6 Nf3', note: 'As brancas formam um centro gigante. Se ele se mantiver, ganham. Se cair, perdem.', sharp: true },
+      { name: 'Variante das Trocas', sans: 'e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 exd6 cxd6', note: 'As brancas tiram a tensão. A posição fica equilibrada, com estrutura assimétrica.' },
+    ],
+    traps: [],
+    mistakes: ['Pelas pretas, mexer o cavalo mais do que o necessário e nunca atacar o centro.', 'Pelas brancas, avançar por avançar: cada peão que sobe deixa casas fracas para trás.'],
+  },
+  {
+    slug: 'moderna',
+    name: 'Defesa Moderna',
+    eco: 'B06',
+    group: 'semiabertas',
+    side: 'b',
+    level: 'intermediário',
+    root: 'e4 g6',
+    summary:
+      'As pretas começam com o fianchetto do bispo do rei, sem definir ainda o cavalo de g8. É parecida com a Pirc, porém mais flexível: em troca, cede ainda mais centro. Serve bem para quem gosta de reagir ao que o adversário faz.',
+    ideas: ['Sem ...Cf6, o peão de e4 não sofre pressão imediata, mas as pretas ganham opções como ...c5 ou ...d5.', 'O bispo de g7 é a peça central do plano.'],
+    plans: {
+      white: ['Ocupar o centro e desenvolver sem pressa, com Be3 e Dd2 para atacar o bispo de g7.'],
+      black: ['Jogar ...d6, ...c6 e ...b5 na ala da dama, deixar a estrutura flexível e abrir só quando estiver pronto.'],
+    },
+    lines: [
+      { name: 'Linha principal', sans: 'e4 g6 d4 Bg7 Nc3 d6 Be3 a6', note: 'As pretas preparam ...b5 e decidem o resto depois.' },
+      { name: 'Com o centro de três peões', sans: 'e4 g6 d4 Bg7 Nc3 d6 f4 c6 Nf3', note: 'As brancas tomam muito espaço. As pretas preparam ...Db6 e ...Bg4 para atacar o centro.', sharp: true },
+    ],
+    traps: [],
+    mistakes: ['Pelas pretas, ficar passivo por tempo demais.', 'Pelas brancas, atacar antes de terminar o desenvolvimento.'],
+  },
+]
