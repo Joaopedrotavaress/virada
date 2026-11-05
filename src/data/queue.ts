@@ -4,6 +4,7 @@ import { parsePgn } from '../chess/pgn'
 import { type EngineLike, EngineAbortError, createBrowserEngine } from '../engine/stockfish'
 import { loadDepth } from '../storage'
 import { type GameRecord, allRecords, saveAnalyzed, updateRecords } from './library'
+import { createBackendEngine, hasBackendEngine } from './localBackend'
 
 export interface QueueState {
   running: boolean
@@ -28,7 +29,7 @@ export function createAnalysisQueue(deps: QueueDeps = {}) {
   const createEngine =
     deps.createEngine ??
     (() => {
-      const engine = createBrowserEngine()
+      const engine = hasBackendEngine() ? createBackendEngine() : createBrowserEngine()
       return Object.assign(engine, { dispose: () => engine.terminate() })
     })
   const depthOf = deps.depth ?? loadDepth
