@@ -15,6 +15,23 @@ export interface GameSetup {
   coachOn: boolean
   allowUndo: boolean
   playerName: string
+  /** Posição de partida, quando não é a inicial. */
+  startFen?: string
+  /** Lances a repetir antes de começar: partida retomada ou linha de abertura. */
+  initialSans?: string[]
+  /** Destes lances, quantos a pessoa não pode desfazer. */
+  lockedPlies?: number
+  /** Relógio em segundos. Sem ele, não há limite de tempo. */
+  time?: { base: number; increment: number }
+  /** Tempo restante ao retomar, em ms. */
+  initialClocks?: { w: number; b: number }
+  initialStamps?: (number | null)[]
+}
+
+export interface GameProgress {
+  sans: string[]
+  clocks?: { w: number; b: number }
+  stamps?: (number | null)[]
 }
 
 export type GamePhase = 'starting' | 'player' | 'checking' | 'warning' | 'bot' | 'over'
@@ -55,11 +72,23 @@ function drawReason(chess: Chess): string {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /** A partida contra o bot: dois motores, um joga e o outro comenta sem limite de força. */
-export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) => void) {
-  const { bot, color, coachOn, allowUndo } = setup
-  const game = useRef(new Chess())
+export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) => void, onProgress?: (progress: GameProgress) => void) {
+  const { bot, color, coachOn, startFen, time } = setup
+  // Com relógio correndo, voltar lance não faz sentido.
+  const allowUndo = setup.allowUndo && !time
+  const lockedPlies = setup.lockedPlies ?? 0
+  const game = useRef<Chess>(null as unknown as Chess)
+  if (!game.current) {
+    const chess = startFen ? new Chess(startFen) : new Chess()
+    for (const san of setup.initialSans ?? []) chess.move(san)
+    game.current = chess
+  }
   if (import.meta.env.DEV) (window as unknown as { __game: Chess }).__game = game.current
-  const [, setVersion] = useState(0)
+  const [version, setVersion] = useState(0)
+  const initialClocks = time ? (setup.initialClocks ?? { w: time.base * 1000, b: time.base * 1000 }) : null
+  const [clocks, setClocks] = useState(initialClocks)
+  const clockRef = useRef(initialClocks)
+  const stamps = useRef<(number | null)[]>(setup.initialStamps ?? (setup.initialSans ?? []).map(() => null))
   const [phase, setPhase] = useState<GamePhase>('starting')
   const [lastGrade, setLastGrade] = useState<LastGrade | null>(null)
   const [comment, setComment] = useState<string | null>(null)
@@ -122,19 +151,34 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
         result: score,
         date: new Date(),
         termination: reason,
+        startFen,
+        stamps: time ? stamps.current : undefined,
+        timeControl: time ? (time.increment ? `${time.base}+${time.increment}` : String(time.base)) : undefined,
       })
-      const finished = { outcome, reason, score, pgn, hasMoves: chess.history().length > 0 }
+      const finished = { outcome, reason, score, pgn, hasMoves: chess.history().length > lockedPlies }
       setResult(finished)
       setPhase('over')
       onFinished(finished)
     },
-    [bot.name, bot.rating, color, onFinished, setup.playerName],
+    [bot.name, bot.rating, color, lockedPlies, onFinished, setup.playerName, startFen, time],
   )
 
   const fail = useCallback((failure: unknown, current: number) => {
     if (failure instanceof EngineAbortError || current !== session.current) return
     setError(failure instanceof Error ? failure.message : 'O Stockfish parou de responder. Recarregue a página.')
   }, [])
+
+  /** Depois de cada lance: soma o incremento e anota o relógio para a análise do tempo. */
+  const stampClock = useCallback(
+    (side: Color) => {
+      if (!time || !clockRef.current) return
+      const next = { ...clockRef.current, [side]: clockRef.current[side] + time.increment * 1000 }
+      clockRef.current = next
+      setClocks(next)
+      stamps.current = [...stamps.current, next[side] / 1000]
+    },
+    [time],
+  )
 
   /** Depois do lance do bot: prepara a dica e avisa se ele errou. */
   const reviewBotMove = useCallback(
@@ -179,13 +223,16 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
       setThreat(null)
       try {
         const started = Date.now()
-        const answer = await getBotEngine().analyze(fen, null, { movetime: bot.movetime, multiPv: bot.multiPv, signal: turn.signal })
+        // Com pouco tempo, o bot também precisa jogar rápido.
+        const budget = clockRef.current ? Math.min(bot.movetime, Math.max(50, clockRef.current[game.current.turn()] / 20)) : bot.movetime
+        const answer = await getBotEngine().analyze(fen, null, { movetime: budget, multiPv: bot.multiPv, signal: turn.signal })
         const uci = pickBotMove(answer, bot, fen)
         if (!uci) throw new Error('o bot não encontrou lance')
-        const delay = thinkingDelay() - (Date.now() - started)
+        const delay = time ? 0 : thinkingDelay() - (Date.now() - started)
         if (delay > 0) await wait(delay)
         if (current !== session.current || turn.signal.aborted) return
         const played = game.current.move(uciParts(uci))
+        stampClock(played.color)
         setLastGrade(null)
         refresh()
         trackEval()
@@ -199,7 +246,7 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
         fail(failure, current)
       }
     },
-    [bot, fail, finish, refresh, reviewBotMove, trackEval],
+    [bot, fail, finish, refresh, reviewBotMove, stampClock, time, trackEval],
   )
 
   useEffect(() => {
@@ -213,7 +260,9 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
       await engine.newGame()
       if (coachOn) await getEngine().newGame()
       if (current !== session.current) return
-      if (color === 'b') {
+      if (game.current.isGameOver()) {
+        finish()
+      } else if (game.current.turn() !== color) {
         await runBot(current)
       } else {
         setPhase('player')
@@ -227,6 +276,36 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
       botTurn.current?.abort()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cada lance fica guardado na hora: recarregar a página não perde a partida.
+  useEffect(() => {
+    if (phase === 'over' || phase === 'starting') return
+    onProgress?.({ sans: game.current.history(), clocks: clockRef.current ?? undefined, stamps: time ? stamps.current : undefined })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [version, phase])
+
+  // O relógio só corre na vez de pensar: o tempo do treinador conferindo o lance não conta.
+  useEffect(() => {
+    if (!time || (phase !== 'player' && phase !== 'bot')) return
+    let last = performance.now()
+    const timer = setInterval(() => {
+      const now = performance.now()
+      const side = game.current.turn()
+      const current = clockRef.current
+      if (!current) return
+      const left = current[side] - (now - last)
+      last = now
+      const next = { ...current, [side]: Math.max(0, left) }
+      clockRef.current = next
+      setClocks(next)
+      if (left <= 0) {
+        session.current += 1
+        botTurn.current?.abort()
+        finish({ outcome: side === color ? 'loss' : 'win', reason: 'Tempo esgotado' })
+      }
+    }, 200)
+    return () => clearInterval(timer)
+  }, [color, finish, phase, time])
 
   /** Depois do lance da pessoa: classifica, avisa do erro e só então libera o bot. */
   const checkPlayerMove = useCallback(
@@ -282,6 +361,7 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
         return false
       }
       const current = session.current
+      stampClock(played.color)
       setComment(null)
       setHint(null)
       setThreat(null)
@@ -296,7 +376,7 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
       else void runBot(current)
       return true
     },
-    [checkPlayerMove, coachOn, finish, phase, refresh, runBot, trackEval],
+    [checkPlayerMove, coachOn, finish, phase, refresh, runBot, stampClock, trackEval],
   )
 
   const continueAnyway = useCallback(() => {
@@ -315,16 +395,18 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
     setThreat(null)
     setComment(null)
     setLastGrade(null)
-    if (chess.turn() !== color) chess.undo()
-    else {
-      if (chess.history().length < 2) return
+    if (chess.turn() !== color) {
+      if (chess.history().length <= lockedPlies) return
+      chess.undo()
+    } else {
+      if (chess.history().length - lockedPlies < 2) return
       chess.undo()
       chess.undo()
     }
     refresh()
     setPhase('player')
     trackEval()
-  }, [allowUndo, color, phase, refresh, trackEval])
+  }, [allowUndo, color, lockedPlies, phase, refresh, trackEval])
 
   const requestHint = useCallback(async () => {
     if (phase !== 'player' || !coachOn) return
@@ -392,6 +474,10 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
     fen: chess.fen(),
     history: chess.history({ verbose: true }),
     inCheck: chess.inCheck(),
+    clocks,
+    lockedPlies,
+    allowUndo,
+    turn: chess.turn(),
     evaluation,
     phase,
     lastGrade,
