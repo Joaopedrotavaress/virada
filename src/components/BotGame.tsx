@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js'
 import { type CSSProperties, useMemo, useState } from 'react'
-import { type GameResult, type GameSetup, useBotGame } from '../bots/useBotGame'
+import { type GameProgress, type GameResult, type GameSetup, useBotGame } from '../bots/useBotGame'
+import { formatClock } from '../chess/clock'
 import type { Color } from '../chess/evaluation'
 import { materialState } from '../chess/material'
 import { sanToPt, uciParts } from '../chess/notation'
@@ -23,6 +24,7 @@ const PROMOTIONS = [
 interface BotGameProps {
   setup: GameSetup
   onFinished: (result: GameResult) => void
+  onProgress?: (progress: GameProgress) => void
   onReview: (result: GameResult) => void
   onRematch: () => void
   onLeave: () => void
@@ -38,9 +40,10 @@ function legalMoves(fen: string, from: string) {
   }
 }
 
-export function BotGame({ setup, onFinished, onReview, onRematch, onLeave }: BotGameProps) {
-  const { bot, color, coachOn, allowUndo } = setup
-  const game = useBotGame(setup, onFinished)
+export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, onLeave }: BotGameProps) {
+  const { bot, color, coachOn } = setup
+  const game = useBotGame(setup, onFinished, onProgress)
+  const { allowUndo } = game
   const isDesktop = useIsDesktop()
   const [selected, setSelected] = useState<string | null>(null)
   const [promotion, setPromotion] = useState<{ from: string; to: string } | null>(null)
@@ -109,7 +112,7 @@ export function BotGame({ setup, onFinished, onReview, onRematch, onLeave }: Bot
   }, [game.hint, game.threat])
 
   const opponentColor: Color = color === 'w' ? 'b' : 'w'
-  const material = useMemo(() => materialState(game.fen, START_FEN), [game.fen])
+  const material = useMemo(() => materialState(game.fen, setup.startFen ?? START_FEN), [game.fen, setup.startFen])
   const strip = (name: string, side: Color, you: boolean) => (
     <div className="flex h-8 items-center gap-2 text-sm">
       <span
@@ -120,6 +123,11 @@ export function BotGame({ setup, onFinished, onReview, onRematch, onLeave }: Bot
       <span className="min-w-0 truncate font-semibold">{name}</span>
       {you && name !== 'Você' && <span className="shrink-0 text-muted">(você)</span>}
       <CapturedPieces color={side} pieces={material.captured[side]} advantage={material.advantage[side]} />
+      {game.clocks && (
+        <span className={`tabular ml-auto shrink-0 rounded-sm px-1.5 font-semibold ${game.turn === side && game.phase !== 'over' ? 'bg-ink text-bg' : 'bg-surface'} ${game.clocks[side] < 20_000 ? 'text-(--text-blunder)' : ''}`}>
+          {formatClock(game.clocks[side] / 1000)}
+        </span>
+      )}
     </div>
   )
 
@@ -221,7 +229,7 @@ export function BotGame({ setup, onFinished, onReview, onRematch, onLeave }: Bot
         <button
           type="button"
           onClick={game.undo}
-          disabled={game.phase === 'over' || game.phase === 'starting' || game.history.length === 0 || (game.history.length < 2 && color === 'b')}
+          disabled={game.phase === 'over' || game.phase === 'starting' || game.history.length <= game.lockedPlies || (game.history.length - game.lockedPlies < 2 && game.turn === color)}
           className="min-h-11 flex-1 rounded-md bg-surface px-2 font-semibold hover:bg-sunken disabled:opacity-40"
         >
           Voltar lance
@@ -300,7 +308,7 @@ export function BotGame({ setup, onFinished, onReview, onRematch, onLeave }: Bot
           <div className="w-full max-w-sm rounded-md bg-surface p-5 text-center">
             <p className="font-book text-4xl leading-tight font-bold">{OUTCOME_TITLE[game.result.outcome]}</p>
             <p className="mt-1 text-muted">
-              {game.result.reason}{game.history.length > 0 ? `, ${Math.ceil(game.history.length / 2)} ${game.history.length > 2 ? 'lances' : 'lance'}` : ''}.
+              {game.result.reason}{game.history.length > game.lockedPlies ? `, ${Math.ceil(game.history.length / 2)} ${game.history.length > 2 ? 'lances' : 'lance'}` : ''}.
             </p>
             {game.result.hasMoves && (
               <button type="button" autoFocus onClick={() => onReview(game.result!)} className="mt-4 min-h-12 w-full rounded-md bg-ink font-semibold text-bg">
