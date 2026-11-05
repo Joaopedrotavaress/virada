@@ -1,14 +1,10 @@
-import type { GameAnalysis } from './chess/analyze'
 import type { Color } from './chess/evaluation'
 
-const GAMES_KEY = 'treinador:partidas:v1'
-const PENDING_KEY = 'treinador:partidas-bot:v1'
+const ACTIVE_GAME_KEY = 'treinador:jogo-atual:v2'
 const USER_KEY = 'treinador:usuario'
 const DEPTH_KEY = 'treinador:profundidade'
 const BOT_PREFS_KEY = 'treinador:bot:v1'
 const REVIEW_SPEED_KEY = 'treinador:velocidade-revisao'
-const MAX_GAMES = 20
-const MAX_PENDING = 30
 
 function read(key: string): string | null {
   try {
@@ -36,57 +32,45 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
-export function loadRecent(): GameAnalysis[] {
-  const parsed = readJson<unknown>(GAMES_KEY, [])
-  if (!Array.isArray(parsed)) return []
-  return (parsed as GameAnalysis[]).filter((game) => game?.id && Array.isArray(game.moves) && Array.isArray(game.positions))
+/** A partida contra o bot em andamento: gravada a cada lance, sobrevive a recarregar e a fechar o app. */
+export interface ActiveGame {
+  botId: string
+  color: Color
+  coachOn: boolean
+  allowUndo: boolean
+  playerName: string
+  startedAt: number
+  /** Todos os lances, a partir da posição inicial. */
+  sans: string[]
+  /** Lances que já vieram prontos (linha de abertura): não dá para voltar além deles. */
+  lockedPlies: number
+  startFen?: string
+  time?: { base: number; increment: number }
+  clocks?: { w: number; b: number }
+  stamps?: (number | null)[]
 }
 
-/** Salva a análise. Sem espaço, descarta as mais antigas. Retorna false se nem assim couber. */
-export function saveAnalysis(analysis: GameAnalysis): boolean {
-  const others = loadRecent().filter((game) => game.id !== analysis.id)
-  let games = [analysis, ...others].slice(0, MAX_GAMES)
-  while (games.length > 0) {
-    if (write(GAMES_KEY, JSON.stringify(games))) return true
-    games = games.slice(0, -1)
+export function loadActiveGame(): ActiveGame | null {
+  const game = readJson<ActiveGame | null>(ACTIVE_GAME_KEY, null)
+  return game?.botId && Array.isArray(game.sans) ? game : null
+}
+
+export const saveActiveGame = (game: ActiveGame) => void write(ACTIVE_GAME_KEY, JSON.stringify(game))
+
+export function clearActiveGame() {
+  try {
+    localStorage.removeItem(ACTIVE_GAME_KEY)
+  } catch {
+    // Sem localStorage não há o que limpar.
   }
-  return false
 }
 
-export function removeAnalysis(id: string): GameAnalysis[] {
-  const games = loadRecent().filter((game) => game.id !== id)
-  write(GAMES_KEY, JSON.stringify(games))
-  return games
+/** Quantos meses do chess.com a pessoa já abriu. */
+export function loadMonthsLoaded(user: string): number {
+  const months = Number(read(`treinador:meses:${user.toLowerCase()}`))
+  return Number.isFinite(months) && months > 0 ? months : 1
 }
-
-/** Partida contra bot ainda sem análise: só o PGN, para analisar quando a pessoa pedir. */
-export interface PendingGame {
-  id: string
-  pgn: string
-  white: string
-  black: string
-  result: string
-  date: string
-  userColor: Color
-  playedAt: number
-}
-
-export function loadPending(): PendingGame[] {
-  const parsed = readJson<unknown>(PENDING_KEY, [])
-  return Array.isArray(parsed) ? (parsed as PendingGame[]).filter((game) => game?.id && game.pgn) : []
-}
-
-export function savePending(game: PendingGame): PendingGame[] {
-  const games = [game, ...loadPending().filter((item) => item.id !== game.id)].slice(0, MAX_PENDING)
-  write(PENDING_KEY, JSON.stringify(games))
-  return games
-}
-
-export function removePending(id: string): PendingGame[] {
-  const games = loadPending().filter((game) => game.id !== id)
-  write(PENDING_KEY, JSON.stringify(games))
-  return games
-}
+export const saveMonthsLoaded = (user: string, months: number) => void write(`treinador:meses:${user.toLowerCase()}`, String(months))
 
 export const loadUsername = () => read(USER_KEY) ?? ''
 export const saveUsername = (username: string) => void write(USER_KEY, username)
@@ -105,9 +89,11 @@ export interface BotPrefs {
   color: 'w' | 'b' | 'random'
   coachOn: boolean
   allowUndo: boolean
+  /** Identificador do ritmo escolhido. */
+  timeId?: string
 }
 
-const DEFAULT_BOT_PREFS: BotPrefs = { botId: 'casual', color: 'random', coachOn: true, allowUndo: true }
+const DEFAULT_BOT_PREFS: BotPrefs = { botId: 'casual', color: 'random', coachOn: true, allowUndo: true, timeId: 'none' }
 
 export const loadBotPrefs = (): BotPrefs => ({ ...DEFAULT_BOT_PREFS, ...readJson<Partial<BotPrefs>>(BOT_PREFS_KEY, {}) })
 export const saveBotPrefs = (prefs: BotPrefs) => void write(BOT_PREFS_KEY, JSON.stringify(prefs))
