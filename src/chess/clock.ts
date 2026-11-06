@@ -145,7 +145,7 @@ export function clockInsights(moves: InsightMove[], data: ClockData, color: Colo
     const side = color === 'w' ? 'brancas' : 'pretas'
     const limit = `com menos de ${LOW_TIME} segundos no relógio.`
     if (blunders.length === 1) {
-      sentences.push(`${isUser ? 'Seu erro grave' : `O erro grave das ${side}`} foi ${limit}`)
+      sentences.push(`${isUser ? 'Seu erro grosseiro' : `O erro grosseiro das ${side}`} foi ${limit}`)
     } else if (hurried.length === blunders.length) {
       sentences.push(`${isUser ? `Seus ${blunders.length} erros graves` : `Os ${blunders.length} erros graves das ${side}`} foram ${limit}`)
     } else {

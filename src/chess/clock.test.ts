@@ -106,7 +106,7 @@ describe('você e o relógio', () => {
 
   it('um único erro grave no aperto', () => {
     const { moves, data } = build([...quiet(6), ['blunder', 3, 12]])
-    expect(clockInsights(moves, data, 'w', true)).toContain('Seu erro grave foi com menos de 30 segundos no relógio.')
+    expect(clockInsights(moves, data, 'w', true)).toContain('Seu erro grosseiro foi com menos de 30 segundos no relógio.')
   })
 
   it('pensou muito e errou', () => {

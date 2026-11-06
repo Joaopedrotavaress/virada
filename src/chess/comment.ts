@@ -49,6 +49,11 @@ export function coachComment({ move, before, after, previousMove, isUserMove, re
     return `${who} ${gave} e a conta fecha: ${payoff}.${ending}`
   }
 
+  if (cls === 'great') {
+    if (moverKeepsMate && after.eval.kind === 'mate') return `Achou! Só este lance mantinha o mate em ${after.eval.moves} na mesa.`
+    return `Achou! Os outros lances ficavam bem atrás e este decide a partida. A avaliação fica em ${to}.${ending}`
+  }
+
   if (cls === 'best') {
     if (moverKeepsMate && after.eval.kind === 'mate') return `Perfeito: o mate em ${after.eval.moves} continua de pé.`
     if (opponentHasMate && after.eval.kind === 'mate') return `Era o melhor, mas já não tinha salvação: o adversário tem mate em ${after.eval.moves}.`

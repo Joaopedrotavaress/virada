@@ -13,6 +13,7 @@ export type Mood = 'feliz' | 'neutro' | 'bravo' | 'espantado'
 
 const MOODS: Record<MoveClass, Mood> = {
   brilliant: 'espantado',
+  great: 'feliz',
   best: 'feliz',
   excellent: 'feliz',
   good: 'neutro',
@@ -25,6 +26,7 @@ const MOODS: Record<MoveClass, Mood> = {
 
 const MINE: Record<MoveClass, string[]> = {
   brilliant: ['Eita, chefia! Esse eu vou contar na mesa a semana inteira.', 'Para tudo e chama o dono do bar, chefia!', 'Em cinquenta anos de boteco, vi pouco lance assim.'],
+  great: ['Achou, chefia! Era esse e mais nenhum.', 'Ô louco! Só esse servia, e você foi nele.', 'Isso é olho de quem joga, chefia.'],
   best: ['Isso, chefia.', 'É esse mesmo.', 'Nem eu jogava melhor, chefia.', 'Aí sim.'],
   excellent: ['Boa, chefia.', 'Gostei de ver.', 'Tá jogando, hein?'],
   good: ['Dá pro gasto, chefia.', 'Não é o prato do dia, mas enche a barriga.'],
@@ -37,6 +39,7 @@ const MINE: Record<MoveClass, string[]> = {
 
 const OTHER: Record<MoveClass, string[]> = {
   brilliant: ['Olha isso, chefia! Esse lance vale a conta de hoje.'],
+  great: ['Achou o lance que decidia, chefia.'],
   best: ['Esse acertou.', 'Lance de quem sabe.'],
   excellent: ['Bem jogado.'],
   good: ['Dá pro gasto.'],
@@ -60,6 +63,7 @@ const LESSONS: Record<Motif['kind'], string> = {
 const GENERAL_LESSON = 'Antes de soltar a peça, pergunta: o que o outro quer fazer agora?'
 const PRECISION_LESSON = 'Sem pressa: compara dois lances antes de escolher.'
 const SACRIFICE_LESSON = 'Sacrifício bom é assim: você paga agora porque já viu o troco.'
+const ONLY_MOVE_LESSON = 'Quando só um lance serve, quem para e procura leva a rodada.'
 
 export const GREETING = `Senta aí, chefia. Eu sou o ${PROFESSOR_NAME} e jogo xadrez neste bar desde antes de você nascer. Vamos ver essa partida.`
 export const FAREWELL = 'Fechou a conta, chefia. Olha o que eu levaria dessa partida.'
@@ -98,6 +102,7 @@ export function speechOf({ move, before, after, isUserMove = false }: SpeechInpu
 
   const opener = pick((isUserMove ? MINE : OTHER)[cls], ply)
   if (cls === 'brilliant') return { opener, lesson: SACRIFICE_LESSON, mood: MOODS[cls] }
+  if (cls === 'great') return { opener, lesson: ONLY_MOVE_LESSON, mood: MOODS[cls] }
   if (!isErrorClass(cls)) return { opener, lesson: null, mood: MOODS[cls] }
 
   const motifs = detectMotifs({

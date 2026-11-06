@@ -1,10 +1,10 @@
 import type { AnalyzedMove, AnalyzedPosition } from './analyze'
-import type { SideSummary } from './classify'
+import { type SideSummary, isTopClass } from './classify'
 import { type ClockData, clockInsights, swingOf } from './clock'
 import { type Color, type Eval, whiteWinPercent } from './evaluation'
 import { sanToPt } from './notation'
 
-export type MomentKind = 'brilliant' | 'missed-mate' | 'allowed-mate' | 'blunder' | 'miss' | 'mistake' | 'inaccuracy' | 'opponent-error' | 'punished'
+export type MomentKind = 'brilliant' | 'great' | 'missed-mate' | 'allowed-mate' | 'blunder' | 'miss' | 'mistake' | 'inaccuracy' | 'opponent-error' | 'punished'
 
 export interface KeyMoment {
   ply: number
@@ -64,7 +64,12 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
       return
     }
 
-    if (mateFor(before.eval, move.color) && !mateFor(after.eval, move.color) && move.cls !== 'best') {
+    if (move.cls === 'great') {
+      found.push({ ...base, kind: 'great', title: 'Ótimo lance', note: 'Era o lance que decidia, e os outros ficavam bem atrás.', importance: mine ? 70 : 25 })
+      return
+    }
+
+    if (mateFor(before.eval, move.color) && !mateFor(after.eval, move.color) && !isTopClass(move.cls)) {
       found.push({ ...base, kind: 'missed-mate', title: 'Mate perdido', note: null, importance: 90 + weight })
       return
     }
@@ -75,7 +80,7 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
     }
 
     if (mine && (move.cls === 'blunder' || move.cls === 'miss' || move.cls === 'mistake')) {
-      const titles = { blunder: 'Erro grave', miss: 'Chance perdida', mistake: 'Erro' }
+      const titles = { blunder: 'Erro grosseiro', miss: 'Chance perdida', mistake: 'Erro' }
       found.push({ ...base, kind: move.cls, title: titles[move.cls], note: null, importance: move.loss + weight })
       return
     }
@@ -152,7 +157,7 @@ function list(parts: string[]): string {
 function errorParts(summary: SideSummary): string[] {
   const { blunder, mistake, miss } = summary.counts
   const parts: string[] = []
-  if (blunder) parts.push(`${blunder} ${blunder === 1 ? 'erro grave' : 'erros graves'}`)
+  if (blunder) parts.push(`${blunder} ${blunder === 1 ? 'erro grosseiro' : 'erros grosseiros'}`)
   if (mistake) parts.push(`${mistake} ${mistake === 1 ? 'erro' : 'erros'}`)
   if (miss) parts.push(`${miss} ${miss === 1 ? 'chance perdida' : 'chances perdidas'}`)
   return parts
@@ -189,13 +194,14 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
     if (parts.length > 0) insights.push(`Você teve ${list(parts)}.`)
     else if (own.length >= 6) insights.push('Você não cometeu nenhum erro sério. Muito bom.')
 
-    const { brilliant = 0, excellent = 0 } = summary[userColor].counts
+    const { brilliant = 0, great = 0, excellent = 0 } = summary[userColor].counts
     if (brilliant > 0) insights.unshift(brilliant === 1 ? 'Você achou um lance brilhante nesta partida!' : `Você achou ${brilliant} lances brilhantes nesta partida!`)
+    if (great > 0) insights.push(great === 1 ? 'Você achou 1 lance ótimo, daqueles que decidem.' : `Você achou ${great} lances ótimos, daqueles que decidem.`)
     if (excellent > 0) insights.push(excellent === 1 ? 'Você teve 1 lance excelente.' : `Você teve ${excellent} lances excelentes.`)
   }
 
   // 3. Mate perdido
-  const missedMate = moves.find((move, index) => move.cls !== 'best' && move.cls !== 'brilliant' && (!userColor || move.color === userColor) && mateFor(positions[index].eval, move.color) && !mateFor(positions[index + 1].eval, move.color))
+  const missedMate = moves.find((move, index) => !isTopClass(move.cls) && (!userColor || move.color === userColor) && mateFor(positions[index].eval, move.color) && !mateFor(positions[index + 1].eval, move.color))
   if (missedMate) {
     const evaluation = positions[missedMate.ply - 1].eval
     if (evaluation.kind === 'mate') {
@@ -214,8 +220,8 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
       insights.push(
         gifts.length === 1
           ? used === 1
-            ? 'O adversário cometeu um erro grave e você aproveitou.'
-            : 'O adversário cometeu um erro grave e você não aproveitou.'
+            ? 'O adversário cometeu um erro grosseiro e você aproveitou.'
+            : 'O adversário cometeu um erro grosseiro e você não aproveitou.'
           : `O adversário cometeu ${gifts.length} erros graves e você aproveitou ${used}.`,
       )
     }
