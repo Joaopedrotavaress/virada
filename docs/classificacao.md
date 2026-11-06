@@ -163,6 +163,22 @@ Uma partida real de 10 minutos, com rating 324 contra 294, comparada com o resum
 - **O que ainda não bate:** o polegar, com 11 aqui e 6 lá. Não sei a causa: pode ser o motor, a profundidade ou a curva.
 - **O limite desta comparação:** é uma partida só, e o resumo traz contagens, não quais lances foram. Os números do "!" foram ajustados com ela, então bater aqui não prova que vai bater em outras. A regressão está em [`classify.chesscom.test.ts`](../src/chess/classify.chesscom.test.ts).
 
+### A profundidade explica a diferença?
+
+A mesma partida, rodando neste computador, nas brancas. O motor é o mesmo, muda só a profundidade:
+
+| Profundidade | Tempo | Excelente (!) | Melhor | Ótimo (polegar) |
+|---:|---:|---:|---:|---:|
+| Chess.com | | 4 | 11 | 6 |
+| 15 | 0,5 min | 5 | 10 | 11 |
+| 18 | 1,6 min | 5 | 11 | 10 |
+| 20 | 4,4 min | 5 | 11 | 9 |
+| 22 | 8,9 min | 5 | 12 | 9 |
+
+Da 15 para a 22, 26 dos 97 lances mudaram de classe, quase sempre para uma classe vizinha, e o total pouco se mexeu. O polegar melhora um pouco, mas continua longe. **Nesta partida, a profundidade não explica a maior parte da diferença.** Por isso as opções 20 e 22 são para quem quer mais confiança numa partida específica, e o motor completo de 99 MB não parece valer o custo por enquanto.
+
+A fila em segundo plano e as 3 melhores linhas param na profundidade 18, para não ficarem lentas demais.
+
 ## O que este teste não prova
 
 **A fidelidade ao Chess.com não foi medida lance a lance.** Eles não têm uma base pública com os rótulos da revisão, então não há como calcular a porcentagem de acerto. Para medir, é preciso comparar mais partidas com a revisão do Chess.com, lado a lado.

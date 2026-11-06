@@ -20,8 +20,8 @@ const DEPTHS = [
   { value: 12, label: 'Rápida', hint: 'Boa para uma olhada. Pode deixar passar táticas longas.' },
   { value: 15, label: 'Normal', hint: 'O equilíbrio para a maioria das partidas.' },
   { value: 18, label: 'Profunda', hint: 'Mais lenta e mais confiável nas táticas.' },
-  { value: 20, label: 'Extra', hint: 'Alguns minutos por partida no computador, e bem mais no celular.' },
-  { value: 22, label: 'Máxima', hint: 'Bem lenta: uns 5 minutos ou mais por partida no computador. No celular, deixe na tomada.' },
+  { value: 20, label: 'Extra', hint: 'Uns 5 minutos numa partida de 50 lances no computador, e bem mais no celular.' },
+  { value: 22, label: 'Máxima', hint: 'Bem lenta: uns 10 minutos numa partida de 50 lances no computador. No celular, deixe na tomada.' },
 ]
 
 const RECENT_LIMIT = 6
