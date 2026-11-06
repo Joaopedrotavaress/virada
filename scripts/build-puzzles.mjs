@@ -21,8 +21,8 @@ const TEMAS = [
   'kingsideAttack', 'endgame', 'pawnEndgame', 'rookEndgame', 'queenEndgame', 'opening',
 ]
 const FAIXAS = [[400, 1000], [1000, 1400], [1400, 1800], [1800, 2300]]
-const POR_GRUPO = 30
-const MAX_LINHAS = 3_000_000
+const POR_GRUPO = 150
+const MAX_LINHAS = 6_000_000
 
 const grupos = new Map()
 const escolhidos = new Map()
