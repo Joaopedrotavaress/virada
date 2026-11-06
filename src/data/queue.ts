@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { analyzeGame } from '../chess/analyze'
 import { parsePgn } from '../chess/pgn'
+import { currentRemote } from '../engine/servidor'
 import { type EngineLike, EngineAbortError, createBrowserEngine } from '../engine/stockfish'
 import { backgroundDepth, loadDepth } from '../storage'
 import { type GameRecord, allRecords, saveAnalyzed, updateRecords } from './library'
@@ -66,7 +67,7 @@ export function createAnalysisQueue(deps: QueueDeps = {}) {
         }
         const active = new AbortController()
         controller = active
-        const analysis = await analyzeGame(engine, game, depthOf(), { signal: active.signal })
+        const analysis = await analyzeGame(engine, game, depthOf(), { signal: active.signal, remote: deps.createEngine ? undefined : currentRemote() })
         await saveAnalyzed(analysis, { pgn: next.pgn, key: next.key, userColor: next.userColor, source: next.source, owner: next.owner, playedAt: next.playedAt })
         set({ done: state.done + 1, remaining: pendingRecords().length })
       }

@@ -16,6 +16,7 @@ import { Training } from './training/Training'
 import { type GameRecord, addUnanalyzed, allRecords, colorOfUser, getAnalysis, initLibrary, recordKeyOf, saveAnalyzed, useAllRecords } from './data/library'
 import { startLocalBackend } from './data/localBackend'
 import { analysisQueue } from './data/queue'
+import { currentRemote } from './engine/servidor'
 import { EngineAbortError, getEngine } from './engine/stockfish'
 import { gamePath, goBack, navigate, useRoute } from './route'
 import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUsername, saveActiveGame, saveDepth, saveUsername } from './storage'
@@ -186,6 +187,7 @@ export default function App() {
         const engine = getEngine()
         await engine.ready
         const analysis = await analyzeGame(engine, game, options.redoAtDepth ?? depth, {
+          remote: currentRemote(),
           signal: controller.signal,
           onProgress: (done, total) => {
             if (!controller.signal.aborted) setJob({ game, done, total, userColor })

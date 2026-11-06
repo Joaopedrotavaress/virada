@@ -1,4 +1,5 @@
-import { type EngineLike, EngineAbortError } from '../engine/stockfish'
+import type { RemoteAnalyzer } from '../engine/servidor'
+import { type EngineLike, type EngineResult, EngineAbortError } from '../engine/stockfish'
 import { type OpeningInfo, findBookMoves, loadBook } from './book'
 import { CLASS_VERSION, type ClassifiedMove, type Ratings, type SideSummary, classifyMoves, summarize } from './classify'
 import { type ClockData, computeClock } from './clock'
@@ -42,6 +43,8 @@ export interface GameAnalysis {
   ratings?: Ratings
   /** A versão das regras que classificou os lances. */
   classVersion?: number
+  /** Onde o motor rodou. Ausente: análise antiga, feita no aparelho. */
+  engine?: 'servidor' | 'aparelho'
 }
 
 /** Só o que cabe mostrar (4–6 lances), para não inflar o localStorage. */
@@ -75,6 +78,8 @@ export interface AnalyzeGameOptions {
   /** done: posições já avaliadas; total: número de posições. */
   onProgress?: (done: number, total: number) => void
   signal?: AbortSignal
+  /** Motor no servidor. O que ele não responder é calculado no aparelho. */
+  remote?: RemoteAnalyzer
 }
 
 /**
@@ -102,7 +107,7 @@ export async function analyzeGame(
   engine: EngineLike,
   game: ParsedGame,
   depth: number,
-  { onProgress, signal }: AnalyzeGameOptions = {},
+  { onProgress, signal, remote }: AnalyzeGameOptions = {},
 ): Promise<GameAnalysis> {
   await engine.newGame()
 
@@ -111,19 +116,42 @@ export async function analyzeGame(
   const { bookMoves: earlyBook } = findBookMoves(book, game.positions.slice(1).map((position) => position.fen))
   const positions: AnalyzedPosition[] = []
   const total = game.positions.length
-  onProgress?.(0, total)
+  // A barra nunca anda para trás, mesmo quando o aparelho completa o que o servidor não respondeu.
+  let shown = 0
+  const report = (done: number) => {
+    shown = Math.max(shown, Math.min(done, total))
+    onProgress?.(shown, total)
+  }
+  report(0)
+
+  let fromServer = new Map<string, EngineResult>()
+  if (remote) {
+    const asked = game.positions.filter((position) => !position.terminal).map((position) => position.fen)
+    const counts = new Map<string, number>()
+    for (const fen of asked) counts.set(fen, (counts.get(fen) ?? 0) + 1)
+    let done = total - asked.length
+    fromServer = await remote(asked, depth, {
+      signal,
+      onResult: (fen) => {
+        done += counts.get(fen) ?? 1
+        report(done)
+      },
+    })
+    if (signal?.aborted) throw new EngineAbortError()
+  }
   for (const position of game.positions) {
     if (signal?.aborted) throw new EngineAbortError()
     if (position.terminal) {
       positions.push({ ...position, eval: terminalEval(position.terminal, position.fen), bestUci: null, pvUci: [] })
     } else {
-      const result = await engine.analyze(position.fen, depth, { signal })
+      const remoteResult = fromServer.get(position.fen)
+      const result = remoteResult ?? (await engine.analyze(position.fen, depth, { signal }))
       const index = positions.length
       const move = game.moves[index]
       // O "!" e o Brilhante dependem de saber o que a segunda melhor linha daria. Só vale buscar quando o lance
       // jogado foi o primeiro do motor, fora do livro e numa posição que não esteja perdida.
       const worthSecond = move && move.uci === result.bestUci && !earlyBook[index] && expectedPoints(result.eval, move.color, ratings[move.color] ?? DEFAULT_RATING) > 0.3
-      const second = worthSecond ? await engine.analyze(position.fen, depth, { signal, multiPv: 2 }) : null
+      const second = !worthSecond ? null : (remoteResult ?? (await engine.analyze(position.fen, depth, { signal, multiPv: 2 })))
       positions.push({
         ...position,
         eval: result.eval,
@@ -132,8 +160,10 @@ export async function analyzeGame(
         ...(second?.lines[1] ? { secondEval: second.lines[1].eval } : {}),
       })
     }
-    onProgress?.(positions.length, total)
+    if (!fromServer.has(position.fen)) report(positions.length)
   }
+
+  report(total)
 
   const { bookMoves, opening } = findBookMoves(book, positions.slice(1).map((position) => position.fen))
   // A base inclui armadilhas, como o mate do louco. Um lance que leva a mate forçado não é teoria a respeitar:
@@ -158,6 +188,7 @@ export async function analyzeGame(
     summary: summarize(moves),
     ratings,
     classVersion: CLASS_VERSION,
+    engine: remote && positions.every((position) => position.terminal || fromServer.has(position.fen)) ? 'servidor' : 'aparelho',
     opening,
     clock: computeClock(game.moves, game.moves.map((move) => move.clock), game.timeControl),
   }

@@ -405,7 +405,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom, 
   const atEnd = !retry && variant ? variant.cursor === variant.steps.length - 1 : ply === moves.length
   const details = [analysis.result === '*' ? '' : analysis.result, formatDate(analysis.date), formatTimeControl(analysis.timeControl)].filter(Boolean)
   const shortMeta = details.join(', ')
-  const meta = [...details, `profundidade ${analysis.depth}`].join(', ')
+  const meta = [...details, `profundidade ${analysis.depth}${analysis.engine === 'servidor' ? ' no servidor' : ''}`].join(', ')
 
   const backButton = (
     <button type="button" onClick={onBack} className="-ml-1 flex min-h-11 shrink-0 items-center gap-1 rounded-md pr-3 pl-1 font-semibold hover:bg-sunken">

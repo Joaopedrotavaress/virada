@@ -82,6 +82,12 @@ export const ANALYSIS_DEPTHS = [12, 15, 18, 20, 22]
 export const MAX_BACKGROUND_DEPTH = 18
 export const backgroundDepth = (depth: number) => Math.min(depth, MAX_BACKGROUND_DEPTH)
 
+const SERVER_ENGINE_KEY = 'treinador:motor-servidor'
+
+/** Por padrão, a análise usa o motor do servidor, e volta para o aparelho se ele não responder. */
+export const loadServerEngine = () => read(SERVER_ENGINE_KEY) !== 'nao'
+export const saveServerEngine = (on: boolean) => void write(SERVER_ENGINE_KEY, on ? 'sim' : 'nao')
+
 export function loadDepth(): number {
   const depth = Number(read(DEPTH_KEY))
   return ANALYSIS_DEPTHS.includes(depth) ? depth : 15

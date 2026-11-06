@@ -5,7 +5,7 @@ import { BOTS } from '../bots/bots'
 import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../data/library'
 import { useInstall } from '../pwa'
 import { navigate } from '../route'
-import type { ActiveGame } from '../storage'
+import { type ActiveGame, loadServerEngine, saveServerEngine } from '../storage'
 import { Icon } from './Icons'
 import { Logo } from './Logo'
 import { ThemeToggle } from './ThemeToggle'
@@ -20,8 +20,8 @@ const DEPTHS = [
   { value: 12, label: 'Rápida', hint: 'Boa para uma olhada. Pode deixar passar táticas longas.' },
   { value: 15, label: 'Normal', hint: 'O equilíbrio para a maioria das partidas.' },
   { value: 18, label: 'Profunda', hint: 'Mais lenta e mais confiável nas táticas.' },
-  { value: 20, label: 'Extra', hint: 'Uns 5 minutos numa partida de 50 lances no computador, e bem mais no celular.' },
-  { value: 22, label: 'Máxima', hint: 'Bem lenta: uns 10 minutos numa partida de 50 lances no computador. No celular, deixe na tomada.' },
+  { value: 20, label: 'Extra', hint: 'Uns 2 minutos numa partida de 50 lances, no servidor. No aparelho, bem mais.' },
+  { value: 22, label: 'Máxima', hint: 'Bem lenta: uns 5 minutos numa partida de 50 lances, no servidor. No aparelho, o dobro ou mais.' },
 ]
 
 const RECENT_LIMIT = 6
@@ -92,6 +92,7 @@ function UserForm({ username, onChange, onSubmit, autoFocus = false, submitLabel
 
 function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onSample }: Pick<HomeProps, 'pgn' | 'depth' | 'error' | 'onPgnChange' | 'onDepthChange' | 'onAnalyze' | 'onSample'>) {
   const hint = DEPTHS.find((option) => option.value === depth)?.hint
+  const [useServer, setUseServer] = useState(loadServerEngine)
   return (
     <form
       onSubmit={(event) => {
@@ -142,6 +143,21 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
           ))}
         </div>
         <p className="mt-2 text-sm text-muted">{hint}</p>
+        <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={useServer}
+            onChange={(event) => {
+              setUseServer(event.target.checked)
+              saveServerEngine(event.target.checked)
+            }}
+            className="mt-0.5 size-5 shrink-0 accent-(--action)"
+          />
+          <span>
+            <span className="font-semibold">Usar o motor do servidor</span>
+            <span className="block text-muted">Mais rápido e mais forte, principalmente no celular. Só as posições saem do aparelho. Sem conexão, a análise roda aqui mesmo.</span>
+          </span>
+        </label>
       </fieldset>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -306,7 +322,7 @@ export function Home(props: HomeProps) {
                 <br />
                 Ache o seu.
               </h1>
-              <p className="mt-3 max-w-prose text-base text-muted">O Stockfish analisa cada lance no seu aparelho. O Virada explica o erro em português e transforma em treino. Grátis, sem cadastro.</p>
+              <p className="mt-3 max-w-prose text-base text-muted">O Stockfish analisa cada lance, no servidor ou no seu aparelho. O Virada explica o erro em português e transforma em treino. Grátis, sem cadastro.</p>
             </div>
             <div className="order-3 mt-8">
             {pgnForm}
