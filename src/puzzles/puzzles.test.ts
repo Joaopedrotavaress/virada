@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js'
 import { describe, expect, it } from 'vitest'
 import type { GameRecord } from '../data/library'
-import { EMPTY_PUZZLE_STATS, LEVELS, THEMES, type Puzzle, afterSolved, loadPuzzles, pickPuzzles, puzzleOfDay, suggestedLevel, toPuzzle } from './puzzles'
+import { EMPTY_PUZZLE_STATS, LEVELS, THEMES, type Puzzle, afterSolved, loadPuzzles, pickPuzzles, puzzleOfDay, suggestedLevel, toPuzzle, morePuzzles } from './puzzles'
 
 const puzzle = (id: string, rating: number, themes = ['fork']): Puzzle => ({ id, fen: '', setup: { from: 'a2', to: 'a3' }, solution: [], rating, themes })
 
@@ -74,5 +74,32 @@ describe('escolha de puzzles', () => {
     expect(once).toEqual({ solved: ['a'], dailyDone: '2026-11-05' })
     expect(afterSolved(once, 'a').solved).toEqual(['a'])
     expect(afterSolved(once, 'b').dailyDone).toBe('2026-11-05')
+  })
+})
+
+describe('rodada sem fim', () => {
+  const make = (id: string, rating = 1200): Puzzle => ({ id, fen: '', setup: { from: 'a1', to: 'a2' }, solution: [], rating, themes: ['fork'] })
+  const pool = ['a', 'b', 'c'].map((id) => make(id))
+
+  it('traz só o que ainda não apareceu nesta rodada', () => {
+    expect(morePuzzles(pool, { levelId: 'medio' }, new Set(['a', 'b'])).map((puzzle) => puzzle.id)).toEqual(['c'])
+  })
+
+  it('quando acabam, volta a repetir em vez de parar', () => {
+    expect(morePuzzles(pool, { levelId: 'medio' }, new Set(['a', 'b', 'c']))).toHaveLength(3)
+  })
+
+  it('não mistura outra dificuldade para continuar', () => {
+    expect(morePuzzles([...pool, make('facil', 500)], { levelId: 'medio' }, new Set(['a', 'b', 'c'])).map((puzzle) => puzzle.id)).not.toContain('facil')
+  })
+
+  it('abre milhares de puzzles sem calcular os lances, e calcula quando vai para o tabuleiro', async () => {
+    const list = await loadPuzzles()
+    const started = performance.now()
+    const picked = pickPuzzles(list, { levelId: 'medio', limit: 20 })
+    expect(performance.now() - started).toBeLessThan(500)
+    expect(picked).toHaveLength(20)
+    expect(picked[0].fen.split(' ')).toHaveLength(6)
+    expect(picked[0].solution.length).toBeGreaterThan(0)
   })
 })

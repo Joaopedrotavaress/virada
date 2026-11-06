@@ -6,9 +6,11 @@ import { BoardScreen, PlayableBoard } from '../components/PlayableBoard'
 import { useSolution } from '../guide/LessonScreen'
 import { goBack, navigate } from '../route'
 import { DAILY_KEY, type DailyState, EMPTY_DAILY, afterExercise, dayOf } from '../training/daily'
-import { EMPTY_PUZZLE_STATS, LEVELS, PUZZLE_KEY, type Puzzle, type PuzzleStats, THEMES, afterSolved, loadPuzzles, pickPuzzles, puzzleOfDay, suggestedLevel, themeLabel } from './puzzles'
+import { EMPTY_PUZZLE_STATS, LEVELS, PUZZLE_KEY, type Puzzle, type PuzzleStats, THEMES, afterSolved, loadPuzzles, morePuzzles, pickPuzzles, puzzleOfDay, suggestedLevel, themeLabel } from './puzzles'
 
 const LAST_MOVE_TINT = 'var(--board-last)'
+/** No endereço #/puzzles/aleatorio, abre direto a rodada sem fim. */
+export const RANDOM_ROUTE = 'aleatorio'
 
 /** Um puzzle no tabuleiro. Também aparece dentro da sessão de treino. */
 export function PuzzleBoard({ puzzle, title, status, nextLabel, onSolved, onNext, onBack = goBack }: { puzzle: Puzzle; title: string; status?: string; nextLabel: string; onSolved: (clean: boolean) => void; onNext: () => void; onBack?: () => void }) {
@@ -72,7 +74,7 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
   const [levelId, setLevelId] = useState(() => suggestedLevel(records))
   const [stats, setStats] = useKv<PuzzleStats>(PUZZLE_KEY, EMPTY_PUZZLE_STATS)
   const [daily, setDaily] = useKv<DailyState>(DAILY_KEY, EMPTY_DAILY)
-  const [run, setRun] = useState<{ items: Puzzle[]; index: number; title: string; isDaily?: boolean } | null>(null)
+  const [run, setRun] = useState<{ items: Puzzle[]; index: number; title: string; isDaily?: boolean; endless?: boolean; done?: number } | null>(null)
   const today = dayOf(new Date())
 
   useEffect(() => {
@@ -97,9 +99,19 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
     }
   }, [levelId, puzzles, stats.solved])
 
+  const startRandom = useMemo(() => {
+    if (!puzzles) return null
+    return () => {
+      const items = pickPuzzles(puzzles, { levelId, solved: new Set(stats.solved) })
+      if (items.length > 0) setRun({ items, index: 0, title: 'Puzzles aleatórios', endless: true, done: 0 })
+    }
+  }, [levelId, puzzles, stats.solved])
+
   // Vindo de uma lição, já abre o tema.
   useEffect(() => {
-    if (theme && start && !run) start(theme)
+    if (run) return
+    if (theme === RANDOM_ROUTE) startRandom?.()
+    else if (theme) start?.(theme)
     // Só ao chegar pelo endereço.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, start === null])
@@ -117,14 +129,19 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
           onBack={() => (theme ? goBack() : setRun(null))}
           puzzle={current}
           title={run.title}
-          status={run.items.length > 1 ? `${run.index + 1} de ${run.items.length}` : undefined}
-          nextLabel={run.index + 1 < run.items.length ? 'Próximo puzzle' : 'Terminar'}
+          status={run.endless ? (run.done ? `${run.done} ${run.done === 1 ? 'resolvido' : 'resolvidos'}` : undefined) : run.items.length > 1 ? `${run.index + 1} de ${run.items.length}` : undefined}
+          nextLabel={run.endless || run.index + 1 < run.items.length ? 'Próximo puzzle' : 'Terminar'}
           onSolved={() => {
             setStats(afterSolved(stats, current.id, run.isDaily ? today : undefined))
             setDaily(afterExercise(daily))
+            if (run.endless) setRun({ ...run, done: (run.done ?? 0) + 1 })
           }}
           onNext={() => {
             if (run.index + 1 < run.items.length) setRun({ ...run, index: run.index + 1 })
+            else if (run.endless && puzzles) {
+              const seen = new Set(run.items.map((item) => item.id))
+              setRun({ ...run, items: [...run.items, ...morePuzzles(puzzles, { levelId, solved: new Set(stats.solved) }, seen)], index: run.index + 1 })
+            }
             else if (theme) navigate('#/puzzles', { replace: true })
             else setRun(null)
           }}
@@ -139,7 +156,34 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
       <h1 className="font-display text-3xl font-semibold">Puzzles</h1>
       <p className="mt-1 text-sm text-muted">{stats.solved.length > 0 ? `${stats.solved.length} resolvidos neste aparelho.` : 'Posições tiradas de partidas reais. Funciona sem internet.'}</p>
 
-      <fieldset className="mt-4">
+      {failed && (
+        <p role="alert" className="mt-4 font-medium text-(--text-blunder)">
+          Não consegui abrir os puzzles. Recarregue a página.
+        </p>
+      )}
+
+      {puzzles && (
+        <section className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col rounded-md bg-surface p-4">
+            <h2 className="font-display text-xl font-semibold">Puzzles aleatórios</h2>
+            <p className="mt-1 mb-3 text-sm text-muted">Sem escolher nada: é só clicar e ir resolvendo, até cansar.</p>
+            <button type="button" onClick={() => startRandom?.()} className="mt-3 min-h-12 w-full rounded-md bg-action px-5 font-semibold text-on-action sm:mt-auto">
+              Começar
+            </button>
+          </div>
+          {ofDay && (
+            <div className="flex flex-col rounded-md bg-surface p-4">
+              <h2 className="font-display text-xl font-semibold">Puzzle do dia</h2>
+              <p className="mt-1 mb-3 text-sm text-muted">{stats.dailyDone === today ? 'Você já resolveu o de hoje. Amanhã tem outro.' : 'Um por dia, escolhido pela data.'}</p>
+              <button type="button" onClick={() => setRun({ items: [ofDay], index: 0, title: 'Puzzle do dia', isDaily: true })} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:mt-auto">
+                {stats.dailyDone === today ? 'Ver de novo' : 'Resolver'}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
+      <fieldset className="mt-5">
         <legend className="mb-1.5 text-sm font-semibold">Dificuldade</legend>
         <div className="grid grid-cols-4 gap-px overflow-hidden rounded-md border border-line bg-line">
           {LEVELS.map((level) => (
@@ -151,30 +195,9 @@ export function PuzzleScreen({ theme, username }: { theme?: string; username: st
         </div>
       </fieldset>
 
-      {failed && (
-        <p role="alert" className="mt-4 font-medium text-(--text-blunder)">
-          Não consegui abrir os puzzles. Recarregue a página.
-        </p>
-      )}
-
-      {ofDay && (
-        <section className="mt-4 rounded-md bg-surface p-4">
-          <h2 className="font-display text-xl font-semibold">Puzzle do dia</h2>
-          <p className="mt-1 text-sm text-muted">{stats.dailyDone === today ? 'Você já resolveu o de hoje. Amanhã tem outro.' : 'Um por dia, escolhido pela data.'}</p>
-          <button type="button" onClick={() => setRun({ items: [ofDay], index: 0, title: 'Puzzle do dia', isDaily: true })} className="mt-3 min-h-12 w-full rounded-md bg-action px-5 font-semibold text-on-action sm:w-auto">
-            {stats.dailyDone === today ? 'Ver de novo' : 'Resolver'}
-          </button>
-        </section>
-      )}
-
       {puzzles && (
         <section className="mt-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-display text-xl font-semibold">Por tema</h2>
-            <button type="button" onClick={() => start?.()} className="min-h-11 rounded-md border border-line px-4 font-semibold hover:bg-sunken">
-              Misturar temas
-            </button>
-          </div>
+          <h2 className="font-display text-xl font-semibold">Por tema</h2>
           <ul className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
             {THEMES.map((item) => (
               <li key={item.id}>

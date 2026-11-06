@@ -49,10 +49,15 @@ export function Training({ username }: { username: string }) {
 
       <section className="mt-4 rounded-md bg-surface p-4">
         <h2 className="font-display text-xl font-semibold">Puzzles</h2>
-        <p className="mt-1 max-w-prose text-muted">Um puzzle por dia, ou quantos quiser por tema. Funciona sem internet.</p>
-        <button type="button" onClick={() => navigate('#/puzzles')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
-          Abrir puzzles
-        </button>
+        <p className="mt-1 max-w-prose text-muted">De partidas de outras pessoas: aleatórios, um por dia ou por tema. Funciona sem internet.</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <button type="button" onClick={() => navigate('#/puzzles/aleatorio')} className="min-h-12 rounded-md bg-action px-5 font-semibold text-on-action">
+            Puzzles aleatórios
+          </button>
+          <button type="button" onClick={() => navigate('#/puzzles')} className="min-h-12 rounded-md border border-line px-5 font-semibold hover:bg-sunken">
+            Puzzle do dia e temas
+          </button>
+        </div>
       </section>
 
       {patterns.length > 0 && (

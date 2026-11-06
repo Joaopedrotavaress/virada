@@ -63,10 +63,31 @@ export function toPuzzle([id, fen, moves, rating, themes]: PuzzleRow): Puzzle {
   return { id, fen: start, setup: { from: setup.from, to: setup.to }, solution, rating, themes: themes.split(' ') }
 }
 
+/** Só calcula os lances quando o puzzle vai para o tabuleiro: são milhares, e a tela precisa abrir na hora no celular. */
+function lazyPuzzle(row: PuzzleRow): Puzzle {
+  const [id, , , rating, themes] = row
+  let full: Puzzle | null = null
+  const load = () => (full ??= toPuzzle(row))
+  return {
+    id,
+    rating,
+    themes: themes.split(' '),
+    get fen() {
+      return load().fen
+    },
+    get setup() {
+      return load().setup
+    },
+    get solution() {
+      return load().solution
+    },
+  }
+}
+
 let cached: Promise<Puzzle[]> | null = null
 
 export function loadPuzzles(): Promise<Puzzle[]> {
-  cached ??= import('./puzzles.json').then((module) => (module.default as PuzzleRow[]).map(toPuzzle))
+  cached ??= import('./puzzles.json').then((module) => (module.default as PuzzleRow[]).map(lazyPuzzle))
   return cached
 }
 
@@ -90,19 +111,27 @@ export interface PickOptions {
   theme?: string
   levelId?: string
   solved?: Set<string>
+  /** Os que já apareceram nesta rodada. */
+  exclude?: Set<string>
   /** Sorteio determinístico nos testes. */
   random?: () => number
   limit?: number
 }
 
 /** Puzzles para praticar, deixando os já resolvidos por último. */
-export function pickPuzzles(puzzles: Puzzle[], { theme, levelId, solved = new Set(), random = Math.random, limit = 20 }: PickOptions): Puzzle[] {
+export function pickPuzzles(puzzles: Puzzle[], { theme, levelId, solved = new Set(), exclude, random = Math.random, limit = 20 }: PickOptions): Puzzle[] {
   const level = LEVELS.find((item) => item.id === levelId)
-  const pool = puzzles.filter((puzzle) => (!theme || puzzle.themes.includes(theme)) && (!level || (puzzle.rating >= level.min && puzzle.rating < level.max)))
+  const pool = puzzles.filter((puzzle) => !exclude?.has(puzzle.id) && (!theme || puzzle.themes.includes(theme)) && (!level || (puzzle.rating >= level.min && puzzle.rating < level.max)))
   const shuffled = pool.map((puzzle) => ({ puzzle, order: random() })).sort((a, b) => a.order - b.order).map((item) => item.puzzle)
   const fresh = shuffled.filter((puzzle) => !solved.has(puzzle.id))
   const old = shuffled.filter((puzzle) => solved.has(puzzle.id))
   return [...fresh, ...old].slice(0, limit)
+}
+
+/** Mais puzzles para a rodada sem fim. Se já apareceram todos da dificuldade, volta a repetir. */
+export function morePuzzles(puzzles: Puzzle[], options: Omit<PickOptions, 'exclude'>, seen: Set<string>): Puzzle[] {
+  const fresh = pickPuzzles(puzzles, { ...options, exclude: seen })
+  return fresh.length > 0 ? fresh : pickPuzzles(puzzles, options)
 }
 
 export interface PuzzleStats {
@@ -112,7 +141,7 @@ export interface PuzzleStats {
 
 export const PUZZLE_KEY = 'puzzles'
 export const EMPTY_PUZZLE_STATS: PuzzleStats = { solved: [], dailyDone: null }
-const MAX_REMEMBERED = 3000
+const MAX_REMEMBERED = 20000
 
 export function afterSolved(stats: PuzzleStats, id: string, dailyDay?: string): PuzzleStats {
   const solved = stats.solved.includes(id) ? stats.solved : [...stats.solved, id].slice(-MAX_REMEMBERED)
