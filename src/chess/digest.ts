@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js'
 import type { GameAnalysis } from './analyze'
-import { MOVE_CLASSES, type MoveClass } from './classify'
+import { CLASS_VERSION, MOVE_CLASSES, type MoveClass } from './classify'
 import { parseTimeControl } from './clock'
 import type { Color } from './evaluation'
 import { type Motif, detectMotifs } from './motifs'
@@ -28,6 +28,8 @@ export interface GameError {
 /** O resumo da análise que fica junto da partida: dá para calcular a evolução sem abrir cada análise. */
 export interface GameDigest {
   id: string
+  /** As regras que produziram estes números. Com outras, o histórico é refeito ao abrir o app. */
+  classVersion?: number
   depth: number
   analyzedAt: number
   plies: number
@@ -93,6 +95,7 @@ export function digestAnalysis(analysis: GameAnalysis, userColor: Color | null):
 
   return {
     id: analysis.id,
+    classVersion: CLASS_VERSION,
     depth: analysis.depth,
     analyzedAt: analysis.analyzedAt,
     plies: analysis.moves.length,

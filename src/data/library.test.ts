@@ -2,13 +2,16 @@ import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { type GameAnalysis, analyzeGame } from '../chess/analyze'
-import { digestAnalysis, phaseOf, pgnFromAnalysis } from '../chess/digest'
+import { type GameDigest, digestAnalysis, phaseOf, pgnFromAnalysis } from '../chess/digest'
+import { STORES, writeMany } from './db'
+import { type GameRecord, publishForTest } from './library'
 import { parsePgn } from '../chess/pgn'
 import type { ChessComGame } from '../chesscom/api'
 import type { EngineLike, EngineResult } from '../engine/stockfish'
 import { loadCards } from '../training/cards'
 import { exportAll, mergeBackup, parseBackup } from './backup'
 import { resetConnection } from './db'
+import { refreshOldDigests } from './library'
 import { allRecords, addUnanalyzed, getAnalysis, ingestChessCom, initLibrary, migrateLegacy, openingFromPgn, outcomeOf, recordsFor, removeRecord, resetLibrary, saveAnalyzed, updateRecord } from './library'
 import { loadBook } from '../chess/book'
 
@@ -26,6 +29,12 @@ const fakeEngine: EngineLike = {
     const side = fen.split(' ')[1]
     return { eval: { kind: 'cp', cp: side === 'w' ? 40 : -40 }, bestUci: 'e2e4', pvUci: ['e2e4'], depth: 10, lines: [] }
   },
+}
+
+const updateOld = async (key: string, digest: GameDigest) => {
+  const record = allRecords().find((item) => item.key === key) as GameRecord
+  publishForTest({ ...record, digest })
+  await writeMany(STORES.games, [{ value: { ...record, digest } }])
 }
 
 const analyzed = (depth: number, pgn = PGN) => analyzeGame(fakeEngine, parsePgn(pgn), depth)
@@ -47,6 +56,18 @@ beforeEach(() => {
 })
 
 describe('biblioteca de partidas', () => {
+  it('refaz os resumos de regras antigas, sem chamar o motor e sem repetir', async () => {
+    await initLibrary('')
+    const { record } = await saveAnalyzed(await analyzed(12), { pgn: PGN, userColor: 'w' })
+    const old = record.digest as NonNullable<typeof record.digest>
+    await updateOld(record.key, { ...old, classVersion: 1, accuracy: { w: 99, b: 99 } })
+    expect(await refreshOldDigests()).toBe(1)
+    const fresh = allRecords().find((item) => item.key === record.key)
+    expect(fresh?.digest?.classVersion).toBe(old.classVersion)
+    expect(fresh?.digest?.accuracy.w).toBe(old.accuracy.w)
+    expect(await refreshOldDigests()).toBe(0)
+  })
+
   it('guarda a partida e a análise, e a análise volta do banco', async () => {
     const analysis = await analyzed(12)
     const { record, persisted } = await saveAnalyzed(analysis, { pgn: PGN, userColor: 'w' })

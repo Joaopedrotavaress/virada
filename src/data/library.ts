@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { Chess } from 'chess.js'
 import { type GameAnalysis, gameKey, hashText, upgradeAnalysis } from '../chess/analyze'
+import { CLASS_VERSION } from '../chess/classify'
 import { type BookData, type OpeningInfo, findBookMoves, loadBook } from '../chess/book'
 import { type GameDigest, digestAnalysis, pgnFromAnalysis } from '../chess/digest'
 import type { Color } from '../chess/evaluation'
@@ -389,12 +390,30 @@ export async function migrateLegacy(username: string): Promise<number> {
 
 let initialized: Promise<void> | null = null
 
+/**
+ * Refaz os resumos guardados com regras antigas, usando as avaliações que já existem.
+ * Sem isso, a evolução misturaria duas réguas de precisão e mostraria uma queda que não aconteceu.
+ */
+export async function refreshOldDigests(): Promise<number> {
+  const old = records.filter((record) => record.digest && record.digest.classVersion !== CLASS_VERSION && !record.deletedAt)
+  let done = 0
+  for (const record of old) {
+    const saved = await readValue<GameAnalysis>(STORES.analyses, record.key)
+    if (!saved) continue
+    const digest = digestAnalysis(upgradeAnalysis(saved), record.userColor)
+    await store([{ ...record, digest }])
+    done += 1
+  }
+  return done
+}
+
 /** Carrega a biblioteca. Sem IndexedDB (modo privado restrito), o app continua, só não guarda. */
 export function initLibrary(username: string): Promise<void> {
   initialized ??= (async () => {
     try {
       publish(await readAll<GameRecord>(STORES.games))
       await migrateLegacy(username)
+      void refreshOldDigests().catch((failure) => console.warn('Resumos não atualizados:', failure))
     } catch (failure) {
       console.warn('Biblioteca indisponível:', failure)
     }
@@ -417,6 +436,9 @@ export async function reloadLibrary(): Promise<void> {
   openAnalyses.clear()
   publish(await readAll<GameRecord>(STORES.games))
 }
+
+/** Só para os testes. */
+export const publishForTest = (record: GameRecord) => publish(records.map((item) => (item.key === record.key ? record : item)))
 
 /** Só para os testes. */
 export function resetLibrary() {
