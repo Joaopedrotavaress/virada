@@ -1,0 +1,25 @@
+# O motor divide a máquina com outro serviço. Por isso: prioridade baixa de CPU, teto de CPU e memória,
+# sem porta publicada, e numa rede só dele, em que só o proxy entra.
+name: virada-motor
+services:
+  motor:
+    build: .
+    container_name: virada-motor
+    restart: unless-stopped
+    environment:
+      MOTORES: "3"
+      HASH_MB: "128"
+    cpus: 3.0
+    cpu_shares: 256
+    mem_limit: 1500m
+    memswap_limit: 1500m
+    pids_limit: 64
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    networks: [rede]
+networks:
+  rede:
+    name: virada-motor-rede
+    internal: true

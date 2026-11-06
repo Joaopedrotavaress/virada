@@ -41,5 +41,5 @@ export default defineConfig({
       },
     }),
   ],
-  test: { environment: 'node', include: ['src/**/*.test.ts'], testTimeout: 120_000, hookTimeout: 180_000 },
+  test: { environment: 'node', include: ['src/**/*.test.ts', 'server/**/*.test.mjs'], testTimeout: 120_000, hookTimeout: 180_000 },
 })
