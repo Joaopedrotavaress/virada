@@ -42,6 +42,8 @@ interface AnalysisViewProps {
   record?: GameRecord
   /** Continua jogando contra um bot a partir da posição na tela. */
   onPlayFrom?: (start: StartPoint) => void
+  /** Refaz a análise, para quem foi analisada com as regras antigas. */
+  onReanalyze?: () => void
 }
 
 interface PendingPromotion {
@@ -121,7 +123,7 @@ function StripButton({ label, onClick, disabled, children }: { label: string; on
   )
 }
 
-export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }: AnalysisViewProps) {
+export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom, onReanalyze }: AnalysisViewProps) {
   const { positions, moves } = analysis
   const isDesktop = useIsDesktop()
   const [ply, setPly] = useState(0)
@@ -574,6 +576,14 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
   const summary = (
     <>
       <Summary analysis={analysis} showTitle={isDesktop} userColor={userColor} />
+      {onReanalyze && analysis.ratings === undefined && (
+        <section className="mt-3 rounded-md bg-surface p-4">
+          <p className="max-w-prose">Esta análise é de antes das regras novas. Os lances Ótimos e o peso do rating só aparecem analisando de novo.</p>
+          <button type="button" onClick={onReanalyze} className="mt-3 min-h-11 w-full rounded-md border border-line px-4 font-semibold hover:bg-sunken">
+            Analisar de novo
+          </button>
+        </section>
+      )}
       {canPlayFrom && (
         <button
           type="button"

@@ -315,6 +315,13 @@ export function Home(props: HomeProps) {
                 Jogar contra um bot
               </button>
             </section>
+            <section className="mt-10 border-t border-line pt-6">
+              <h2 className="font-display text-2xl font-bold">Quer aprender do começo?</h2>
+              <p className="mt-1 max-w-prose text-muted">Um caminho em quatro níveis, das regras ao cálculo, com o Seu Nonato mostrando no tabuleiro.</p>
+              <button type="button" onClick={() => navigate('#/aprender')} className="mt-3 min-h-12 w-full rounded-md border border-line px-5 font-semibold hover:bg-sunken sm:w-auto">
+                Ver o caminho
+              </button>
+            </section>
             {installSection}
             {footer}
             </div>

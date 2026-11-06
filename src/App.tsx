@@ -49,6 +49,8 @@ interface StartOptions {
   playedAt?: number
   /** Troca a tela atual no histórico em vez de empilhar outra. */
   replace?: boolean
+  /** Refaz a análise mesmo que já exista, nesta profundidade. */
+  redoAtDepth?: number
 }
 
 const loading = (
@@ -58,7 +60,7 @@ const loading = (
 )
 
 /** Abre a análise pelo endereço. Sem análise guardada, mas com o PGN, analisa de novo. */
-function GameRoute({ gameKey, username, notice, onAnalyze, onPlayFrom }: { gameKey: string; username: string; notice: string | null; onAnalyze: (record: GameRecord) => void; onPlayFrom: (start: StartPoint) => void }) {
+function GameRoute({ gameKey, username, notice, onAnalyze, onRedo, onPlayFrom }: { gameKey: string; username: string; notice: string | null; onAnalyze: (record: GameRecord) => void; onRedo: (record: GameRecord, depth: number) => void; onPlayFrom: (start: StartPoint) => void }) {
   const [analysis, setAnalysis] = useState<GameAnalysis | null | undefined>(undefined)
   const records = useAllRecords()
   const record = records.find((item) => item.key === gameKey)
@@ -105,6 +107,7 @@ function GameRoute({ gameKey, username, notice, onAnalyze, onPlayFrom }: { gameK
         notice={notice}
         onBack={goBack}
         onPlayFrom={onPlayFrom}
+        onReanalyze={record ? () => onRedo(record, analysis.depth) : undefined}
       />
     </Suspense>
   )
@@ -167,7 +170,7 @@ export default function App() {
       const key = options.key ?? recordKeyOf(game)
       const saved = allRecords().find((record) => record.key === key && !record.deletedAt)
       // Já analisada com profundidade igual ou maior: não precisa esperar de novo.
-      if (saved?.digest && saved.digest.depth >= depth && (await getAnalysis(key))) {
+      if (!options.redoAtDepth && saved?.digest && saved.digest.depth >= depth && (await getAnalysis(key))) {
         navigate(gamePath(key), { replace: options.replace })
         return
       }
@@ -182,7 +185,7 @@ export default function App() {
       try {
         const engine = getEngine()
         await engine.ready
-        const analysis = await analyzeGame(engine, game, depth, {
+        const analysis = await analyzeGame(engine, game, options.redoAtDepth ?? depth, {
           signal: controller.signal,
           onProgress: (done, total) => {
             if (!controller.signal.aborted) setJob({ game, done, total, userColor })
@@ -270,7 +273,7 @@ export default function App() {
   }
 
   if (route.name === 'game') {
-    return <GameRoute gameKey={route.key} username={username} notice={notice} onAnalyze={(record) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace: true })} onPlayFrom={playFrom} />
+    return <GameRoute gameKey={route.key} username={username} notice={notice} onRedo={(record, redoAtDepth) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, redoAtDepth })} onAnalyze={(record) => void start(record.pgn, { key: record.key, userColor: record.userColor, source: record.source, owner: record.owner, playedAt: record.playedAt, replace: true })} onPlayFrom={playFrom} />
   }
 
   if (route.name === 'bot-game') {

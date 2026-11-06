@@ -141,7 +141,7 @@ export function NextLessonCard({ compact = false }: { compact?: boolean }) {
         <div className="h-full bg-(--positive)" style={{ width: `${percent}%` }} />
       </div>
       {progress.next ? (
-        <button type="button" onClick={() => navigate(lessonPath(progress.next as string))} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 text-left font-semibold text-on-action">
+        <button type="button" onClick={() => navigate(lessonPath(progress.next as string))} className="mt-3 min-h-12 w-full rounded-md bg-action px-4 py-2 text-left font-semibold text-on-action">
           {progress.done === 0 ? 'Começar' : 'Continuar'}: {lessonTitle(progress.next)}
         </button>
       ) : (

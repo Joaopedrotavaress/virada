@@ -226,7 +226,7 @@ function Finished({ lesson, onAgain }: { lesson: Lesson; onAgain: () => void }) 
       {level && nextLevel && level.id !== nextLevel.id && <p className="mt-4 rounded-md bg-surface p-3 font-semibold">Você terminou a última aula do nível {level.title}. Agora vem o {nextLevel.title}.</p>}
       <div className="mt-5 flex flex-col gap-2">
         {nextLesson && (
-          <button type="button" autoFocus onClick={() => navigate(`#/aprender/aula/${nextLesson.id}`, { replace: true })} className="min-h-12 rounded-md bg-action px-5 text-left font-semibold text-on-action">
+          <button type="button" autoFocus onClick={() => navigate(`#/aprender/aula/${nextLesson.id}`, { replace: true })} className="min-h-12 rounded-md bg-action px-5 py-2 text-left font-semibold text-on-action">
             Próxima aula: {nextLesson.title}
           </button>
         )}
