@@ -43,23 +43,6 @@ export function turningPoint(moves: AnalyzedMove[]): AnalyzedMove | null {
   return worst.loss >= TURNING_POINT_LOSS ? worst : null
 }
 
-/**
- * Os 3 lances que a Revelação mostra: o da virada e os dois seguintes.
- * Se a partida acaba em mate logo depois, mostra os 3 últimos, para terminar no mate.
- * `focusAt` é o índice do lance da virada; -1 quer dizer que ele já estava no tabuleiro.
- */
-export function revelationLine(moves: { uci: string; san: string }[], ply: number) {
-  const total = moves.length
-  const endsInMate = moves[total - 1]?.san.endsWith('#') ?? false
-  const start = endsInMate && total - ply <= 3 ? Math.max(0, total - 3) : ply - 1
-  return {
-    start,
-    moves: moves.slice(start, start + 3).map((move) => move.uci),
-    focus: moves[ply - 1].uci.slice(2, 4),
-    focusAt: ply - 1 - start,
-  }
-}
-
 /** Os pontos em que vale parar: os erros da pessoa pesam mais que os do adversário. */
 export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Color | null): KeyMoment[] {
   const turning = turningPoint(moves)
@@ -73,28 +56,27 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
     const mine = userColor === null || move.color === userColor
     const opponent: Color = move.color === 'w' ? 'b' : 'w'
     const isTurningPoint = turning?.ply === move.ply
-    const turningNote = isTurningPoint ? `A partida virou aqui: este lance custou ${percent(move.loss)} de chance de vitória.` : null
     const base = { ply: move.ply, isTurningPoint }
     const weight = mine ? 20 : 0
 
     if (move.cls === 'brilliant') {
-      found.push({ ...base, kind: 'brilliant', title: 'Lance brilhante', note: turningNote, importance: mine ? 120 : 45 })
+      found.push({ ...base, kind: 'brilliant', title: 'Lance brilhante', note: null, importance: mine ? 120 : 45 })
       return
     }
 
     if (mateFor(before.eval, move.color) && !mateFor(after.eval, move.color) && move.cls !== 'best') {
-      found.push({ ...base, kind: 'missed-mate', title: 'Mate perdido', note: turningNote, importance: 90 + weight })
+      found.push({ ...base, kind: 'missed-mate', title: 'Mate perdido', note: null, importance: 90 + weight })
       return
     }
     // Numa posição já perdida, o mate custa pouco e não ensina nada: não vale a parada.
     if (mateFor(after.eval, opponent) && !mateFor(before.eval, opponent) && move.loss >= ALLOWED_MATE_LOSS) {
-      found.push({ ...base, kind: 'allowed-mate', title: 'Mate permitido', note: turningNote, importance: 85 + weight })
+      found.push({ ...base, kind: 'allowed-mate', title: 'Mate permitido', note: null, importance: 85 + weight })
       return
     }
 
     if (mine && (move.cls === 'blunder' || move.cls === 'miss' || move.cls === 'mistake')) {
       const titles = { blunder: 'Erro grave', miss: 'Chance perdida', mistake: 'Erro' }
-      found.push({ ...base, kind: move.cls, title: titles[move.cls], note: turningNote, importance: move.loss + weight })
+      found.push({ ...base, kind: move.cls, title: titles[move.cls], note: null, importance: move.loss + weight })
       return
     }
 
@@ -103,7 +85,7 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
         ...base,
         kind: 'opponent-error',
         title: 'O adversário errou',
-        note: turningNote ?? `Este lance deu ${percent(move.loss)} de chance de vitória para você.`,
+        note: `Este lance deu ${percent(move.loss)} de chance de vitória para você.`,
         importance: move.loss * 0.6,
       })
       return
@@ -200,17 +182,7 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
     insights.push(`Precisão de ${format(w.accuracy)} das brancas e ${format(b.accuracy)} das pretas.`)
   }
 
-  // 2. O ponto de virada
-  const turning = turningPoint(moves)
-  const judged = moves.filter((move) => move.cls !== 'book')
-  if (turning) {
-    const whose = !userColor ? `das ${side(turning.color)}` : turning.color === userColor ? 'seu' : 'do adversário'
-    insights.push(`A partida virou em ${moveName(turning)}, lance ${whose} que custou ${percent(turning.loss)} de chance de vitória.`)
-  } else if (judged.length >= 6) {
-    insights.push('Nenhum lance sozinho mudou o rumo: a partida foi decidida nos detalhes.')
-  }
-
-  // 3. Erros
+  // 2. Erros
   if (userColor) {
     const parts = errorParts(summary[userColor])
     const own = moves.filter((move) => move.color === userColor && move.cls !== 'book')
@@ -222,7 +194,7 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
     if (excellent > 0) insights.push(excellent === 1 ? 'Você teve 1 lance excelente.' : `Você teve ${excellent} lances excelentes.`)
   }
 
-  // 4. Mate perdido
+  // 3. Mate perdido
   const missedMate = moves.find((move, index) => move.cls !== 'best' && move.cls !== 'brilliant' && (!userColor || move.color === userColor) && mateFor(positions[index].eval, move.color) && !mateFor(positions[index + 1].eval, move.color))
   if (missedMate) {
     const evaluation = positions[missedMate.ply - 1].eval

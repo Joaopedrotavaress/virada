@@ -9,7 +9,7 @@ import { clocksAt, formatClock } from '../chess/clock'
 import { materialState } from '../chess/material'
 import { uciParts } from '../chess/notation'
 import { formatDate, formatTimeControl } from '../chess/pgn'
-import { REVIEW_SPEEDS, findKeyMoments, gameInsights, turningPoint } from '../chess/review'
+import { REVIEW_SPEEDS, findKeyMoments, gameInsights } from '../chess/review'
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
 import { isErrorClass } from '../chess/classify'
@@ -148,7 +148,6 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
 
   const moments = useMemo(() => findKeyMoments(analysis, userColor), [analysis, userColor])
   const insights = useMemo(() => gameInsights(analysis, userColor), [analysis, userColor])
-  const turning = useMemo(() => turningPoint(moves), [moves])
   const moveTo = useCallback((next: number) => {
     setRevealed(false)
     setSelected(null)
@@ -502,7 +501,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       }}
     />
   ) : review.status === 'idle' && ply === 0 ? (
-    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} turning={turning} hideStart={!isDesktop} />
+    <ReviewIntro insights={insights} moments={moments} onStart={resumeReview} hideStart={!isDesktop} />
   ) : review.status === 'done' ? (
     <ReviewEnd
       insights={insights}
@@ -554,7 +553,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
         : 'neutro'
 
   const coachWithTablebase = (
-    <Professor mood={mood} large={isDesktop}>
+    <Professor mood={mood} large={isDesktop} say={`${ply}|${review.status}|${retry?.phase ?? ''}|${variantStep?.id ?? ''}|${variantStep?.cls ?? ''}|${revealed}`} talkMs={playing ? 700 : 2400}>
       {coach}
       {tablebase && !playing && (
         <p role="status" className="rounded-md bg-surface p-3 text-sm">

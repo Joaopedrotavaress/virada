@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { AnalyzedMove, AnalyzedPosition } from './analyze'
 import { type MoveClass, summarize } from './classify'
 import type { Eval } from './evaluation'
-import { findKeyMoments, gameInsights, revelationLine, stepDelay } from './review'
+import { findKeyMoments, gameInsights, stepDelay } from './review'
 
 const cp = (value: number): Eval => ({ kind: 'cp', cp: value })
 const mate = (moves: number, winner: 'w' | 'b'): Eval => ({ kind: 'mate', moves, winner })
@@ -80,10 +80,10 @@ describe('momentos-chave', () => {
     expect(findKeyMoments(game, 'w').map((moment) => moment.kind)).not.toContain('missed-mate')
   })
 
-  it('aponta o ponto de virada: o lance que mais custou', () => {
+  it('marca o lance que mais custou, sem falar disso na tela', () => {
     const game = build([['mistake', 12], ['good', 1], ['blunder', 40], ['good', 1]])
     const moments = findKeyMoments(game, 'w')
-    expect(moments.find((moment) => moment.ply === 3)).toMatchObject({ isTurningPoint: true, note: 'A partida virou aqui: este lance custou 40% de chance de vitória.' })
+    expect(moments.find((moment) => moment.ply === 3)).toMatchObject({ isTurningPoint: true, note: null })
     expect(moments.find((moment) => moment.ply === 1)?.isTurningPoint).toBe(false)
   })
 
@@ -117,29 +117,21 @@ describe('momentos-chave', () => {
 })
 
 describe('insights', () => {
-  it('compara a precisão e aponta a virada', () => {
+  it('compara a precisão e conta os erros', () => {
     const game = build([...quiet(6), ['blunder', 40], ['good', 1]])
     const insights = gameInsights(game, 'w')
     expect(insights[0]).toMatch(/^Sua precisão foi de .*, contra .* do adversário\.$/)
-    expect(insights).toContain('A partida virou em 14. Cf3, lance seu que custou 40% de chance de vitória.')
     expect(insights).toContain('Você teve 1 erro grave.')
   })
 
-  it('diz de quem foi a virada', () => {
+  it('nunca fala de virada, nem do lance que mais custou', () => {
     const game = build([...quiet(6), ['blunder', 40], ['good', 1]])
-    expect(gameInsights(game, 'b').join(' ')).toContain('lance do adversário que custou 40%')
-    expect(gameInsights(game, null).join(' ')).toContain('lance das brancas que custou 40%')
+    for (const side of ['w', 'b', null] as const) expect(gameInsights(game, side).join(' ')).not.toMatch(/virou|rumo/)
   })
 
   it('elogia só quando não houve erro sério em partida de verdade', () => {
     expect(gameInsights(build(quiet(14)), 'w')).toContain('Você não cometeu nenhum erro sério. Muito bom.')
     expect(gameInsights(build(quiet(4)), 'w').join(' ')).not.toContain('Muito bom')
-  })
-
-  it('sem grandes viradas, não inventa uma', () => {
-    const insights = gameInsights(build(quiet(14)), 'w')
-    expect(insights.join(' ')).not.toContain('virou')
-    expect(insights).toContain('Nenhum lance sozinho mudou o rumo: a partida foi decidida nos detalhes.')
   })
 
   it('conta os erros do adversário aproveitados', () => {
@@ -180,34 +172,5 @@ describe('ritmo', () => {
   it('teoria passa mais rápido e o momento-chave tem uma pausa antes', () => {
     expect(stepDelay('2x', true, false)).toBeLessThan(stepDelay('2x', false, false))
     expect(stepDelay('2x', false, true)).toBeGreaterThan(stepDelay('2x', false, false))
-  })
-})
-
-describe('revelationLine', () => {
-  const game = (count: number, lastSan = 'Nf3') =>
-    Array.from({ length: count }, (_, index) => ({ uci: `a${index}b${index}`, san: index === count - 1 ? lastSan : 'Nf3' }))
-
-  it('mostra o lance da virada e os dois seguintes', () => {
-    expect(revelationLine(game(20), 5)).toEqual({ start: 4, moves: ['a4b4', 'a5b5', 'a6b6'], focus: 'b4', focusAt: 0 })
-  })
-
-  it('mostra menos lances quando a partida acaba antes', () => {
-    expect(revelationLine(game(6), 6).moves).toEqual(['a5b5'])
-  })
-
-  it('volta um lance para terminar no mate que veio logo depois da virada', () => {
-    expect(revelationLine(game(7, 'Qxf7#'), 6)).toEqual({ start: 4, moves: ['a4b4', 'a5b5', 'a6b6'], focus: 'b5', focusAt: 1 })
-  })
-
-  it('termina no mate que veio três lances depois, com a virada já no tabuleiro', () => {
-    expect(revelationLine(game(9, 'Qh7#'), 6)).toEqual({ start: 6, moves: ['a6b6', 'a7b7', 'a8b8'], focus: 'b5', focusAt: -1 })
-  })
-
-  it('ignora um mate distante', () => {
-    expect(revelationLine(game(30, 'Qh7#'), 6).start).toBe(5)
-  })
-
-  it('não passa do começo da partida', () => {
-    expect(revelationLine(game(2, 'Qh4#'), 1)).toEqual({ start: 0, moves: ['a0b0', 'a1b1'], focus: 'b0', focusAt: 0 })
   })
 })

@@ -430,7 +430,6 @@ export function Games({ username, onUsernameChange, onOpen }: GamesProps) {
                         {[formatDay(record.playedAt), klass ? timeClassLabel(klass) : '', view.myRating || view.opponentRating ? `${view.myRating ?? '?'} x ${view.opponentRating ?? '?'}` : ''].filter(Boolean).join(', ')}
                       </span>
                       {record.opening && <span className="block truncate text-sm text-muted">{formatOpening(record.opening)}</span>}
-                      {record.digest && record.digest.errors.length > 0 && <span className="block text-sm font-semibold">Virou no lance {record.digest.errors.reduce((worst, error) => (error.loss > worst.loss ? error : worst)).moveNumber}</span>}
                       {record.digest && record.userColor && (record.digest.counts[record.userColor].brilliant ?? 0) > 0 && (
                         <span className="block text-sm font-bold text-(--text-brilliant)">{record.digest.counts[record.userColor].brilliant === 1 ? '!! 1 lance brilhante' : `!! ${record.digest.counts[record.userColor].brilliant} lances brilhantes`}</span>
                       )}

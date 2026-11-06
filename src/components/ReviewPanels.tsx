@@ -1,7 +1,5 @@
-import { sanToPt } from '../chess/notation'
 import { FAREWELL, GREETING } from '../chess/professor'
 import { Icon } from './Icons'
-import { Placa } from './Revelation'
 import type { AnalyzedMove } from '../chess/analyze'
 import { type KeyMoment, REVIEW_SPEEDS, type ReviewSpeedId } from '../chess/review'
 import { ClassSymbol } from './ClassBadge'
@@ -45,21 +43,14 @@ interface IntroProps {
   insights: string[]
   moments: KeyMoment[]
   onStart: () => void
-  /** O lance em que a partida virou, quando houve um. */
-  turning?: { moveNumber: number; san: string } | null
   /** Celular: o botão de começar fica na barra fixa de baixo. */
   hideStart?: boolean
 }
 
 /** O que aparece ao abrir a partida: o resumo e o convite para rever. */
-export function ReviewIntro({ insights, moments, onStart, turning, hideStart = false }: IntroProps) {
+export function ReviewIntro({ insights, moments, onStart, hideStart = false }: IntroProps) {
   return (
     <section aria-label="Resumo da revisão" className="shrink-0 rounded-md bg-surface p-4 sm:p-5">
-      {turning && (
-        <div className="-mx-4 -mt-4 mb-4 overflow-hidden rounded-t-md sm:-mx-5 sm:-mt-5">
-          <Placa number={turning.moveNumber} title={`Virou aqui: ${sanToPt(turning.san)}`} animate={false} compact />
-        </div>
-      )}
       <h2 className="font-display text-2xl leading-tight font-semibold">Como foi a partida</h2>
       <p className="mt-1.5 max-w-prose text-base leading-snug">{GREETING}</p>
       {!hideStart && (
