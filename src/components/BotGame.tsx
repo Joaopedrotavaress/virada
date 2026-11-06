@@ -204,7 +204,7 @@ export function BotGame({ setup, onFinished, onProgress, onReview, onRematch, on
     </section>
   )
 
-  const coachSpeaks = coachOn ? <Professor mood={game.phase === 'warning' ? 'bravo' : moodOf(game.lastGrade?.cls)} large={isDesktop}>{coachPanel}</Professor> : coachPanel
+  const coachSpeaks = coachOn ? <Professor mood={game.phase === 'warning' ? 'bravo' : moodOf(game.lastGrade?.cls)} large={isDesktop} say={game.warning ?? game.comment ?? game.threat?.text ?? undefined}>{coachPanel}</Professor> : coachPanel
 
   const coachButtons = coachOn && (
     <div className="flex gap-1.5">
