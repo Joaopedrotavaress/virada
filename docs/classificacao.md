@@ -159,7 +159,7 @@ Uma partida real de 10 minutos, com rating 324 contra 294, comparada com o resum
 | Melhor | 11 | 21 | 10 |
 | Ótimo (polegar) | 6 | 5 | 11 |
 
-- **O que bateu:** Melhor mais "!" dá 15 lá e 15 aqui, e são os lances em que o jogador fez o primeiro do motor.
+- **O que bateu naquele momento:** Melhor mais "!" deu 15 lá e 15 aqui, com o motor lite. Com o motor completo, deu 17 aqui, então essa coincidência não deve ser levada como prova.
 - **O que levou à mudança:** antes, 6 lances fora do primeiro do motor apareciam como Melhor, e nenhuma captura decisiva ganhava "!".
 - **O que ainda não bate:** o polegar, com 11 aqui e 6 lá. Não sei a causa: pode ser o motor, a profundidade ou a curva.
 - **O limite desta comparação:** é uma partida só, e o resumo traz contagens, não quais lances foram. Os números do "!" foram ajustados com ela, então bater aqui não prova que vai bater em outras. A regressão está em [`classify.chesscom.test.ts`](../src/chess/classify.chesscom.test.ts).
@@ -195,23 +195,25 @@ O resultado por rating: até 600, erro de 6,2; 1000 a 1400, 5,4; 1400 a 1800, 4,
 
 ### Segunda comparação: os dois lados, tabela completa
 
-Uma partida de 98 lances, com rating 348 contra 342. Partida e números do Chess.com vieram da revisão dele; o Virada usou o Stockfish 19 completo em profundidade 18:
+Uma partida de 98 lances, com rating 348 contra 342. Números do Chess.com vêm da revisão dele; os do Virada, do Stockfish 19 completo no servidor, em profundidade 18:
 
-| Classe | Brancas: Chess.com | Antes | Agora | Pretas: Chess.com | Antes | Agora |
-|---|---:|---:|---:|---:|---:|---:|
-| Excelente (!) | 2 | 9 | 3 | 7 | 9 | 8 |
-| Melhor | 16 | 6 | 12 | 18 | 17 | 18 |
-| Ótimo (polegar) | 5 | 12 | 12 | 5 | 8 | 8 |
-| Bom | 7 | 8 | 8 | 7 | 4 | 4 |
-| Imprecisão | 2 | 1 | 1 | 3 | 2 | 2 |
-| Erro | 11 | 8 | 7 | 1 | 1 | 1 |
-| Chance perdida | 2 | 0 | 2 | 3 | 2 | 3 |
-| Erro grosseiro | 0 | 2 | 1 | 2 | 3 | 2 |
-| Precisão | 57,0 | | 64,1 | 71,2 | | 72,0 |
+| Classe | Brancas: Chess.com | Virada | Pretas: Chess.com | Virada |
+|---|---:|---:|---:|---:|
+| Excelente (!) | 2 | 1 | 7 | 8 |
+| Melhor | 16 | 17 | 18 | 18 |
+| Ótimo (polegar) | 5 | 12 | 5 | 6 |
+| Bom | 7 | 5 | 7 | 3 |
+| Imprecisão | 2 | 1 | 3 | 5 |
+| Erro | 11 | 8 | 1 | 0 |
+| Chance perdida | 2 | 2 | 3 | 5 |
+| Erro grosseiro | 0 | 0 | 2 | 1 |
+| Precisão | 57,0 | 63,6 | 71,2 | 67,1 |
 
-Ao juntar as tabelas das duas partidas e testar milhares de combinações, a diferença total caiu de 52 para 34 lances com três regras: retomar peça nunca é "!", a Chance perdida olha os 3 últimos lances do adversário, e a posição ganha começa em 0,65 ponto.
+Juntando as tabelas das duas partidas, três regras baixaram a diferença total de 49 para 39 lances: retomar peça nunca é "!", a Chance perdida olha os 3 últimos lances do adversário, e a posição ganha começa em 0,65 ponto. Na primeira partida, as brancas ficaram em 2 "!", 15 Melhores e 10 polegares, contra 4, 11 e 6.
 
-**O que não mudei de propósito:** baixar o limite do polegar de 0,02 para 0,012 melhorava só de 34 para 31 e contrariava a tabela pública. Com tão poucas partidas, isso seria encaixar números, não entender a regra. O polegar segue acima do Chess.com, e o Melhor, abaixo.
+**O que continua diferente:** o polegar das brancas (12 contra 5) é o maior erro, e a primeira partida também sobra nele. Testar outros limites não trouxe ganho claro, então a tabela pública foi mantida. São só duas partidas: bastam para achar problemas, não para garantir o resultado em outras.
+
+**Um erro meu nesta medição:** a primeira versão dessas comparações caiu sem aviso no motor lite, porque o motor de teste apagava o `fetch` do Node. Os números acima são da nova rodada, em que os testes confirmaram que tudo veio do servidor. A calibração da precisão usou o servidor desde o início.
 
 ## O que este teste não prova
 
