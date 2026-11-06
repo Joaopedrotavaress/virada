@@ -65,8 +65,8 @@ export function expectedPoints(evaluation: Eval, color: Color, rating: number = 
 /** Os três estados que o Chess.com cita ao explicar o "!" e a Chance perdida. Como saem dos pontos esperados, variam com o rating. */
 export type Standing = 'losing' | 'equal' | 'winning'
 
-const WINNING_POINTS = 0.7
-const LOSING_POINTS = 0.3
+const WINNING_POINTS = 0.65
+const LOSING_POINTS = 0.35
 
 export function standingOf(points: number): Standing {
   if (points >= WINNING_POINTS) return 'winning'

@@ -36,7 +36,7 @@ export const isTopClass = (cls: MoveClass) => cls === 'best' || isSpecialClass(c
  * Sobe sempre que as regras mudam: a análise guardada com outra versão é reclassificada ao abrir,
  * com as avaliações que já tem, sem chamar o motor de novo.
  */
-export const CLASS_VERSION = 4
+export const CLASS_VERSION = 5
 
 export interface PositionEval {
   eval: Eval
@@ -179,7 +179,8 @@ export interface GreatInput {
 export function isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, rating = DEFAULT_RATING, lastMoveTo }: GreatInput): boolean {
   if (!secondEval) return false
   const generous = rating < OBVIOUS_CAPTURES_COUNT_BELOW
-  if (!generous && uci.slice(2, 4) === lastMoveTo) return false
+  // Retomar a peça que acabou de chegar é a resposta que qualquer um vê.
+  if (uci.slice(2, 4) === lastMoveTo) return false
   const points = expectedPoints(evalBefore, color, rating)
   const second = expectedPoints(secondEval, color, rating)
   const gap = points - second
@@ -206,13 +207,15 @@ export function isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, ra
 /** O erro do adversário precisa ser de verdade, e o lance jogado também, para valer como chance perdida. */
 const PUNISHABLE = INACCURACY
 const MISS_MIN_LOST = INACCURACY
+/** Quantos lances do adversário olhar para trás: uma trapalhada nem sempre é castigada no lance seguinte. */
+const MISS_WINDOW = 3
 
 /**
  * Chance perdida: o adversário acabou de errar, havia posição ganha na mesa e o lance jogado a deixou passar.
  * É a definição pública do Chess.com, que acrescenta: em geral, a pessoa termina igual ou pior.
  */
-function isMiss(previousLost: number, pointsBefore: number, pointsAfter: number, pointsLost: number): boolean {
-  return previousLost >= PUNISHABLE && pointsLost >= MISS_MIN_LOST && isWinning(pointsBefore) && !isWinning(pointsAfter)
+function isMiss(recentLost: number, pointsBefore: number, pointsAfter: number, pointsLost: number): boolean {
+  return recentLost >= PUNISHABLE && pointsLost >= MISS_MIN_LOST && isWinning(pointsBefore) && !isWinning(pointsAfter)
 }
 
 export interface PlayedContext {
@@ -277,8 +280,9 @@ export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], position
       ? classOf(graded, { fen: before.fen, uci: move.uci, color: move.color, evalBefore: before.eval, evalAfter: after.eval, secondEval: repeated ? undefined : before.secondEval, rating, lastMoveTo: index > 0 ? moves[index - 1].uci.slice(2, 4) : undefined })
       : baseClass(move.color, before.eval, after.eval, graded)
 
-    const previousLost = index > 0 ? (classified[index - 1].pointsLost ?? 0) : 0
-    if (!graded.isBest && isMiss(previousLost, expectedPoints(before.eval, move.color, rating), expectedPoints(after.eval, move.color, rating), pointsLost)) cls = 'miss'
+    let recentLost = 0
+    for (let back = 1; back <= MISS_WINDOW; back += 1) recentLost = Math.max(recentLost, classified[index - (2 * back - 1)]?.pointsLost ?? 0)
+    if (!graded.isBest && isMiss(recentLost, expectedPoints(before.eval, move.color, rating), expectedPoints(after.eval, move.color, rating), pointsLost)) cls = 'miss'
 
     classified.push({ winBefore, winAfter, loss, cls, accuracy, pointsLost })
   })

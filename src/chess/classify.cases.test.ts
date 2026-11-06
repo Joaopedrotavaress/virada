@@ -65,8 +65,8 @@ describe('a curva depende do rating', () => {
   })
 
   it('os estados mudam com o rating', () => {
-    expect(standingOf(expectedPoints(cp(350), 'w', 2200))).toBe('winning')
-    expect(standingOf(expectedPoints(cp(350), 'w', 800))).toBe('equal')
+    expect(standingOf(expectedPoints(cp(250), 'w', 2200))).toBe('winning')
+    expect(standingOf(expectedPoints(cp(250), 'w', 800))).toBe('equal')
     expect(standingOf(expectedPoints(cp(-350), 'w', 2200))).toBe('losing')
   })
 
@@ -279,8 +279,8 @@ describe('o "!" (Excelente)', () => {
   })
 
   it('o limite muda com o rating: o mesmo lance vale para o iniciante e não para o forte', () => {
-    expect(great(cp(200), cp(200), cp(-50), 900)).toBe('great')
-    expect(great(cp(200), cp(200), cp(-50), 2400)).toBe('best')
+    expect(great(cp(150), cp(150), cp(-100), 900)).toBe('great')
+    expect(great(cp(150), cp(150), cp(-100), 2400)).toBe('best')
   })
 })
 
