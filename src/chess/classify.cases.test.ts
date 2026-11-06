@@ -90,7 +90,7 @@ describe('posição equilibrada', () => {
     expect(one(cp(20), cp(-20)).cls).toBe('good')
   })
 
-  it('perda maior é Imprecisão, Erro e Erro grosseiro', () => {
+  it('perda maior é Imprecisão, Erro e Capivarada', () => {
     expect(one(cp(20), cp(-60)).cls).toBe('inaccuracy')
     expect(one(cp(20), cp(-150)).cls).toBe('mistake')
     expect(one(cp(20), cp(-500)).cls).toBe('blunder')
@@ -107,7 +107,7 @@ describe('vantagem grande', () => {
     expect(one(cp(900), cp(600)).cls).toBe('inaccuracy')
   })
 
-  it('jogar fora a vitória é Erro grosseiro', () => {
+  it('jogar fora a vitória é Capivarada', () => {
     expect(one(cp(900), cp(0)).cls).toBe('blunder')
   })
 
@@ -131,15 +131,15 @@ describe('mate', () => {
     expect(['excellent', 'good']).toContain(one(mate(3, 'w'), cp(800)).cls)
   })
 
-  it('largar o mate e ficar igual é Erro grosseiro', () => {
+  it('largar o mate e ficar igual é Capivarada', () => {
     expect(one(mate(3, 'w'), cp(0)).cls).toBe('blunder')
   })
 
-  it('trocar o seu mate pelo do adversário é Erro grosseiro', () => {
+  it('trocar o seu mate pelo do adversário é Capivarada', () => {
     expect(one(mate(3, 'w'), mate(2, 'b')).cls).toBe('blunder')
   })
 
-  it('permitir mate numa posição boa é Erro grosseiro', () => {
+  it('permitir mate numa posição boa é Capivarada', () => {
     expect(one(cp(100), mate(2, 'b')).cls).toBe('blunder')
   })
 
@@ -328,7 +328,7 @@ describe('sacrifícios', () => {
 })
 
 describe('perda de material', () => {
-  it('entregar a dama numa posição igual é Erro grosseiro', () => {
+  it('entregar a dama numa posição igual é Capivarada', () => {
     expect(one(cp(0), cp(-900)).cls).toBe('blunder')
   })
 
@@ -365,7 +365,7 @@ describe('abertura', () => {
 })
 
 describe('final', () => {
-  it('largar o empate num final é Erro grosseiro, e a vitória também', () => {
+  it('largar o empate num final é Capivarada, e a vitória também', () => {
     expect(one(cp(0), cp(-700)).cls).toBe('blunder')
     expect(one(cp(700), cp(0)).cls).toBe('blunder')
   })

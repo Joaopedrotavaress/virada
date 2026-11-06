@@ -121,7 +121,7 @@ describe('insights', () => {
     const game = build([...quiet(6), ['blunder', 40], ['good', 1]])
     const insights = gameInsights(game, 'w')
     expect(insights[0]).toMatch(/^Sua precisão foi de .*, contra .* do adversário\.$/)
-    expect(insights).toContain('Você teve 1 erro grosseiro.')
+    expect(insights).toContain('Você teve 1 capivarada.')
   })
 
   it('nunca fala de virada, nem do lance que mais custou', () => {
@@ -136,9 +136,9 @@ describe('insights', () => {
 
   it('conta os erros do adversário aproveitados', () => {
     const used = build([['blunder', 30], ['best', 0], ['good', 1], ['good', 1]])
-    expect(gameInsights(used, 'b')).toContain('O adversário cometeu um erro grosseiro e você aproveitou.')
+    expect(gameInsights(used, 'b')).toContain('O adversário cometeu uma capivarada e você aproveitou.')
     const wasted = build([['blunder', 30], ['mistake', 15], ['good', 1], ['good', 1]])
-    expect(gameInsights(wasted, 'b')).toContain('O adversário cometeu um erro grosseiro e você não aproveitou.')
+    expect(gameInsights(wasted, 'b')).toContain('O adversário cometeu uma capivarada e você não aproveitou.')
   })
 
   it('compara as fases só com lances suficientes e diferença real', () => {

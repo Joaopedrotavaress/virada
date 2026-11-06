@@ -88,25 +88,25 @@ describe('você e o relógio', () => {
   }
   const quiet = (count: number, spent = 10, remaining = 300): [MoveClass, number, number][] => Array.from({ length: count }, () => ['good', spent, remaining])
 
-  it('erros graves com pouco tempo, contando certo', () => {
+  it('capivaradas com pouco tempo, contando certo', () => {
     const { moves, data } = build([...quiet(6), ['blunder', 3, 20], ['blunder', 3, 15], ['blunder', 3, 10], ['blunder', 20, 200]])
-    expect(clockInsights(moves, data, 'w', true)).toContain('3 dos seus 4 erros graves foram com menos de 30 segundos no relógio.')
+    expect(clockInsights(moves, data, 'w', true)).toContain('3 das suas 4 capivaradas foram com menos de 30 segundos no relógio.')
   })
 
   it('quando foram todos, diz de forma natural', () => {
     const { moves, data } = build([...quiet(6), ['blunder', 3, 20], ['blunder', 3, 15]])
-    expect(clockInsights(moves, data, 'w', true)).toContain('Seus 2 erros graves foram com menos de 30 segundos no relógio.')
-    expect(clockInsights(moves, data, 'w', false)).toContain('Os 2 erros graves das brancas foram com menos de 30 segundos no relógio.')
+    expect(clockInsights(moves, data, 'w', true)).toContain('Suas 2 capivaradas foram com menos de 30 segundos no relógio.')
+    expect(clockInsights(moves, data, 'w', false)).toContain('As 2 capivaradas das brancas foram com menos de 30 segundos no relógio.')
   })
 
-  it('não diz isso se os erros graves foram com tempo de sobra', () => {
+  it('não diz isso se as capivaradas foram com tempo de sobra', () => {
     const { moves, data } = build([...quiet(6), ['blunder', 3, 200], ['blunder', 3, 150], ['blunder', 3, 20]])
-    expect(clockInsights(moves, data, 'w', true).join()).not.toContain('erros graves')
+    expect(clockInsights(moves, data, 'w', true).join()).not.toContain('capivaradas')
   })
 
-  it('um único erro grave no aperto', () => {
+  it('uma única capivarada no aperto', () => {
     const { moves, data } = build([...quiet(6), ['blunder', 3, 12]])
-    expect(clockInsights(moves, data, 'w', true)).toContain('Seu erro grosseiro foi com menos de 30 segundos no relógio.')
+    expect(clockInsights(moves, data, 'w', true)).toContain('Sua capivarada foi com menos de 30 segundos no relógio.')
   })
 
   it('pensou muito e errou', () => {

@@ -272,7 +272,7 @@ As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como tex
 
 **A Regra do Acerto.** A única exceção aceita é o acerto de exercício: a onda e o flash amarelos na casa do lance certo. Ela dura menos de um segundo e some sozinha. O código ainda tem barras de progresso e um aviso de análise em segundo plano em amarelo; eles divergem da regra e não servem de modelo.
 
-**A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Bom e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grosseiro e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
+**A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Bom e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Capivarada e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
 
 **A Regra do Fundo Fixo.** O símbolo e os retratos ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.
 
@@ -367,7 +367,7 @@ Botões retos e diretos, em que a cor diz qual é a próxima ação.
 ### Inputs / Fields
 - **Estilo:** fundo de superfície, borda de 1px, canto de 3px, texto de 1rem e 48px de altura.
 - **Foco:** contorno de 2px na cor do texto, afastado 1px.
-- **Erro:** mensagem em peso 500 na cor de texto de Erro grosseiro, logo abaixo do campo.
+- **Erro:** mensagem em peso 500 na cor de texto de Capivarada, logo abaixo do campo.
 
 ### Cartões
 - **Fundo:** superfície, sem sombra e sem borda, com canto de 3px e 16px a 20px de respiro interno.
@@ -390,7 +390,7 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 | Bom | #6a6a73 | Ícone de visto | #ffffff | Texto comum | Texto comum |
 | Imprecisão | #c28a00 | Sinal "?!" | #0b0b0d | #7a5a00 | #e6ae3a |
 | Erro | #bd5206 | Sinal "?" | #ffffff | #ab4805 | #f5944c |
-| Erro grosseiro | #a30f2e | Sinal "??" | #ffffff | #a30f2e | #f97f8c |
+| Capivarada | #a30f2e | Sinal "??" | #ffffff | #a30f2e | #f97f8c |
 | Chance perdida | #8446dc | Ícone de X | #ffffff | #6c34bd | #bb99f7 |
 | Livro | #74747d | Ícone de livro aberto | #ffffff | Texto apagado | Texto apagado |
 

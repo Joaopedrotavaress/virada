@@ -138,18 +138,18 @@ export function clockInsights(moves: InsightMove[], data: ClockData, color: Colo
   const typical = median(own.map(spentOf))
   const sentences: string[] = []
 
-  // 1. Erros graves com pouco tempo.
+  // 1. Capivaradas com pouco tempo.
   const blunders = own.filter((move) => move.cls === 'blunder')
   const hurried = blunders.filter((move) => remainingOf(move) < LOW_TIME)
   if (hurried.length > 0 && hurried.length * 2 >= blunders.length) {
     const side = color === 'w' ? 'brancas' : 'pretas'
     const limit = `com menos de ${LOW_TIME} segundos no relógio.`
     if (blunders.length === 1) {
-      sentences.push(`${isUser ? 'Seu erro grosseiro' : `O erro grosseiro das ${side}`} foi ${limit}`)
+      sentences.push(`${isUser ? 'Sua capivarada' : `A capivarada das ${side}`} foi ${limit}`)
     } else if (hurried.length === blunders.length) {
-      sentences.push(`${isUser ? `Seus ${blunders.length} erros graves` : `Os ${blunders.length} erros graves das ${side}`} foram ${limit}`)
+      sentences.push(`${isUser ? `Suas ${blunders.length} capivaradas` : `As ${blunders.length} capivaradas das ${side}`} foram ${limit}`)
     } else {
-      sentences.push(`${hurried.length} ${isUser ? `dos seus ${blunders.length} erros graves` : `dos ${blunders.length} erros graves das ${side}`} ${plural(hurried.length, 'foi', 'foram')} ${limit}`)
+      sentences.push(`${hurried.length} ${isUser ? `das suas ${blunders.length} capivaradas` : `das ${blunders.length} capivaradas das ${side}`} ${plural(hurried.length, 'foi', 'foram')} ${limit}`)
     }
   }
 

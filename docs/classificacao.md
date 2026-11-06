@@ -2,7 +2,7 @@
 
 O objetivo é chegar o mais perto possível do Chess.com. O algoritmo deles é fechado, então este documento separa o que eles dizem publicamente do que precisou ser estimado.
 
-**Os nomes seguem o Chess.com em português:** lá, o lance "!" (Great, em inglês) se chama Excelente, e o do polegar (Excellent, em inglês) se chama Ótimo. Parece invertido, mas é o que aparece na tela deles.
+**Os nomes seguem o Chess.com em português:** lá, o lance "!" (Great, em inglês) se chama Excelente, o do polegar (Excellent) se chama Ótimo, e o "??" (Blunder) se chama Capivarada.
 
 O código está em [`src/chess/classify.ts`](../src/chess/classify.ts), [`brilliant.ts`](../src/chess/brilliant.ts) e [`expectedPoints.ts`](../src/chess/expectedPoints.ts).
 
@@ -16,7 +16,7 @@ O código está em [`src/chess/classify.ts`](../src/chess/classify.ts), [`brilli
 | Bom | 0,02 a 0,05 | Igual | Público |
 | Imprecisão | 0,05 a 0,10 | Igual | Público |
 | Erro | 0,10 a 0,20 | Igual | Público |
-| Erro grosseiro | 0,20 a 1,00 | Igual | Público |
+| Capivarada | 0,20 a 1,00 | Igual | Público |
 | A curva de cada rating | Diz que existe, não publica | Medida em 157 mil partidas do Lichess | **Medido** por nós |
 | Escala de rating | Não se aplica | Rating do Chess.com convertido para a escala do Lichess | **Estimado**, com a tabela do ChessGoals |
 | Excelente (!) | De perdido para igual, de igual para ganho, ou o único lance bom. Mais generoso com rating baixo | Comparação com a segunda melhor linha | Ideia pública, números **estimados** |
@@ -46,7 +46,7 @@ O valor de `k` foi medido com `scripts/medir-pontos-esperados.mjs`, na base aber
 | 2000 a 2200 | 14.966 | 0,00345 | 0,74 |
 | 2200 ou mais | 12.894 | 0,00350 | 0,74 |
 
-Na prática: a mesma vantagem vale mais para quem joga melhor. Um lance que custa 3 peões, numa posição igual, é Erro para um jogador de 800 e Erro grosseiro para um de 2200.
+Na prática: a mesma vantagem vale mais para quem joga melhor. Um lance que custa 3 peões, numa posição igual, é Erro para um jogador de 800 e Capivarada para um de 2200.
 
 Duas conferências: os valores do topo ficam perto do `0,00368` da fórmula pública do Lichess, medida em jogadores fortes, e o ajuste por faixa acompanha o resultado observado.
 
@@ -116,10 +116,10 @@ São mais de 90 casos em [`classify.cases.test.ts`](../src/chess/classify.cases.
 | Equilibrada | +0,2 para −0,2 | Bom |
 | Equilibrada | +0,2 para −0,6 | Imprecisão |
 | Equilibrada | +0,2 para −1,5 | Erro |
-| Equilibrada | +0,2 para −5 | Erro grosseiro |
+| Equilibrada | +0,2 para −5 | Capivarada |
 | Vantagem grande | +28 para +24 | Ótimo |
 | Vantagem grande | +9 para +6 | Imprecisão |
-| Vantagem grande | +9 para 0 | Erro grosseiro |
+| Vantagem grande | +9 para 0 | Capivarada |
 | Perdida | −12 para −15 | Ótimo |
 | Tática | Adversário erra (0 para −5), o lance volta a −0,2 | Chance perdida |
 | Tática | A segunda linha dá +0,4 e o lance dá +4,5 | Excelente |
@@ -127,21 +127,21 @@ São mais de 90 casos em [`classify.cases.test.ts`](../src/chess/classify.cases.
 | Sacrifício | Bispo em h7, posição boa | Brilhante |
 | Sacrifício | Dama de Morphy, com o Stockfish (Ópera, 1858) | Brilhante |
 | Sacrifício | O mesmo lance, com outro mate disponível | Não é Brilhante |
-| Sacrifício | Que deixa a posição ruim | Erro grosseiro |
+| Sacrifício | Que deixa a posição ruim | Capivarada |
 | Sacrifício | Com vitória fácil de outro jeito | Melhor |
 | Sacrifício | Gambito de peão | Melhor |
-| Perda de material | Dama entregue numa posição igual | Erro grosseiro |
+| Perda de material | Dama entregue numa posição igual | Capivarada |
 | Perda de material | Peão: 1500 e 2300 | Imprecisão e Erro |
 | Forçado | Único lance legal | Melhor |
 | Abertura | Dentro da teoria | Livro |
-| Final | Largar o empate ou a vitória | Erro grosseiro |
+| Final | Largar o empate ou a vitória | Capivarada |
 | Final | +90 de base de finais para mate em 20 | Ótimo |
 
 ### Em partidas reais
 
 36 partidas do Lichess, 12 por faixa, com o Stockfish em profundidade 12. Porcentagem de lances:
 
-| Rating | Brilhante | Excelente | Livro | Melhor | Ótimo | Bom | Imprecisão | Erro | Chance perdida | Erro grosseiro |
+| Rating | Brilhante | Excelente | Livro | Melhor | Ótimo | Bom | Imprecisão | Erro | Chance perdida | Capivarada |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1000 | 0,1 | 7,5 | 4,6 | 25,3 | 23,5 | 17,0 | 11,5 | 6,0 | 1,2 | 3,2 |
 | 1500 | 0,0 | 1,0 | 7,6 | 31,9 | 25,7 | 14,6 | 9,3 | 4,6 | 1,7 | 3,7 |
@@ -206,7 +206,7 @@ Uma partida de 98 lances, com rating 348 contra 342. Números do Chess.com vêm 
 | Imprecisão | 2 | 1 | 3 | 5 |
 | Erro | 11 | 8 | 1 | 0 |
 | Chance perdida | 2 | 2 | 3 | 5 |
-| Erro grosseiro | 0 | 0 | 2 | 1 |
+| Capivarada | 0 | 0 | 2 | 1 |
 | Precisão | 57,0 | 63,6 | 71,2 | 67,1 |
 
 Juntando as tabelas das duas partidas, três regras baixaram a diferença total de 49 para 39 lances: retomar peça nunca é "!", a Chance perdida olha os 3 últimos lances do adversário, e a posição ganha começa em 0,65 ponto. Na primeira partida, as brancas ficaram em 2 "!", 15 Melhores e 10 polegares, contra 4, 11 e 6.

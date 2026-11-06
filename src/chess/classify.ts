@@ -19,7 +19,7 @@ export const CLASS_INFO: Record<MoveClass, { label: string; symbol: string }> = 
   good: { label: 'Bom', symbol: '✓' },
   inaccuracy: { label: 'Imprecisão', symbol: '?!' },
   mistake: { label: 'Erro', symbol: '?' },
-  blunder: { label: 'Erro grosseiro', symbol: '??' },
+  blunder: { label: 'Capivarada', symbol: '??' },
   miss: { label: 'Chance perdida', symbol: '✕' },
 }
 

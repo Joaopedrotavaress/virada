@@ -22,7 +22,7 @@ describe('com o Stockfish de verdade', () => {
     expect(analysis.classVersion).toBe(CLASS_VERSION)
   }, 120_000)
 
-  it('o mate do pastor: quem deixa é Erro grosseiro, quem dá é Melhor', async () => {
+  it('o mate do pastor: quem deixa é Capivarada, quem dá é Melhor', async () => {
     const { bySan } = await classesOf('1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7# 1-0')
     expect(bySan('Nf6')).toEqual(['blunder'])
     expect(bySan('Qxf7#')).toEqual(['best'])

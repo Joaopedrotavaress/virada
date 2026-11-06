@@ -80,7 +80,7 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
     }
 
     if (mine && (move.cls === 'blunder' || move.cls === 'miss' || move.cls === 'mistake')) {
-      const titles = { blunder: 'Erro grosseiro', miss: 'Chance perdida', mistake: 'Erro' }
+      const titles = { blunder: 'Capivarada', miss: 'Chance perdida', mistake: 'Erro' }
       found.push({ ...base, kind: move.cls, title: titles[move.cls], note: null, importance: move.loss + weight })
       return
     }
@@ -157,7 +157,7 @@ function list(parts: string[]): string {
 function errorParts(summary: SideSummary): string[] {
   const { blunder, mistake, miss } = summary.counts
   const parts: string[] = []
-  if (blunder) parts.push(`${blunder} ${blunder === 1 ? 'erro grosseiro' : 'erros grosseiros'}`)
+  if (blunder) parts.push(`${blunder} ${blunder === 1 ? 'capivarada' : 'capivaradas'}`)
   if (mistake) parts.push(`${mistake} ${mistake === 1 ? 'erro' : 'erros'}`)
   if (miss) parts.push(`${miss} ${miss === 1 ? 'chance perdida' : 'chances perdidas'}`)
   return parts
@@ -220,9 +220,9 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
       insights.push(
         gifts.length === 1
           ? used === 1
-            ? 'O adversário cometeu um erro grosseiro e você aproveitou.'
-            : 'O adversário cometeu um erro grosseiro e você não aproveitou.'
-          : `O adversário cometeu ${gifts.length} erros graves e você aproveitou ${used}.`,
+            ? 'O adversário cometeu uma capivarada e você aproveitou.'
+            : 'O adversário cometeu uma capivarada e você não aproveitou.'
+          : `O adversário cometeu ${gifts.length} capivaradas e você aproveitou ${used}.`,
       )
     }
   }
