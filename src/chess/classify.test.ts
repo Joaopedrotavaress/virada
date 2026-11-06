@@ -81,7 +81,7 @@ describe('classificação', () => {
   it('não dá perda negativa quando a avaliação melhora', () => {
     const [move] = classifyMoves([{ uci: 'a', color: 'w' }], [pos(cp(0)), pos(cp(50), null)])
     expect(move.loss).toBe(0)
-    expect(move.cls).toBe('best')
+    expect(move.cls).toBe('excellent')
   })
 
   it('chance perdida exige perda ≥ 10 nos dois lances', () => {

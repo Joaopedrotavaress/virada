@@ -62,7 +62,7 @@ export function expectedPoints(evaluation: Eval, color: Color, rating: number = 
   return color === 'w' ? white : 1 - white
 }
 
-/** Os três estados que o Chess.com cita ao explicar Ótimo e Chance perdida. Como saem dos pontos esperados, variam com o rating. */
+/** Os três estados que o Chess.com cita ao explicar o "!" e a Chance perdida. Como saem dos pontos esperados, variam com o rating. */
 export type Standing = 'losing' | 'equal' | 'winning'
 
 const WINNING_POINTS = 0.7

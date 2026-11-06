@@ -5,16 +5,17 @@ import { DEFAULT_RATING, expectedPoints, isWinning, standingOf } from './expecte
 import { uciParts } from './notation'
 import type { GameMove } from './pgn'
 
+/** Os nomes seguem o Chess.com em português: lá, "Great" (!) é Excelente e "Excellent" (polegar) é Ótimo. */
 export type MoveClass = 'brilliant' | 'great' | 'book' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
 
 export const MOVE_CLASSES: MoveClass[] = ['brilliant', 'great', 'book', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']
 
 export const CLASS_INFO: Record<MoveClass, { label: string; symbol: string }> = {
   brilliant: { label: 'Brilhante', symbol: '!!' },
-  great: { label: 'Ótimo', symbol: '!' },
+  great: { label: 'Excelente', symbol: '!' },
   book: { label: 'Livro', symbol: '' },
   best: { label: 'Melhor', symbol: '★' },
-  excellent: { label: 'Excelente', symbol: '' },
+  excellent: { label: 'Ótimo', symbol: '' },
   good: { label: 'Bom', symbol: '✓' },
   inaccuracy: { label: 'Imprecisão', symbol: '?!' },
   mistake: { label: 'Erro', symbol: '?' },
@@ -28,14 +29,14 @@ export const isErrorClass = (cls: MoveClass) => cls === 'inaccuracy' || cls === 
 /** Lances que merecem festa: achar é o que importa neles. */
 export const isSpecialClass = (cls: MoveClass) => cls === 'brilliant' || cls === 'great'
 
-/** Melhor, Ótimo ou Brilhante: não há seta de "o melhor era" para mostrar. */
+/** Melhor, "!" ou Brilhante: não há seta de "o melhor era" para mostrar. */
 export const isTopClass = (cls: MoveClass) => cls === 'best' || isSpecialClass(cls)
 
 /**
  * Sobe sempre que as regras mudam: a análise guardada com outra versão é reclassificada ao abrir,
  * com as avaliações que já tem, sem chamar o motor de novo.
  */
-export const CLASS_VERSION = 2
+export const CLASS_VERSION = 3
 
 export interface PositionEval {
   eval: Eval
@@ -58,15 +59,13 @@ export function moveAccuracy(loss: number): number {
   return Math.min(100, Math.max(0, 103.1668 * Math.exp(-0.04354 * loss) - 3.1669))
 }
 
-/** A tabela pública do Chess.com, em pontos esperados perdidos. Ela mostra duas casas: abaixo de 0,005 aparece como 0,00. */
-const SAME_AS_BEST = 0.005
+/** A tabela pública do Chess.com, em pontos esperados perdidos. Melhor é só o primeiro lance do motor, sem faixa de perda. */
 const EXCELLENT = 0.02
 const GOOD = 0.05
 const INACCURACY = 0.1
 const MISTAKE = 0.2
 
 export function classifyPointsLost(pointsLost: number): MoveClass {
-  if (pointsLost < SAME_AS_BEST) return 'best'
   if (pointsLost < EXCELLENT) return 'excellent'
   if (pointsLost < GOOD) return 'good'
   if (pointsLost < INACCURACY) return 'inaccuracy'
@@ -121,11 +120,11 @@ function baseClass(color: Color, before: Eval, after: Eval, graded: GradedMove):
 }
 
 /** Quanto a segunda melhor linha precisa ficar atrás para o lance ser decisivo. Com rating baixo, é mais generoso. */
-const GREAT_GAP_LOW = 0.05
+const GREAT_GAP_LOW = 0.045
 const GREAT_GAP_MID = 0.08
 const GREAT_GAP_HIGH = 0.12
-/** Sem mudar de estado, a diferença precisa ser o dobro: é o caso do "único lance bom". */
-const ONLY_MOVE_FACTOR = 2
+/** Abaixo deste rating, pegar a peça que decide a partida também conta: quem está começando pode não ver. */
+const OBVIOUS_CAPTURES_COUNT_BELOW = 1200
 /** Com a alternativa já ganhando com folga, achar o lance não decide nada. */
 const SECOND_ALREADY_WON = 0.9
 /** Melhor lance de uma posição que continua perdida não salva ninguém. */
@@ -136,6 +135,12 @@ export function greatGapFor(rating: number): number {
   if (rating <= 1500) return GREAT_GAP_LOW + ((GREAT_GAP_MID - GREAT_GAP_LOW) * (rating - 1000)) / 500
   if (rating >= 2200) return GREAT_GAP_HIGH
   return GREAT_GAP_MID + ((GREAT_GAP_HIGH - GREAT_GAP_MID) * (rating - 1500)) / 700
+}
+
+/** Sem mudar de estado, a diferença precisa ser maior: é o caso do "único lance bom". Com rating baixo, não há essa exigência. */
+function onlyMoveFactor(rating: number): number {
+  if (rating <= 1000) return 1
+  return rating >= 1800 ? 2 : 1 + (rating - 1000) / 800
 }
 
 export interface GreatInput {
@@ -151,18 +156,20 @@ export interface GreatInput {
 }
 
 /**
- * Ótimo: decisivo para o resultado. O Chess.com cita três casos: de perdido para igual, de igual para ganho,
+ * O "!" (Great): decisivo para o resultado. O Chess.com cita três casos: de perdido para igual, de igual para ganho,
  * ou o único lance bom. Aqui isso é medido contra a segunda melhor linha.
  */
 export function isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, rating = DEFAULT_RATING, lastMoveTo }: GreatInput): boolean {
-  if (!secondEval || uci.slice(2, 4) === lastMoveTo) return false
+  if (!secondEval) return false
+  const generous = rating < OBVIOUS_CAPTURES_COUNT_BELOW
+  if (!generous && uci.slice(2, 4) === lastMoveTo) return false
   const points = expectedPoints(evalBefore, color, rating)
   const second = expectedPoints(secondEval, color, rating)
   const gap = points - second
   const needed = greatGapFor(rating)
   if (gap < needed || second >= SECOND_ALREADY_WON) return false
   if (expectedPoints(evalAfter, color, rating) <= STILL_LOST) return false
-  if (standingOf(points) === standingOf(second) && gap < needed * ONLY_MOVE_FACTOR) return false
+  if (standingOf(points) === standingOf(second) && gap < needed * onlyMoveFactor(rating)) return false
   try {
     const chess = new Chess(fen)
     const legal = chess.moves().length
@@ -171,9 +178,9 @@ export function isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, ra
     const gainOf = (square: Parameters<typeof exchangeGain>[1]) => exchangeGain(new Chess(fen), square)
     const move = chess.move(uciParts(uci))
     if (chess.isCheckmate() || move.promotion === 'q') return false
-    // Pegar o que ficou solto ou trocar peças também decide a partida, mas qualquer um vê.
-    // Só conta a captura em que se entrega mais do que se leva.
-    return !move.captured || (gainOf(move.to) === 0 && VALUES[move.piece] > VALUES[move.captured])
+    // Pegar o que ficou solto ou trocar peças também decide a partida, mas o jogador experiente vê.
+    // Para ele, só conta a captura em que se entrega mais do que se leva.
+    return generous || !move.captured || (gainOf(move.to) === 0 && VALUES[move.piece] > VALUES[move.captured])
   } catch {
     return false
   }

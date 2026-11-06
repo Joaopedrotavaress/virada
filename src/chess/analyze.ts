@@ -79,7 +79,7 @@ export interface AnalyzeGameOptions {
 
 /**
  * Análise guardada com regras antigas é reclassificada ao abrir, com as avaliações que já tem.
- * O que depende da segunda melhor linha, como o lance Ótimo, só aparece analisando de novo.
+ * O que depende da segunda melhor linha, como o lance "!", só aparece analisando de novo.
  */
 export function upgradeAnalysis(analysis: GameAnalysis): GameAnalysis {
   if (analysis.classVersion === CLASS_VERSION) return analysis
@@ -120,7 +120,7 @@ export async function analyzeGame(
       const result = await engine.analyze(position.fen, depth, { signal })
       const index = positions.length
       const move = game.moves[index]
-      // Ótimo e Brilhante dependem de saber o que a segunda melhor linha daria. Só vale buscar quando o lance
+      // O "!" e o Brilhante dependem de saber o que a segunda melhor linha daria. Só vale buscar quando o lance
       // jogado foi o primeiro do motor, fora do livro e numa posição que não esteja perdida.
       const worthSecond = move && move.uci === result.bestUci && !earlyBook[index] && expectedPoints(result.eval, move.color, ratings[move.color] ?? DEFAULT_RATING) > 0.3
       const second = worthSecond ? await engine.analyze(position.fen, depth, { signal, multiPv: 2 }) : null

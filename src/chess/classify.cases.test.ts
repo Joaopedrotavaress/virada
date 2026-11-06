@@ -17,9 +17,7 @@ const one = (before: Eval, after: Eval, rating = 1500, extra: Partial<Position> 
 
 describe('a tabela pública de pontos perdidos', () => {
   it.each([
-    [0, 'best'],
-    [0.0049, 'best'],
-    [0.005, 'excellent'],
+    [0, 'excellent'],
     [0.0199, 'excellent'],
     [0.02, 'good'],
     [0.0499, 'good'],
@@ -72,7 +70,7 @@ describe('a curva depende do rating', () => {
     expect(standingOf(expectedPoints(cp(-350), 'w', 2200))).toBe('losing')
   })
 
-  it('o Ótimo é mais generoso com quem tem rating baixo', () => {
+  it('o "!" é mais generoso com quem tem rating baixo', () => {
     expect(greatGapFor(800)).toBeLessThan(greatGapFor(1500))
     expect(greatGapFor(1500)).toBeLessThan(greatGapFor(2400))
   })
@@ -83,11 +81,11 @@ describe('posição equilibrada', () => {
     expect(classifyMoves([{ uci: 'x', color: 'w' }], [pos(cp(20)), pos(cp(15), null)])[0].cls).toBe('best')
   })
 
-  it('outro lance que custa nada também aparece como Melhor', () => {
-    expect(one(cp(20), cp(18)).cls).toBe('best')
+  it('outro lance que custa quase nada é Ótimo: Melhor é só o primeiro do motor', () => {
+    expect(one(cp(20), cp(18)).cls).toBe('excellent')
   })
 
-  it('perda pequena é Excelente, depois Bom', () => {
+  it('perda pequena é Ótimo, depois Bom', () => {
     expect(one(cp(20), cp(0)).cls).toBe('excellent')
     expect(one(cp(20), cp(-20)).cls).toBe('good')
   })
@@ -101,7 +99,7 @@ describe('posição equilibrada', () => {
 
 describe('vantagem grande', () => {
   it('+28 para +24 não é erro: a partida segue ganha', () => {
-    expect(one(cp(2800), cp(2400)).cls).toBe('best')
+    expect(one(cp(2800), cp(2400)).cls).toBe('excellent')
   })
 
   it('+9 para +8 custa pouco; +9 para +6 já é Imprecisão', () => {
@@ -114,7 +112,7 @@ describe('vantagem grande', () => {
   })
 
   it('quem já perdeu tudo quase não tem ponto a perder', () => {
-    expect(one(cp(-1200), cp(-1500)).cls).toBe('best')
+    expect(one(cp(-1200), cp(-1500)).cls).toBe('excellent')
   })
 })
 
@@ -123,7 +121,7 @@ describe('mate', () => {
     expect(one(mate(4, 'w'), mate(3, 'w')).cls).toBe('best')
   })
 
-  it('demorar um lance a mais é Excelente; muitos, Imprecisão', () => {
+  it('demorar um lance a mais é Ótimo; muitos, Imprecisão', () => {
     expect(one(mate(3, 'w'), mate(3, 'w')).cls).toBe('excellent')
     expect(one(mate(3, 'w'), mate(5, 'w')).cls).toBe('good')
     expect(one(mate(2, 'w'), mate(9, 'w')).cls).toBe('inaccuracy')
@@ -198,7 +196,7 @@ describe('Chance perdida', () => {
   })
 })
 
-describe('Ótimo', () => {
+describe('o "!" (Excelente)', () => {
   const FEN = '6k1/5ppp/8/8/8/5N2/5PPP/6K1 w - - 0 1'
   const great = (before: Eval, after: Eval, second: Eval | undefined, rating = 1500, fen = FEN, uci = 'f3e5') =>
     classifyMoves([{ uci, color: 'w' }], [pos(before, uci, { fen, secondEval: second }), pos(after, null)], [], { w: rating })[0].cls
@@ -246,7 +244,7 @@ describe('Ótimo', () => {
     expect(great(cp(450), cp(450), cp(40), 1500, '6k1/5ppp/6p1/4n3/8/5N2/5PPP/6K1 w - - 0 1'.replace('6p1', '3p2p1'), 'f3e5')).toBe('best')
   })
 
-  it('num xeque perpétuo, só a primeira vez é Ótimo', () => {
+  it('num xeque perpétuo, só a primeira vez vale', () => {
     const fen = '6k1/5ppp/8/8/8/5N2/5PPP/6K1 w - - 0 1'
     const moves = [
       { uci: 'f3e5', color: 'w' as const },
@@ -274,6 +272,12 @@ describe('Ótimo', () => {
     expect(great(cp(800), cp(800), cp(100), 1500, '6k1/P4ppp/8/8/8/8/5PPP/6K1 w - - 0 1', 'a7a8q')).toBe('best')
   })
 
+  it('com rating baixo, capturar a peça que decide conta; com rating alto, não', () => {
+    const fen = '6k1/5ppp/8/4n3/8/5N2/5PPP/6K1 w - - 0 1'
+    expect(great(cp(450), cp(450), cp(40), 700, fen, 'f3e5')).toBe('great')
+    expect(great(cp(450), cp(450), cp(40), 1500, fen, 'f3e5')).toBe('best')
+  })
+
   it('o limite muda com o rating: o mesmo lance vale para o iniciante e não para o forte', () => {
     expect(great(cp(200), cp(200), cp(-50), 900)).toBe('great')
     expect(great(cp(200), cp(200), cp(-50), 2400)).toBe('best')
@@ -290,7 +294,7 @@ describe('sacrifícios', () => {
     expect(of(GREEK, 'd3h7', cp(120), cp(120), cp(20))).toBe('brilliant')
   })
 
-  it('Brilhante vence Ótimo quando as duas regras valem', () => {
+  it('Brilhante vence o "!" quando as duas regras valem', () => {
     expect(of(GREEK, 'd3h7', cp(450), cp(450), cp(40))).toBe('brilliant')
   })
 
@@ -367,7 +371,7 @@ describe('final', () => {
   })
 
   it('num final de base de finais (±10000 ou mate), o que vale é o resultado', () => {
-    expect(one(cp(9000), mate(20, 'w')).cls).toBe('best')
+    expect(one(cp(9000), mate(20, 'w')).cls).toBe('excellent')
   })
 })
 
