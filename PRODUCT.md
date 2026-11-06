@@ -16,7 +16,7 @@ O Virada analisa as partidas da pessoa com o Stockfish rodando no navegador, cla
 
 ## Positioning
 
-Grátis, sem cadastro e sem servidor: a análise acontece no aparelho e os dados ficam com a pessoa. O centro do produto é achar o ponto de virada de cada partida e transformar o erro da própria pessoa em treino, em português do Brasil.
+Grátis, sem cadastro e sem servidor: a análise acontece no aparelho e os dados ficam com a pessoa. O centro do produto é achar os momentos que decidiram cada partida e transformar o erro da própria pessoa em treino, em português do Brasil.
 
 ## Operating Context
 

@@ -217,14 +217,14 @@ components:
 
 **Creative North Star: "Da Sombra à Placa"**
 
-A partida sai do escuro, casa por casa, até o ponto em que virou, e uma placa amarela entrega a resposta. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.
+Uma jogada famosa sai do escuro, casa por casa, até o lance que decidiu, e uma placa amarela entrega a história. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.
 
 O tema da noite é o padrão, e o do dia só vale quando a pessoa escolhe. É o tema para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.
 
 O carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um professor de boteco e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.
 
 **Key Characteristics:**
-- Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao ponto de virada.
+- Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao lance que decide.
 - Escala de 11 tons, visível como barra de 6px no topo das telas de navegação.
 - Superfícies chapadas: a profundidade vem do tom, quase nunca de sombra.
 - Cantos de 2px e 3px; a placa não tem canto nenhum.
@@ -267,13 +267,13 @@ Cinzas levemente frios mais um amarelo de sinalização; as outras cores só exi
 As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como texto (com contraste próprio por tema). O detalhe de cada selo está em Components.
 
 ### Named Rules
-**A Regra da Placa.** O amarelo é só para ação e ponto de virada. Se não dá para tocar e não marca onde a partida virou, não é amarelo. No tabuleiro, o resto é mudança de tom.
+**A Regra da Placa.** O amarelo é só para ação, para o lance em destaque na Revelação e para a linha discreta do gráfico. Se não dá para tocar e não marca esse lance, não é amarelo. No tabuleiro, o resto é mudança de tom.
 
 **A Regra do Acerto.** A única exceção aceita é o acerto de exercício: a onda e o flash amarelos na casa do lance certo. Ela dura menos de um segundo e some sozinha. O código ainda tem barras de progresso e um aviso de análise em segundo plano em amarelo; eles divergem da regra e não servem de modelo.
 
 **A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Boa e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grave e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
 
-**A Regra do Fundo Fixo.** O símbolo, os retratos dos bots e a tela da Revelação ao fim de uma análise ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.
+**A Regra do Fundo Fixo.** O símbolo e os retratos ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.
 
 ## Typography
 
@@ -283,9 +283,9 @@ As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como tex
 **Caráter:** a condensada pesada anuncia como letreiro de rua; a Figtree, humanista e arredondada, explica como gente. As fontes vêm empacotadas no app e funcionam sem internet.
 
 ### Hierarchy
-- **Número da placa** (800, 6.5rem, altura de linha 0.85, espaçamento -0.05em, algarismos tabulares): o número do lance na placa. Na versão compacta, 3.75rem.
+- **Número da placa** (800, 6.5rem, altura de linha 0.85, espaçamento -0.05em, algarismos tabulares): o número do lance na placa.
 - **Display** (800, 2.25rem, altura de linha 1; 3.75rem na tela larga para visitantes novos e 3rem para quem volta): o título da tela inicial.
-- **Título da placa** (800, 1.75rem, altura de linha 1; 1.5rem na compacta): a frase ao lado do número.
+- **Título da placa** (800, 1.75rem, altura de linha 1): a frase ao lado do número.
 - **Headline** (700, 1.875rem, altura de linha 1.2): título de tela, como "Quem vai sentar do outro lado?".
 - **Title** (700, 1.25rem, altura de linha 1.4; 1.125rem no nome dos bots): títulos de seção e o enunciado dos exercícios.
 - **Logotipo** (800, 1.5rem, espaçamento 0.025em; 1.25rem no cabeçalho da tela larga).
@@ -346,7 +346,7 @@ Um V desenhado em casas de tabuleiro: desce, vira na casa amarela e sobe mais fo
 - **Fundo:** sempre o quadro escuro, nos dois temas. O favicon e os ícones do app usam o mesmo desenho.
 
 ### Barra de tons
-As 11 zonas lado a lado, sem espaço, com 6px de altura. Fica no topo da navegação e da tela da Revelação.
+As 11 zonas lado a lado, sem espaço, com 6px de altura. Fica no topo da navegação.
 
 ### Buttons
 Botões retos e diretos, em que a cor diz qual é a próxima ação.
@@ -400,24 +400,24 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 ### Placa
 A resposta do app. Bloco amarelo sem canto, com o número gigante à esquerda, a frase ao lado e uma nota de 0.875rem em peso 600.
 
-- **Grande:** primeira visita ("17, Entregou a dama e deu mate", com a nota "Morphy, Paris, 1858"), tela final da análise e última partida na tela inicial. Vai de ponta a ponta no celular.
+- **Na tela inicial:** o número do lance, o que aconteceu ("Entregou a dama e deu mate.") e a nota com a partida ("A Partida da Ópera: Morphy x Duque de Brunswick, 1858"). Vai de ponta a ponta no celular.
 - **Compacta:** no resumo da revisão guiada ("Virou aqui", com o lance).
-- **Movimento:** sobe de fora da tela (de 110vh ao lugar) em 550ms. Na última partida da tela inicial e na compacta, já aparece parada.
+- **Movimento:** sobe de fora da tela (de 110vh ao lugar) em 550ms. Ao voltar para o início, já aparece parada.
 
 ### A Revelação
-O movimento próprio do Virada: a partida se acende a partir da casa-chave, 3 lances acontecem, a casa-chave fica amarela, as peças derrubadas saem voando e a placa sobe. Na primeira visita usa a Partida da Ópera, e ao fim de uma análise usa a posição real da partida, em tela cheia sobre zona 0.
+O movimento próprio do Virada: a partida se acende a partir da casa-chave, 3 lances acontecem, a casa-chave fica amarela, as peças derrubadas saem voando e a placa sobe. Só na tela inicial, e só com jogadas famosas: são 120 partidas reais, sorteadas a cada visita, e "Mostra outra" troca a jogada. Depois de analisar uma partida, nada interrompe: a análise abre direto.
 
-- **Quais lances:** o da virada e os dois seguintes. Se a partida acaba em mate até 3 lances depois da virada, mostra os 3 últimos, para terminar no mate. Se a virada ficar antes deles, a casa amarela já começa acesa.
+- **Quais lances:** o lance em destaque e os dois seguintes, ou os 3 últimos quando a partida termina em mate logo depois. Os lances vêm da base PGN Mentor. O destaque é o lance célebre, nos clássicos marcados à mão; nas outras, o último sacrifício do vencedor que o Stockfish aprova ou, sem sacrifício, a resposta ao maior erro de quem perdeu ("O erro saiu caro.").
 
 - **Casas:** acendem em onda a partir da casa-chave, com atraso de 150ms mais 85ms por casa de distância. Em 650ms, a opacidade vai de 0 a 1 e o brilho vai de 0.2 a 1.6 e volta a 1.
 - **Tabuleiro:** assenta de -1.6 graus e 97% para o lugar, em 900ms, a partir de 700ms.
 - **Peças:** surgem em 280ms, 200ms depois da própria casa.
 - **Lances:** começam em 1250ms, com 400ms cada (300ms o último) e pausa de 300ms entre eles. A peça cresce até 120% no caminho.
 - **Voo:** quando a outra peça chega, a capturada sai em arco por 1000ms, girando duas voltas, para o lado mais perto da borda: sobe quase 2 casas, anda 8 e cresce até 150%. Se o último lance é mate, o rei voa igual, no impacto. O arco evita que a peça suma logo, já que o tabuleiro da tela inicial fica no topo da página. A página recorta a largura em `#root`, porque no celular a peça encolheria a tela inteira.
-- **Impacto:** a casa amarela acende em 160ms quando o lance da virada está chegando, e a onda amarela (borda de 4px, de 100% a 450%, em 750ms) sai dela nesse instante. A origem e o rei em mate aparecem no começo do último lance. Quando ele termina, o tabuleiro desce 5px e volta, em 320ms.
+- **Impacto:** a casa amarela acende em 160ms quando o lance em destaque está chegando, e a onda amarela (borda de 4px, de 100% a 450%, em 750ms) sai dela nesse instante. A origem e o rei em mate aparecem no começo do último lance. Quando ele termina, o tabuleiro desce 5px e volta, em 320ms.
 - **Placa:** sobe 500ms depois do impacto, com a peça ainda no ar (3450ms com 3 lances).
-- **Pular:** um toque encerra tudo. Na tela inicial, as animações vão direto ao fim. Na tela final, o toque abre a análise, que também abre sozinha 5 segundos depois de a placa subir.
-- **Menos movimento:** nenhuma animação roda. O tabuleiro já mostra a posição final com as marcas e o rei em mate parado na casa vermelha, a placa aparece no lugar e a tela final fica 5 segundos. O estado de repouso é sempre o certo.
+- **Pular:** um toque encerra tudo. Na tela inicial, as animações vão direto ao fim.
+- **Menos movimento:** nenhuma animação roda. O tabuleiro já mostra a posição final com as marcas e o rei em mate parado na casa vermelha e a placa aparece no lugar. O estado de repouso é sempre o certo.
 
 ### O acerto de exercício
 Quando a pessoa acha o lance, sai uma onda amarela da casa dele. É decorativa, escondida de leitores de tela e some sozinha.
@@ -436,7 +436,7 @@ Seu Nonato, um velho de boteco que joga xadrez no bar há décadas: direto, com 
 
 - **Quem fala o quê:** a abertura da fala e a lição são dele. O que aconteceu na posição continua vindo do Stockfish, sem floreio. A lição é geral, nunca cita lance da posição, para não estragar o "Tentar de novo".
 - **Boteco sem exagero:** balcão, conta, mesa, dono do bar. Sem bebedeira e sem xingar.
-- **Retrato:** 12 por 12 casas, careca, bigode branco e palito na boca, com quatro caras: neutra, feliz, brava e espantada. Fica ao lado do cartão, que vira balão de fala, com 44px no celular e 64px com o nome na tela larga.
+- **Retrato:** 12 por 12 casas, careca, bigode branco e palito na boca, com quatro caras: neutra, feliz, brava e espantada. Quando tem coisa nova para dizer, ele fala: a boca abre e fecha a cada 120ms, a cabeça acompanha e o corpo fica parado. Pisca a cada 3,6 segundos. Com menos movimento, fica parado. Fica ao lado do cartão, que vira balão de fala, com 44px no celular e 64px com o nome na tela larga.
 
 - **Frases curtas, falando com "você":** "Não é esse. Olha de novo.", "Achou! ... era o caminho.", "Esse volta logo, para fixar."
 - **Coloquial sem exagero:** "Ô, chefia, calma. Tem lance bem melhor aqui.", "Deixa eu ver esse lance…", "Olha o garfo: ...", "Xeque-mate. Fim de papo: ...", "Teoria pura: esse lance está nos livros."
@@ -470,7 +470,7 @@ A tela inicial termina com "Feito com carinho no Brasil" em Barlow Condensed 700
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use o amarelo #ffd100 em botões principais, no traço da seção atual, em interruptores ligados e em tudo que marca o ponto de virada, sempre com texto #0b0b0d.
+- **Do** use o amarelo #ffd100 em botões principais, no traço da seção atual, e em interruptores ligados, sempre com texto #0b0b0d.
 - **Do** mostre seleção invertendo texto e fundo.
 - **Do** mantenha cantos em 3px nos controles e cartões, 2px no tabuleiro e nos retratos, e 0 na placa.
 - **Do** separe planos com tom e borda de 1px.
@@ -478,14 +478,15 @@ A tela inicial termina com "Feito com carinho no Brasil" em Barlow Condensed 700
 - **Do** desenhe novos ícones em SVG e novos retratos na mesma grade de 8 por 8 casas, com os quatro tons da escala.
 - **Do** faça toda animação nova terminar no estado de repouso certo e respeitar a preferência por menos movimento, sem perder informação.
 - **Do** escreva como o Seu Nonato: curto, direto, com "você" e "chefia".
-- **Do** deixe o símbolo, os retratos e a Revelação sobre tons escuros fixos nos dois temas.
+- **Do** deixe o símbolo e os retratos sobre tons escuros fixos nos dois temas.
 
 ### Don't:
-- **Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do ponto de virada e do acerto de exercício.
+- **Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do lance em destaque na Revelação e do acerto de exercício.
 - **Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.
 - **Don't** dê cor forte a Melhor ou Boa.
 - **Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.
 - **Don't** arredonde a placa.
 - **Don't** use Barlow Condensed em parágrafos.
 - **Don't** interrompa uma tarefa com personalidade: bordões ficam na escolha de bots, e a Revelação sempre pode ser pulada com um toque.
-- **Don't** transforme a Revelação em animação de tela comum: ela é o momento do ponto de virada.
+- **Don't** transforme a Revelação em animação de tela comum, nem a repita em cada partida: ela é só a abertura do app.
+- **Don't** fale do ponto de virada nas partidas da pessoa: ele fica só como a linha discreta do gráfico.

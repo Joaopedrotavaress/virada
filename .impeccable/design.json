@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-05T22:58:57.655Z",
+  "generatedAt": "2026-11-06T00:06:07.546Z",
   "title": "Design System: Virada",
   "extensions": {
     "colorMeta": {
@@ -1316,9 +1316,9 @@
   ],
   "narrative": {
     "northStar": "Da Sombra à Placa",
-    "overview": "A partida sai do escuro, casa por casa, até o ponto em que virou, e uma placa amarela entrega a resposta. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.\n\nO tema da noite é o padrão, e o do dia só vale quando a pessoa escolhe. É o tema para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.\n\nO carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um treinador que fala como amigo de clube e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.",
+    "overview": "Uma jogada famosa sai do escuro, casa por casa, até o lance que decidiu, e uma placa amarela entrega a história. Todo o sistema serve a esse gesto: um fundo quase preto, uma escala de 11 tons que parece uma exposição de foto, um tabuleiro cinza neutro e um único amarelo chapado. O Virada recusa o painel escuro com verde que a categoria sempre usa. Quem chega depois de perder enxerga primeiro um tabuleiro e um número, e não um painel de métricas.\n\nO tema da noite é o padrão, e o do dia só vale quando a pessoa escolhe. É o tema para o qual o Virada foi desenhado, porque o uso principal é no celular, logo depois de jogar. O tema do dia troca só as superfícies e os textos: a escala de tons, o amarelo, o tabuleiro e os selos são os mesmos nos dois. O tema segue a preferência do aparelho e não há seletor dentro do app.\n\nO carinho aparece nos detalhes, não em enfeite: retratos desenhados à mão em casas de tabuleiro, bordões, um professor de boteco e o rodapé assinado. Títulos em letra condensada e pesada, cantos quase retos e nenhum gradiente dão o tom de placa de rua. Tudo que é tarefa continua calmo: no meio de um exercício, a personalidade não atrapalha.",
     "keyCharacteristics": [
-      "Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao ponto de virada.",
+      "Um só amarelo chapado (#ffd100), reservado ao que dá para tocar e ao lance que decide.",
       "Escala de 11 tons, visível como barra de 6px no topo das telas de navegação.",
       "Superfícies chapadas: a profundidade vem do tom, quase nunca de sombra.",
       "Cantos de 2px e 3px; a placa não tem canto nenhum.",
@@ -1329,7 +1329,7 @@
     "rules": [
       {
         "name": "A Regra da Placa",
-        "body": "O amarelo é só para ação e ponto de virada. Se não dá para tocar e não marca onde a partida virou, não é amarelo. No tabuleiro, o resto é mudança de tom.",
+        "body": "O amarelo é só para ação, para o lance em destaque na Revelação e para a linha discreta do gráfico. Se não dá para tocar e não marca esse lance, não é amarelo. No tabuleiro, o resto é mudança de tom.",
         "section": "colors"
       },
       {
@@ -1344,7 +1344,7 @@
       },
       {
         "name": "A Regra do Fundo Fixo",
-        "body": "O símbolo, os retratos dos bots e a tela da Revelação ao fim de uma análise ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.",
+        "body": "O símbolo e os retratos ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.",
         "section": "colors"
       },
       {
@@ -1369,25 +1369,26 @@
       }
     ],
     "dos": [
-      "**Do** use o amarelo #ffd100 em botões principais, no traço da seção atual, em interruptores ligados e em tudo que marca o ponto de virada, sempre com texto #0b0b0d.",
+      "**Do** use o amarelo #ffd100 em botões principais, no traço da seção atual, e em interruptores ligados, sempre com texto #0b0b0d.",
       "**Do** mostre seleção invertendo texto e fundo.",
       "**Do** mantenha cantos em 3px nos controles e cartões, 2px no tabuleiro e nos retratos, e 0 na placa.",
       "**Do** separe planos com tom e borda de 1px.",
       "**Do** coloque símbolo junto de toda cor de classificação.",
       "**Do** desenhe novos ícones em SVG e novos retratos na mesma grade de 8 por 8 casas, com os quatro tons da escala.",
       "**Do** faça toda animação nova terminar no estado de repouso certo e respeitar a preferência por menos movimento, sem perder informação.",
-      "**Do** escreva como amigo de clube: curto, direto, com \"você\".",
-      "**Do** deixe o símbolo, os retratos e a Revelação sobre tons escuros fixos nos dois temas."
+      "**Do** escreva como o Seu Nonato: curto, direto, com \"você\" e \"chefia\".",
+      "**Do** deixe o símbolo e os retratos sobre tons escuros fixos nos dois temas."
     ],
     "donts": [
-      "**Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do ponto de virada e do acerto de exercício.",
+      "**Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do lance em destaque na Revelação e do acerto de exercício.",
       "**Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.",
       "**Don't** dê cor forte a Melhor ou Boa.",
       "**Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.",
       "**Don't** arredonde a placa.",
       "**Don't** use Barlow Condensed em parágrafos.",
       "**Don't** interrompa uma tarefa com personalidade: bordões ficam na escolha de bots, e a Revelação sempre pode ser pulada com um toque.",
-      "**Don't** transforme a Revelação em animação de tela comum: ela é o momento do ponto de virada."
+      "**Don't** transforme a Revelação em animação de tela comum, nem a repita em cada partida: ela é só a abertura do app.",
+      "**Don't** fale do ponto de virada nas partidas da pessoa: ele fica só como a linha discreta do gráfico."
     ]
   }
 }

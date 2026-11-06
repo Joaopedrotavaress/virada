@@ -12,7 +12,7 @@ Sem cadastro. Sem assinatura. Sem servidor. Seus dados ficam com você.
 
 **[Abrir o Virada](https://virada-kappa.vercel.app)**
 
-<img src="docs/revelacao.gif" width="300" alt="Animação: o tabuleiro surge da sombra, Morphy entrega a dama em b8, dá mate com a torre em d8, o rei sai voando, e uma placa amarela sobe com o número 17">
+<img src="docs/revelacao.gif" width="300" alt="Animação: o tabuleiro surge da sombra, Morphy entrega a dama em b8, dá mate com a torre em d8, o rei sai voando, e uma placa amarela sobe com o número 16">
 
 </div>
 
@@ -26,7 +26,8 @@ O Virada acha esse lance, explica em português o que aconteceu, com a voz do Se
 
 | | |
 |---|---|
-| **Acha a virada** | Classifica cada lance, marca o ponto em que a partida mudou de lado e mostra isso com uma animação na sua própria posição. |
+| **Acha a virada** | Classifica cada lance e, na revisão guiada, para nos momentos que decidiram a partida. |
+| **Abre com história** | A tela inicial mostra uma de 120 jogadas de partidas reais, da Imortal de 1851 aos dias de hoje, com o Seu Nonato comentando. Os lances vêm da base [PGN Mentor](https://www.pgnmentor.com). |
 | **Festeja o brilhante** | Quando você entrega material e a conta fecha, o lance vira Brilhante. A regra confere o sacrifício de verdade, então ele é raro. |
 | **Explica de verdade** | Peça sem defesa, garfo, cravada, mate perdido: o erro é explicado em português, com as linhas do Stockfish. |
 | **Revisão guiada** | Passa pela partida sozinho, em quatro velocidades, e para nos momentos decisivos. |
@@ -40,14 +41,14 @@ O Virada acha esse lance, explica em português o que aconteceu, com a voz do Se
 ## Telas
 
 <div align="center">
-<img src="docs/telas/inicio.png" width="200" alt="Tela inicial com a placa amarela mostrando o lance em que a última partida virou">
+<img src="docs/telas/inicio.png" width="200" alt="Tela inicial com uma jogada famosa, a placa amarela e o Seu Nonato comentando">
 <img src="docs/telas/analise.png" width="200" alt="Análise de uma partida com tabuleiro, barra de avaliação e comentários do treinador">
 <img src="docs/telas/bots.png" width="200" alt="Lista de bots com nome, frase e avatar de cada personagem">
 <img src="docs/telas/exercicio.png" width="200" alt="Exercício a partir de um erro de partida">
 </div>
 
 <div align="center">
-<img src="docs/telas/computador.png" width="820" alt="Análise de uma partida no computador, com tabuleiro, comentários, gráfico com o ponto de virada em amarelo e resumo">
+<img src="docs/telas/computador.png" width="820" alt="Análise de uma partida no computador, com tabuleiro, comentários, gráfico da partida e resumo">
 </div>
 
 ## Como rodar
