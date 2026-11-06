@@ -15,6 +15,7 @@ export type Route =
   | { name: 'opening'; slug: string }
   | { name: 'family'; id: string }
   | { name: 'practice'; slug: string; line: number }
+  | { name: 'learn' }
   | { name: 'lesson'; id: string }
   | { name: 'my-openings' }
   | { name: 'data' }
@@ -47,6 +48,8 @@ export function parseRoute(hash: string): Route {
       if (second === 'licao' && third) return { name: 'lesson', id: third }
       if (second === 'minhas') return { name: 'my-openings' }
       return { name: 'guide' }
+    case 'aprender':
+      return second === 'aula' && third ? { name: 'lesson', id: third } : { name: 'learn' }
     case 'dados':
       return { name: 'data' }
     default:

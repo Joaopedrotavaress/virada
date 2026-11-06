@@ -13,9 +13,8 @@ import { goBack, navigate } from '../route'
 import { type TrainingCard, lineCard, loadCards, saveCards } from '../training/cards'
 import { useLine } from '../training/useLine'
 import { FAMILY_GROUPS, type OpeningFamily, filterFamilies, filterGuides, loadFamilies } from './catalog'
-import { LESSONS, LESSON_GROUPS } from './lessons'
 import { OPENING_GUIDES, guideBySlug, splitSans } from './openings'
-import { LESSONS_KEY, REPERTOIRE_KEY, type Repertoire, progressOf, recordLineDone, toggleRepertoire, usageByGuide, usageSentence } from './repertoire'
+import { REPERTOIRE_KEY, type Repertoire, progressOf, recordLineDone, toggleRepertoire, usageByGuide, usageSentence } from './repertoire'
 import { GROUP_LABEL, type GuideGroup, type OpeningGuide } from './types'
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -96,7 +95,6 @@ export function GuideHome({ username }: { username: string }) {
   const [query, setQuery] = useState('')
   const [kind, setKind] = useState<'all' | 'gambits' | 'systems' | 'guide'>('all')
   const [repertoire] = useKv<Repertoire>(REPERTOIRE_KEY, {})
-  const [lessonsDone] = useKv<string[]>(LESSONS_KEY, [])
   const records = recordsFor(useAllRecords(), username)
   const usage = useMemo(() => usageByGuide(records).slice(0, 3), [records])
 
@@ -254,23 +252,12 @@ export function GuideHome({ username }: { username: string }) {
             </section>
           ))}
 
-          <section className="mt-8">
-            <h2 className="font-display text-2xl font-semibold">Lições</h2>
-            {LESSON_GROUPS.map((group) => (
-              <div key={group.id} className="mt-3">
-                <h3 className="font-display text-lg font-semibold">{group.title}</h3>
-                <ul className="mt-1 divide-y divide-line overflow-hidden rounded-md bg-surface">
-                  {LESSONS.filter((lesson) => lesson.group === group.id).map((lesson) => (
-                    <li key={lesson.id}>
-                      <button type="button" onClick={() => navigate(`#/guia/licao/${lesson.id}`)} className="flex min-h-12 w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-sunken">
-                        <span className="min-w-0 font-semibold">{lesson.title}</span>
-                        {lessonsDone.includes(lesson.id) && <span className="shrink-0 text-sm font-semibold text-(--positive)">Feita</span>}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <section className="mt-8 rounded-md bg-surface p-4">
+            <h2 className="font-display text-xl font-semibold">Mates, táticas e finais</h2>
+            <p className="mt-1 max-w-prose text-muted">Agora ficam no caminho de aulas, em ordem e no tabuleiro.</p>
+            <button type="button" onClick={() => navigate('#/aprender')} className="mt-3 min-h-12 rounded-md border border-line px-5 font-semibold hover:bg-sunken">
+              Abrir o caminho
+            </button>
           </section>
         </>
       )}

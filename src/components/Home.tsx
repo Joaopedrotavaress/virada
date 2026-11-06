@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { formatOpening } from '../chess/book'
 import { FAMOUS_MOMENTS, momentLine, pickMoment } from '../chess/famous'
 import { BOTS } from '../bots/bots'
@@ -13,6 +13,8 @@ import { Professor } from './Professor'
 import { Placa, RevelationBoard, placaDelay } from './Revelation'
 import { TodayCard } from './TodayCard'
 import { viewRecord } from './Games'
+
+const NextLessonCard = lazy(() => import('../learn/RoadmapScreen').then((module) => ({ default: module.NextLessonCard })))
 
 const DEPTHS = [
   { value: 12, label: 'Rápida', hint: 'Boa para uma olhada. Pode deixar passar táticas longas.' },
@@ -360,6 +362,9 @@ export function Home(props: HomeProps) {
           </div>
 
           <TodayCard />
+          <Suspense fallback={null}>
+            <NextLessonCard compact />
+          </Suspense>
 
           <section className="mt-6">
             <h2 className="font-display text-2xl font-bold">Partidas recentes</h2>

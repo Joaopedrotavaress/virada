@@ -17,6 +17,8 @@ describe('endereços do app', () => {
     expect(parseRoute('#/guia/abertura/italiana')).toEqual({ name: 'opening', slug: 'italiana' })
     expect(parseRoute('#/guia/praticar/italiana/2')).toEqual({ name: 'practice', slug: 'italiana', line: 2 })
     expect(parseRoute('#/guia/licao/garfo')).toEqual({ name: 'lesson', id: 'garfo' })
+    expect(parseRoute('#/aprender')).toEqual({ name: 'learn' })
+    expect(parseRoute('#/aprender/aula/garfo')).toEqual({ name: 'lesson', id: 'garfo' })
   })
 
   it('endereço desconhecido ou incompleto cai numa tela válida', () => {

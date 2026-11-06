@@ -8,7 +8,7 @@ const ITEMS: { path: string; label: string; icon: string; active: Route['name'][
   { path: '#/', label: 'Início', icon: 'M12 3 2 12h3v8h5v-6h4v6h5v-8h3z', active: ['home', 'data'] },
   { path: '#/partidas', label: 'Partidas', icon: 'M4 5h16v2H4zm0 6h16v2H4zm0 6h16v2H4z', active: ['games'] },
   { path: '#/treino', label: 'Treino', icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12m0 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6', active: ['training', 'puzzles', 'session'] },
-  { path: '#/guia', label: 'Guia', icon: 'M6 2h13v20H6a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3m0 15a1 1 0 0 0 0 4h11v-4zm2-11v2h8V6zm0 4v2h6v-2z', active: ['guide', 'opening', 'family', 'lesson', 'my-openings', 'practice'] },
+  { path: '#/aprender', label: 'Aprender', icon: 'M6 2h13v20H6a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3m0 15a1 1 0 0 0 0 4h11v-4zm2-11v2h8V6zm0 4v2h6v-2z', active: ['learn', 'guide', 'opening', 'family', 'lesson', 'my-openings', 'practice'] },
   { path: '#/progresso', label: 'Progresso', icon: 'M4 20V10h3v10zm6.5 0V4h3v16zM17 20v-7h3v7z', active: ['progress'] },
 ]
 

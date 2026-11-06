@@ -23,6 +23,7 @@ import { type ActiveGame, clearActiveGame, loadActiveGame, loadDepth, loadUserna
 // O que tem gráfico fica fora do pacote inicial: a tela de abertura carrega bem mais rápido.
 const AnalysisView = lazy(() => import('./components/AnalysisView').then((module) => ({ default: module.AnalysisView })))
 const Progress = lazy(() => import('./components/Progress').then((module) => ({ default: module.Progress })))
+const Roadmap = lazy(() => import('./learn/RoadmapScreen').then((module) => ({ default: module.Roadmap })))
 const GuideHome = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.GuideHome })))
 const OpeningPage = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.OpeningPage })))
 const FamilyPage = lazy(() => import('./guide/GuideScreens').then((module) => ({ default: module.FamilyPage })))
@@ -366,6 +367,12 @@ export default function App() {
     content = <Games username={username} onUsernameChange={setUsername} onOpen={openRecord} />
   } else if (route.name === 'data') {
     content = <DataScreen username={username} />
+  } else if (route.name === 'learn') {
+    content = (
+      <Suspense fallback={loading}>
+        <Roadmap />
+      </Suspense>
+    )
   } else if (route.name === 'guide') {
     content = (
       <Suspense fallback={loading}>
