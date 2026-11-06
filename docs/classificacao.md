@@ -179,6 +179,19 @@ Da 15 para a 22, 26 dos 97 lances mudaram de classe, quase sempre para uma class
 
 A fila em segundo plano e as 3 melhores linhas param na profundidade 18, para não ficarem lentas demais.
 
+### A precisão
+
+A API pública do Chess.com informa a precisão oficial das partidas revisadas. Coletei 160 partidas (320 lados), analisei com o Stockfish 19 completo em profundidade 14 e ajustei a fórmula em metade dos lados. Os números abaixo são da outra metade:
+
+| | Erro médio | Até 3 pontos | Até 5 pontos |
+|---|---:|---:|---:|
+| Fórmula antiga (Lichess) | 11,2 pontos | 10% | 21% |
+| Fórmula ajustada | 4,5 pontos | 46% | 71% |
+
+O resultado por rating: até 600, erro de 6,2; 1000 a 1400, 5,4; 1400 a 1800, 4,0; 1800 ou mais, 2,4.
+
+**Limites.** Só entram partidas que alguém revisou, e quase nenhuma tinha rating entre 600 e 1000. É uma aproximação do resultado: a fórmula CAPS do Chess.com continua fechada. A precisão nos diz pouco sobre as classes: a API não informa o rótulo de cada lance.
+
 ## O que este teste não prova
 
 **A fidelidade ao Chess.com não foi medida lance a lance.** Eles não têm uma base pública com os rótulos da revisão, então não há como calcular a porcentagem de acerto. Para medir, é preciso comparar mais partidas com a revisão do Chess.com, lado a lado.
@@ -188,7 +201,7 @@ Outras diferenças que continuam existindo:
 - O motor e a profundidade são outros. No celular, o Stockfish roda bem mais raso que num servidor.
 - O "!" só é calculado na análise completa. No jogo contra bots e nos lances testados na revisão, não há segunda linha.
 - A base de aberturas é outra, então o ponto em que o Livro acaba pode mudar.
-- A precisão continua na fórmula pública do Lichess, não na CAPS do Chess.com.
+- A precisão é uma aproximação ajustada, não a CAPS do Chess.com.
 
 ## Partidas antigas
 

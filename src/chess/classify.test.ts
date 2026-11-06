@@ -42,8 +42,8 @@ describe('avaliação', () => {
 describe('classificação', () => {
   it('calcula a precisão do lance dentro de 0 a 100', () => {
     expect(moveAccuracy(0)).toBeCloseTo(100, 2)
-    expect(moveAccuracy(10)).toBeCloseTo(103.1668 * Math.exp(-0.4354) - 3.1669)
-    expect(moveAccuracy(100)).toBe(0)
+    expect(moveAccuracy(10)).toBeCloseTo(94 * Math.exp(-0.85) + 6)
+    expect(moveAccuracy(100)).toBeCloseTo(6, 0)
   })
 
   const pos = (value: Eval, bestUci: string | null = 'x') => ({ eval: value, bestUci })
@@ -108,11 +108,11 @@ describe('classificação', () => {
       { color: 'w', accuracy: 50, cls: 'blunder', loss: 0, winAfter: 0, winBefore: 0 },
       { color: 'b', accuracy: 70, cls: 'good', loss: 0, winAfter: 0, winBefore: 0 },
     ])
-    expect(summary.w.accuracy).toBe(75)
+    expect(summary.w.accuracy).toBeCloseTo(0.7 * 75 + 0.3 * (2 / (1 / 100 + 1 / 50)))
     expect(summary.w.counts.best).toBe(1)
     expect(summary.w.counts.blunder).toBe(1)
     expect(summary.w.counts.miss).toBe(0)
-    expect(summary.b.accuracy).toBe(70)
+    expect(summary.b.accuracy).toBeCloseTo(70)
   })
 })
 

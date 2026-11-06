@@ -36,7 +36,7 @@ export const isTopClass = (cls: MoveClass) => cls === 'best' || isSpecialClass(c
  * Sobe sempre que as regras mudam: a análise guardada com outra versão é reclassificada ao abrir,
  * com as avaliações que já tem, sem chamar o motor de novo.
  */
-export const CLASS_VERSION = 3
+export const CLASS_VERSION = 4
 
 export interface PositionEval {
   eval: Eval
@@ -55,8 +55,25 @@ export interface ClassifiedMove {
   pointsLost?: number
 }
 
+/**
+ * A precisão foi ajustada à oficial do Chess.com em 160 partidas públicas revisadas (docs/classificacao.md).
+ * A CAPS deles é fechada: isto aproxima o resultado, não reproduz o cálculo.
+ */
+const ACCURACY_FLOOR = 6
+const ACCURACY_DECAY = 0.085
+const ACCURACY_MEAN_WEIGHT = 0.7
+const HARMONIC_MIN = 5
+
 export function moveAccuracy(loss: number): number {
-  return Math.min(100, Math.max(0, 103.1668 * Math.exp(-0.04354 * loss) - 3.1669))
+  return Math.min(100, Math.max(0, (100 - ACCURACY_FLOOR) * Math.exp(-ACCURACY_DECAY * loss) + ACCURACY_FLOOR))
+}
+
+/** Média comum misturada com a harmônica: um erro grande pesa mais do que numa média simples, como lá. */
+export function gameAccuracy(accuracies: number[]): number | null {
+  if (accuracies.length === 0) return null
+  const mean = accuracies.reduce((sum, value) => sum + value, 0) / accuracies.length
+  const harmonic = accuracies.length / accuracies.reduce((sum, value) => sum + 1 / Math.max(value, HARMONIC_MIN), 0)
+  return ACCURACY_MEAN_WEIGHT * mean + (1 - ACCURACY_MEAN_WEIGHT) * harmonic
 }
 
 /** A tabela pública do Chess.com, em pontos esperados perdidos. Melhor é só o primeiro lance do motor, sem faixa de perda. */
@@ -280,7 +297,7 @@ export function summarize(moves: (ClassifiedMove & { color: Color })[]): Record<
     const counts = Object.fromEntries(MOVE_CLASSES.map((cls) => [cls, 0])) as Record<MoveClass, number>
     for (const move of own) counts[move.cls] += 1
     const judged = own.filter((move) => move.cls !== 'book')
-    const accuracy = judged.length ? judged.reduce((sum, move) => sum + move.accuracy, 0) / judged.length : null
+    const accuracy = gameAccuracy(judged.map((move) => move.accuracy))
     return { accuracy, counts }
   }
   return { w: side('w'), b: side('b') }
