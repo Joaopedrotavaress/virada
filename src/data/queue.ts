@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { analyzeGame } from '../chess/analyze'
 import { parsePgn } from '../chess/pgn'
 import { type EngineLike, EngineAbortError, createBrowserEngine } from '../engine/stockfish'
-import { loadDepth } from '../storage'
+import { backgroundDepth, loadDepth } from '../storage'
 import { type GameRecord, allRecords, saveAnalyzed, updateRecords } from './library'
 import { createBackendEngine, hasBackendEngine } from './localBackend'
 
@@ -32,7 +32,7 @@ export function createAnalysisQueue(deps: QueueDeps = {}) {
       const engine = hasBackendEngine() ? createBackendEngine() : createBrowserEngine()
       return Object.assign(engine, { dispose: () => engine.terminate() })
     })
-  const depthOf = deps.depth ?? loadDepth
+  const depthOf = deps.depth ?? (() => backgroundDepth(loadDepth()))
   let state: QueueState = { running: false, held: false, done: 0, remaining: 0, current: null, error: null }
   let controller: AbortController | null = null
   let stopping = false

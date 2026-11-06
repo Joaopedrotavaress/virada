@@ -75,9 +75,16 @@ export const saveMonthsLoaded = (user: string, months: number) => void write(`tr
 export const loadUsername = () => read(USER_KEY) ?? ''
 export const saveUsername = (username: string) => void write(USER_KEY, username)
 
+/** As profundidades que a pessoa pode escolher. */
+export const ANALYSIS_DEPTHS = [12, 15, 18, 20, 22]
+
+/** O que roda sem a pessoa olhar não passa daqui: a fila e as 3 melhores linhas ficariam lentas demais. */
+export const MAX_BACKGROUND_DEPTH = 18
+export const backgroundDepth = (depth: number) => Math.min(depth, MAX_BACKGROUND_DEPTH)
+
 export function loadDepth(): number {
   const depth = Number(read(DEPTH_KEY))
-  return [12, 15, 18].includes(depth) ? depth : 15
+  return ANALYSIS_DEPTHS.includes(depth) ? depth : 15
 }
 export const saveDepth = (depth: number) => void write(DEPTH_KEY, String(depth))
 

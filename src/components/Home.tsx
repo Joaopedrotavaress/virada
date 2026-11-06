@@ -20,6 +20,8 @@ const DEPTHS = [
   { value: 12, label: 'Rápida', hint: 'Boa para uma olhada. Pode deixar passar táticas longas.' },
   { value: 15, label: 'Normal', hint: 'O equilíbrio para a maioria das partidas.' },
   { value: 18, label: 'Profunda', hint: 'Mais lenta e mais confiável nas táticas.' },
+  { value: 20, label: 'Extra', hint: 'Alguns minutos por partida no computador, e bem mais no celular.' },
+  { value: 22, label: 'Máxima', hint: 'Bem lenta: uns 5 minutos ou mais por partida no computador. No celular, deixe na tomada.' },
 ]
 
 const RECENT_LIMIT = 6
@@ -125,7 +127,7 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
 
       <fieldset className="mt-6">
         <legend className="mb-1.5 text-sm font-semibold">Profundidade</legend>
-        <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line">
+        <div className="grid grid-cols-5 gap-px overflow-hidden rounded-md border border-line bg-line">
           {DEPTHS.map((option) => (
             <label
               key={option.value}
@@ -134,7 +136,7 @@ function PgnForm({ pgn, depth, error, onPgnChange, onDepthChange, onAnalyze, onS
               }`}
             >
               <input type="radio" name="profundidade" value={option.value} checked={depth === option.value} onChange={() => onDepthChange(option.value)} className="sr-only" />
-              <span className="text-sm font-semibold">{option.label}</span>
+              <span className="text-xs font-semibold sm:text-sm">{option.label}</span>
               <span className="tabular text-xs opacity-80">{option.value}</span>
             </label>
           ))}

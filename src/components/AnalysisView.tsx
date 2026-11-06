@@ -13,6 +13,7 @@ import { REVIEW_SPEEDS, findKeyMoments, gameInsights } from '../chess/review'
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
 import { isErrorClass, isTopClass } from '../chess/classify'
+import { backgroundDepth } from '../storage'
 import { type Mood, moodOf, speechOf } from '../chess/professor'
 import { CapturedPieces } from './CapturedPieces'
 import { ClockChart } from './ClockChart'
@@ -138,7 +139,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom, 
 
   // "Mostrar melhor" vale só para o lance atual: o próximo erro não deve vir com a resposta aberta.
   const [revealed, setRevealed] = useState(false)
-  const bestLines = useBestLines(revealed ? (before ?? position).fen : null, analysis.depth)
+  const bestLines = useBestLines(revealed ? (before ?? position).fen : null, backgroundDepth(analysis.depth))
   // A busca com 3 linhas pode discordar da análise. Mostrando as linhas, a primeira manda,
   // a não ser que o lance jogado já tenha sido o melhor: aí ele continua no topo.
   const storedBest = (before ?? position).bestUci
