@@ -1,6 +1,6 @@
 import { type CSSProperties, useEffect, useRef } from 'react'
 import { type Arrow, Chessboard } from 'react-chessboard'
-import type { MoveClass } from '../chess/classify'
+import { type MoveClass, isSpecialClass } from '../chess/classify'
 import { ClassBadge } from './ClassBadge'
 
 // A biblioteca do tabuleiro usa a cor no identificador da seta: aqui precisa ser um valor literal.
@@ -63,7 +63,7 @@ export function Board({ fen, orientation, arrows = [], squareStyles = {}, badge,
                 <ClassBadge cls={badge.cls} className="pointer-events-none absolute top-[1%] right-[1%] z-10 w-[42%]" />
               )}
               {/* O lance brilhante merece festa: uma onda na cor dele sai da casa, cada vez que se chega nela. */}
-              {badge?.square === square && badge.cls === 'brilliant' && <span key={fen} aria-hidden="true" className="acerto-onda" style={{ inset: 0, width: '100%', height: '100%', '--onda': 'var(--fill-brilliant)' } as CSSProperties} />}
+              {badge?.square === square && isSpecialClass(badge.cls) && <span key={fen} aria-hidden="true" className="acerto-onda" style={{ inset: 0, width: '100%', height: '100%', '--onda': `var(--fill-${badge.cls})` } as CSSProperties} />}
             </div>
           ),
         }}

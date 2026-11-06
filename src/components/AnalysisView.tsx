@@ -12,7 +12,7 @@ import { formatDate, formatTimeControl } from '../chess/pgn'
 import { REVIEW_SPEEDS, findKeyMoments, gameInsights } from '../chess/review'
 import { useTablebase } from '../chess/tablebase'
 import { BEST_ARROW_COLOR, Board } from './Board'
-import { isErrorClass } from '../chess/classify'
+import { isErrorClass, isTopClass } from '../chess/classify'
 import { type Mood, moodOf, speechOf } from '../chess/professor'
 import { CapturedPieces } from './CapturedPieces'
 import { ClockChart } from './ClockChart'
@@ -140,7 +140,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
   // A busca com 3 linhas pode discordar da análise. Mostrando as linhas, a primeira manda,
   // a não ser que o lance jogado já tenha sido o melhor: aí ele continua no topo.
   const storedBest = (before ?? position).bestUci
-  const shownBest = move?.cls === 'best' || move?.cls === 'brilliant' ? storedBest : (bestLines.lines?.[0]?.pvUci[0] ?? storedBest)
+  const shownBest = move && isTopClass(move.cls) ? storedBest : (bestLines.lines?.[0]?.pvUci[0] ?? storedBest)
 
   const { retry, start: startRetry, exit: exitRetry, again: retryAgain, reveal: retryReveal, play: retryPlay } = useRetry(positions)
   const { variant, current: variantStep, baseFen, liveEval, error: variantError, play: variantPlay, playAfter: variantPlayAfter, select: variantSelect, walk: variantWalk, exit: exitVariant } = useVariant(positions)
@@ -337,7 +337,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom }
       return {
         fen,
         squareStyles: withSelection(fen, squareStyles),
-        arrows: step?.cls && step.cls !== 'best' && step.cls !== 'brilliant' ? arrowOf(step.before?.bestUci) : [],
+        arrows: step?.cls && !isTopClass(step.cls) ? arrowOf(step.before?.bestUci) : [],
         badge: step?.cls ? { square: step.to, cls: step.cls } : null,
         animateArrow: false,
       }

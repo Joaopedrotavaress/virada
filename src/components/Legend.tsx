@@ -6,15 +6,16 @@ import { CLASS_INFO } from '../chess/classify'
 import { ClassBadge } from './ClassBadge'
 
 const MEANINGS: { cls: MoveClass; text: string }[] = [
-  { cls: 'brilliant', text: 'O raro: entrega material de verdade, é o melhor lance ou quase, e a posição continua boa.' },
+  { cls: 'brilliant', text: 'O raro: um bom sacrifício de peça. É o melhor lance ou quase, a posição continua boa e a partida não estava ganha de qualquer jeito.' },
+  { cls: 'great', text: 'O lance que decide: de perdido para igual, de igual para ganho, ou o único bom da posição.' },
   { cls: 'book', text: 'Lance conhecido da teoria de aberturas. Não conta para a precisão nem para os erros.' },
   { cls: 'best', text: 'O melhor lance da posição, segundo o Stockfish.' },
-  { cls: 'excellent', text: 'Quase igual ao melhor: perde menos de 2% de chance de vitória.' },
-  { cls: 'good', text: 'Um lance razoável: perde de 2% a 5% de chance de vitória.' },
-  { cls: 'inaccuracy', text: 'Havia coisa melhor: perde de 5% a 10% de chance de vitória.' },
-  { cls: 'mistake', text: 'Um erro de verdade: perde de 10% a 20% de chance de vitória.' },
-  { cls: 'miss', text: 'O adversário tinha acabado de errar e este lance deixou a chance passar, perdendo 10% ou mais.' },
-  { cls: 'blunder', text: 'Muda o rumo da partida: perde 20% ou mais de chance de vitória.' },
+  { cls: 'excellent', text: 'Quase igual ao melhor: perde menos de 2 centésimos de ponto.' },
+  { cls: 'good', text: 'Um lance razoável: perde de 2 a 5 centésimos de ponto.' },
+  { cls: 'inaccuracy', text: 'Havia coisa melhor: perde de 5 a 10 centésimos de ponto.' },
+  { cls: 'mistake', text: 'Um erro de verdade: perde de 10 a 20 centésimos de ponto.' },
+  { cls: 'miss', text: 'O adversário tinha acabado de errar, havia posição ganha na mesa e este lance deixou passar.' },
+  { cls: 'blunder', text: 'Muda o rumo da partida: perde 20 centésimos de ponto ou mais.' },
 ]
 
 const EVALS: { sample: string; text: string }[] = [
@@ -104,6 +105,7 @@ function LegendDialog({ onClose }: { onClose: () => void }) {
             </li>
           </ul>
           <p className="mt-4 text-sm text-muted">Chance de vitória é a estimativa de quem está ganhando, calculada a partir da avaliação do Stockfish.</p>
+          <p className="mt-2 text-sm text-muted">Os pontos vão de 0 (derrota) a 1 (vitória). Eles dependem do rating: quanto mais forte o jogador, mais a mesma vantagem vale, então o mesmo lance pesa mais para quem joga melhor.</p>
         </div>
       </div>
     </div>

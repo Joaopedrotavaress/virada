@@ -1,4 +1,4 @@
-import { CLASS_INFO, isErrorClass } from '../chess/classify'
+import { CLASS_INFO, isErrorClass, isTopClass } from '../chess/classify'
 import { formatEval } from '../chess/evaluation'
 import { detectMotifs, explainMotifs } from '../chess/motifs'
 import { sanToPt, uciToSan } from '../chess/notation'
@@ -22,7 +22,7 @@ function terminalText(step: VariantStep) {
 /** Feedback do lance testado: o que ele seria se tivesse sido jogado na partida. */
 export function VariantPanel({ origin, step, isUserColor, error, onExit }: VariantPanelProps) {
   const bestSan = step?.before ? uciToSan(step.beforeFen, step.before.bestUci) : null
-  const isBest = step?.cls === 'best'
+  const isBest = Boolean(step?.cls && isTopClass(step.cls))
   const explanation =
     step?.cls && isErrorClass(step.cls) && step.before && step.after
       ? explainMotifs(

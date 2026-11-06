@@ -16,6 +16,7 @@ export function BookIcon({ className }: { className?: string }) {
 export function ClassSymbol({ cls, iconClassName }: { cls: MoveClass; iconClassName?: string }) {
   if (cls === 'book') return <BookIcon className={iconClassName} />
   if (cls === 'best') return <Icon name="star" className={iconClassName ?? 'inline size-[1em]'} />
+  if (cls === 'excellent') return <Icon name="thumb" className={iconClassName ?? 'inline size-[1em]'} />
   if (cls === 'good') return <Icon name="check" className={iconClassName ?? 'inline size-[1em]'} />
   if (cls === 'miss') return <Icon name="close" className={iconClassName ?? 'inline size-[1em]'} />
   return <>{CLASS_INFO[cls].symbol}</>
@@ -27,9 +28,9 @@ export function ClassBadge({ cls, className }: { cls: MoveClass; className?: str
   return (
     <svg viewBox="0 0 100 100" role="img" aria-label={label} className={className}>
       <rect x="4" y="4" width="92" height="92" rx="6" fill={`var(--fill-${cls})`} stroke="var(--zone-0)" strokeWidth="5" />
-      {cls === 'book' || cls === 'best' || cls === 'good' || cls === 'miss' ? (
+      {cls === 'book' || cls === 'best' || cls === 'excellent' || cls === 'good' || cls === 'miss' ? (
         <g transform="translate(20 20) scale(2.5)" fill={cls === 'best' ? 'var(--on-fill-best)' : 'var(--on-fill)'}>
-          <path d={cls === 'book' ? BOOK_PATH : cls === 'best' ? ICON_PATHS.star : cls === 'good' ? ICON_PATHS.check : ICON_PATHS.close} />
+          <path d={cls === 'book' ? BOOK_PATH : cls === 'best' ? ICON_PATHS.star : cls === 'excellent' ? ICON_PATHS.thumb : cls === 'good' ? ICON_PATHS.check : ICON_PATHS.close} />
         </g>
       ) : (
         <text

@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
 import type { AnalyzedMove } from '../chess/analyze'
-import { CLASS_INFO, type MoveClass, isErrorClass } from '../chess/classify'
+import { CLASS_INFO, type MoveClass, isErrorClass, isSpecialClass } from '../chess/classify'
 import { sanToPt } from '../chess/notation'
 import { ClassSymbol } from './ClassBadge'
 import type { VariantState } from './useVariant'
 
-const showsSymbol = (cls: MoveClass | null | undefined): cls is MoveClass => Boolean(cls && (isErrorClass(cls) || cls === 'brilliant' || cls === 'excellent'))
+const showsSymbol = (cls: MoveClass | null | undefined): cls is MoveClass => Boolean(cls && (isErrorClass(cls) || isSpecialClass(cls) || cls === 'excellent'))
 
 interface ChipProps {
   label: string

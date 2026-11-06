@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react'
 import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { AnalyzedMove, AnalyzedPosition } from '../chess/analyze'
-import { CLASS_INFO, type MoveClass, isErrorClass } from '../chess/classify'
+import { CLASS_INFO, type MoveClass, isErrorClass, isSpecialClass } from '../chess/classify'
 import { formatEval, whiteWinPercent } from '../chess/evaluation'
 import { turningPoint } from '../chess/review'
 import { moveLabel } from './CoachCard'
@@ -24,7 +24,7 @@ interface EvalChartProps {
 /** Tamanho também diferencia a gravidade, além da cor. */
 const DOT_RADIUS: Partial<Record<MoveClass, number>> = { brilliant: 5.5, inaccuracy: 3.5, mistake: 4.5, miss: 4.5, blunder: 5.5 }
 const PLOT_PADDING = 8
-const LEGEND: MoveClass[] = ['brilliant', 'inaccuracy', 'mistake', 'miss', 'blunder']
+const LEGEND: MoveClass[] = ['brilliant', 'great', 'inaccuracy', 'mistake', 'miss', 'blunder']
 
 function ChartTooltip({ active, payload }: { active?: boolean; payload?: readonly { payload?: Point }[] }) {
   const point = payload?.[0]?.payload
@@ -63,7 +63,7 @@ const EvalPlot = memo(function EvalPlot({ data, turning }: { data: Point[]; turn
           activeDot={false}
           dot={(props) => {
             const cls = (props.payload as Point | undefined)?.move?.cls
-            if (!cls || (!isErrorClass(cls) && cls !== 'brilliant') || props.cx == null || props.cy == null) return <g key={props.key} />
+            if (!cls || (!isErrorClass(cls) && !isSpecialClass(cls)) || props.cx == null || props.cy == null) return <g key={props.key} />
             return <circle key={props.key} cx={props.cx} cy={props.cy} r={DOT_RADIUS[cls]} fill={`var(--fill-${cls})`} stroke="var(--on-fill)" strokeWidth={2} />
           }}
         />

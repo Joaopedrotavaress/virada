@@ -315,7 +315,7 @@ export function useBotGame(setup: GameSetup, onFinished: (result: GameResult) =>
         const [before, after] = await Promise.all([coachEval(played.before), coachEval(played.after)])
         if (current !== session.current || game.current.fen() !== played.after) return
         const graded = gradeMove(played.lan, played.color, before, after)
-        const cls = classOf(graded, { fen: played.before, uci: played.lan, color: played.color, evalBefore: before.eval })
+        const cls = classOf(graded, { fen: played.before, uci: played.lan, color: played.color, evalBefore: before.eval, evalAfter: after.eval })
         setLastGrade({ square: played.to, cls })
 
         const explanation = explainMotifs(

@@ -40,7 +40,13 @@
 
   /* Fundo dos sinais e pontos do gráfico (validados para daltonismo). */
   /* Lance comum é neutro. Cor só no erro e no que merece festa; o símbolo garante a leitura sem cor. */
+  /* Marcas das aulas no tabuleiro. */
+  --mark-good: rgb(31 138 69 / 0.55);
+  --mark-bad: rgb(209 45 45 / 0.55);
+  --mark-focus: rgb(42 111 209 / 0.6);
+
   --fill-brilliant: #16c2bb;
+  --fill-great: #2a6fd1;
   --fill-book: #74747d;
   --fill-best: #f4f4f6;
   --fill-excellent: #1f8a45;
@@ -56,6 +62,7 @@
 
   /* Mesmas categorias como texto: contraste AA sobre a superfície. */
   --text-brilliant: #0a7470;
+  --text-great: #1f5fb8;
   --text-book: var(--muted);
   --text-best: var(--ink);
   --text-excellent: #1f7a33;
@@ -92,6 +99,7 @@
 
   --positive: #68d278;
   --text-brilliant: #4fe3dc;
+  --text-great: #8dbcff;
   --text-excellent: #68d278;
   --text-inaccuracy: #e6ae3a;
   --text-mistake: #f5944c;
