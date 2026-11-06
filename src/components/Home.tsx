@@ -1,8 +1,6 @@
-import { Chess } from 'chess.js'
 import { useEffect, useMemo, useState } from 'react'
 import { formatOpening } from '../chess/book'
-import { parsePgn } from '../chess/pgn'
-import { revelationLine } from '../chess/review'
+import { FAMOUS_MOMENTS, momentLine, pickMoment } from '../chess/famous'
 import { BOTS } from '../bots/bots'
 import { type GameRecord, recordsFor, removeRecord, useAllRecords } from '../data/library'
 import { useInstall } from '../pwa'
@@ -11,7 +9,8 @@ import type { ActiveGame } from '../storage'
 import { Icon } from './Icons'
 import { Logo } from './Logo'
 import { ThemeToggle } from './ThemeToggle'
-import { OPERA_FEN, OPERA_MOVES, Placa, RevelationBoard, placaDelay } from './Revelation'
+import { Professor } from './Professor'
+import { Placa, RevelationBoard, placaDelay } from './Revelation'
 import { TodayCard } from './TodayCard'
 import { viewRecord } from './Games'
 
@@ -177,58 +176,51 @@ function RecentGames({ records, onOpen }: { records: GameRecord[]; onOpen: (reco
   )
 }
 
-/** A Revelação toca uma vez por visita: voltar para o início não repete. */
+/** A animação toca uma vez por visita: voltar para o início não repete nem troca a jogada. */
 let heroPlayed = false
+let heroMoment: number | null = null
 
 const finishAnimations = (element: HTMLElement) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish())
 
-/** O tabuleiro e a placa. Com uma partida analisada, mostra onde ela virou. Sem nenhuma, o mate de Morphy. */
-function HomeHero({ record, onOpen }: { record?: GameRecord; onOpen: (record: GameRecord) => void }) {
-  const [animate] = useState(() => !heroPlayed)
+/** Uma jogada famosa, sorteada, e o Seu Nonato comentando. */
+function HomeHero() {
+  const [animate, setAnimate] = useState(() => !heroPlayed)
+  const [index, setIndex] = useState(() => (heroMoment ??= pickMoment()))
   useEffect(() => {
     heroPlayed = true
   }, [])
-  const real = useMemo(() => {
-    const errors = record?.digest?.errors ?? []
-    if (!record || errors.length === 0) return null
-    const error = errors.reduce((worst, item) => (item.loss > worst.loss ? item : worst))
-    try {
-      const single = new Chess(error.fen).move(error.san)
-      try {
-        const game = parsePgn(record.pgn)
-        if (game.moves[error.ply - 1]?.uci === single.lan) {
-          const line = revelationLine(game.moves, error.ply)
-          return { error, fen: game.positions[line.start].fen, moves: line.moves, focusAt: line.focusAt, to: line.focus }
-        }
-      } catch {
-        // Sem o PGN, mostra só o lance da virada.
-      }
-      return { error, fen: error.fen, moves: [single.lan], focusAt: 0, to: single.to }
-    } catch {
-      return null
-    }
-  }, [record])
-  if (!real || !record) {
-    return (
-      <div onClick={(event) => finishAnimations(event.currentTarget)}>
-        <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
-          <RevelationBoard fen={OPERA_FEN} moves={OPERA_MOVES} focus="d8" animate={animate} />
-        </div>
-        <div className="mt-3 overflow-hidden">
-          <Placa number={17} title="Entregou a dama e deu mate." note="Morphy, Paris, 1858" delayMs={placaDelay(OPERA_MOVES.length)} animate={animate} />
-        </div>
-      </div>
-    )
+  const moment = FAMOUS_MOMENTS[index]
+  const delayMs = placaDelay(moment.moves.length)
+  const showAnother = () => {
+    heroMoment = pickMoment(index)
+    setAnimate(true)
+    setIndex(heroMoment)
   }
-  const opponent = record.userColor === 'b' ? record.white : record.black
   return (
     <div onClick={(event) => finishAnimations(event.currentTarget)}>
       <div className="mx-auto max-w-[max(14rem,calc(100dvh-25rem))] px-5 lg:max-w-none lg:px-0">
-        <RevelationBoard fen={real.fen} moves={real.moves} focus={real.to} focusAt={real.focusAt} orientation={record.userColor === 'b' ? 'black' : 'white'} animate={animate} />
+        <RevelationBoard key={index} fen={moment.fen} moves={moment.moves} focus={moment.focus} focusAt={moment.focusAt} orientation={moment.orientation} animate={animate} />
       </div>
-      <button type="button" onClick={() => onOpen(record)} className="mt-3 block w-full overflow-hidden text-left">
-        <Placa number={real.error.moveNumber} title={`Foi aqui que virou contra ${opponent}.`} note="Sua última partida analisada. Toque para rever." delayMs={placaDelay(real.moves.length)} animate={animate} />
-      </button>
+      <div className="mt-3 overflow-hidden">
+        <Placa key={index} number={moment.number} title={moment.title} note={moment.note} delayMs={delayMs} animate={animate} />
+      </div>
+      <div className="mt-2 px-5 lg:px-0">
+        <Professor say={`${index}`} talkMs={1600} delayMs={animate ? delayMs + 300 : 0}>
+          <div className="flex min-h-11 items-center justify-between gap-2 rounded-md bg-surface py-1 pr-1 pl-3">
+            <p className="text-sm font-semibold">{momentLine(index)}</p>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                showAnother()
+              }}
+              className="min-h-9 shrink-0 rounded-md px-2.5 text-sm font-semibold underline hover:bg-sunken"
+            >
+              Mostra outra
+            </button>
+          </div>
+        </Professor>
+      </div>
     </div>
   )
 }
@@ -296,7 +288,7 @@ export function Home(props: HomeProps) {
               <Logo />
               <ThemeToggle />
             </div>
-            <HomeHero onOpen={props.onOpen} />
+            <HomeHero />
           </div>
           <main className="flex min-w-0 flex-col px-5 pt-4 lg:px-0 lg:pt-0">
             <div className="order-1 lg:order-2 lg:mt-5">
@@ -330,8 +322,6 @@ export function Home(props: HomeProps) {
     )
   }
 
-  const latest = records.find((record) => record.digest && record.digest.errors.length > 0)
-
   return (
     <div className="mx-auto w-full max-w-5xl pb-10 lg:px-4 lg:pt-8">
       <div className="lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
@@ -340,7 +330,7 @@ export function Home(props: HomeProps) {
             <Logo />
             <ThemeToggle />
           </div>
-          <HomeHero record={latest} onOpen={props.onOpen} />
+          <HomeHero />
         </div>
 
         <main className="min-w-0 px-5 pt-5 lg:px-0 lg:pt-0">

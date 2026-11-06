@@ -1,8 +1,7 @@
 import { Chess } from 'chess.js'
 import { type ReactNode, useEffect, useMemo, useRef } from 'react'
 import { defaultPieces } from 'react-chessboard'
-import { sanToPt, uciParts } from '../chess/notation'
-import { ZoneRamp } from './Logo'
+import { uciParts } from '../chess/notation'
 
 const FILES = 'abcdefgh'
 const FIRST_MOVE_AT = 1250
@@ -238,7 +237,7 @@ export function RevelationBoard({ fen, moves: moveList, orientation = 'white', f
 }
 
 /** A placa amarela: o número grande e o que ele quer dizer. Sobe de baixo no fim da revelação. */
-export function Placa({ number, title, note, delayMs = 0, animate = true, compact = false }: { number: ReactNode; title: string; note?: string; delayMs?: number; animate?: boolean; compact?: boolean }) {
+export function Placa({ number, title, note, delayMs = 0, animate = true }: { number: ReactNode; title: string; note?: string; delayMs?: number; animate?: boolean }) {
   const root = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!animate || !root.current || reducedMotion()) return
@@ -246,46 +245,12 @@ export function Placa({ number, title, note, delayMs = 0, animate = true, compac
     return () => animation.cancel()
   }, [animate, delayMs])
   return (
-    <div ref={root} className={`flex items-center bg-action text-on-action ${compact ? 'gap-2.5 px-4 py-2' : 'gap-3 px-5 py-3'}`}>
-      <div className={`font-display tabular shrink-0 leading-[0.85] font-extrabold tracking-tighter ${compact ? 'text-6xl' : 'text-[6.5rem]'}`}>{number}</div>
+    <div ref={root} className="flex items-center gap-3 bg-action px-5 py-3 text-on-action">
+      <div className="font-display tabular shrink-0 text-[6.5rem] leading-[0.85] font-extrabold tracking-tighter">{number}</div>
       <div className="min-w-0">
-        <p className={`font-display leading-none font-extrabold text-balance ${compact ? 'text-2xl' : 'text-[1.75rem]'}`}>{title}</p>
+        <p className="font-display text-[1.75rem] leading-none font-extrabold text-balance">{title}</p>
         {note && <p className="mt-1.5 text-sm font-semibold">{note}</p>}
       </div>
     </div>
   )
 }
-
-/** Tela cheia ao terminar uma análise: mostra onde a partida virou e sai sozinha. Um toque pula. */
-export function RevelationOverlay({ fen, moves, focus, focusAt, san, moveNumber, isUserMove, label, orientation, onDone }: { fen: string; moves: string[]; focus: string; focusAt: number; san: string; moveNumber: number; isUserMove: boolean; label: string; orientation: 'white' | 'black'; onDone: () => void }) {
-  const done = useRef(onDone)
-  done.current = onDone
-  const button = useRef<HTMLButtonElement>(null)
-  useEffect(() => {
-    button.current?.focus()
-    if (reducedMotion()) {
-      const timer = setTimeout(() => done.current(), 5000)
-      return () => clearTimeout(timer)
-    }
-    const timer = setTimeout(() => done.current(), placaDelay(moves.length) + 5000)
-    return () => clearTimeout(timer)
-  }, [moves.length])
-  return (
-    <button
-      ref={button}
-      type="button"
-      onClick={onDone}
-      aria-label={`${isUserMove ? 'Foi aqui que a sua partida virou' : 'Foi aqui que a partida virou'}: lance ${moveNumber}, ${sanToPt(san)}, ${label}. Toque para ver a análise.`}
-      className="fixed inset-0 z-30 flex flex-col overflow-clip bg-(--zone-0) text-left text-(--zone-10)"
-    >
-      <ZoneRamp />
-      <div className="mx-auto flex min-h-0 w-full max-w-[min(100%,calc(100dvh-14rem))] flex-1 flex-col justify-center px-4 lg:max-w-[min(32rem,calc(100dvh-14rem))]">
-        <RevelationBoard fen={fen} moves={moves} orientation={orientation} focus={focus} focusAt={focusAt} />
-      </div>
-      <Placa number={moveNumber} title={isUserMove ? 'Foi aqui que a sua partida virou.' : 'Foi aqui que a partida virou.'} note={`${sanToPt(san)}, ${label}. Toque para ver a análise.`} delayMs={placaDelay(moves.length)} />
-    </button>
-  )
-}
-
-export const OPERA_FEN = '4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16'
-export const OPERA_MOVES = ['b3b8', 'd7b8', 'd1d8']
