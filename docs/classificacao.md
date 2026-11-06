@@ -80,16 +80,17 @@ Tudo isto precisa valer:
 - A segunda linha fica atrás por 0,045 com rating até 1000, 0,08 com 1500 e 0,12 a partir de 2200.
 - A partir de rating 1000, se os dois lances caem no mesmo estado (perdido, igual, ganho), a diferença precisa ser maior, até o dobro em 1800. É o caso do "único lance bom".
 - A segunda linha vale menos de 0,90, e a posição depois do lance vale mais de 0,30.
+- Não retoma a peça que acabou de chegar, em nenhum rating.
 - Não é mate no lance, não é promover a dama, nem saída de xeque com até 2 opções.
 - O lance não se repete na partida: num xeque perpétuo, só a primeira vez conta.
-- A partir de rating 1200: não captura a peça que acabou de chegar, nem peça solta, nem troca de igual valor. Só vale a captura em que se entrega mais do que se leva. Abaixo disso, essas capturas contam, porque quem está começando pode não vê-las.
+- A partir de rating 1200: não captura peça solta, nem troca de igual valor. Só vale a captura em que se entrega mais do que se leva. Abaixo disso, essas capturas contam, porque quem está começando pode não vê-las.
 
-Os estados valem: perdido até 0,30, ganho a partir de 0,70. Como saem dos pontos, mudam com o rating, como o Chess.com descreve.
+Os estados valem: perdido até 0,35, ganho a partir de 0,65. Como saem dos pontos, mudam com o rating, como o Chess.com descreve.
 
 ### Chance perdida
 
-- O adversário acabou de perder 0,10 ou mais.
-- Antes do lance havia posição ganha (0,70 ou mais), e depois não há mais.
+- O adversário perdeu 0,10 ou mais em um dos seus 3 últimos lances.
+- Antes do lance havia posição ganha (0,65 ou mais), e depois não há mais.
 - O lance perdeu 0,10 ou mais e não foi o do motor.
 
 ### Mate
@@ -191,6 +192,26 @@ A API pública do Chess.com informa a precisão oficial das partidas revisadas. 
 O resultado por rating: até 600, erro de 6,2; 1000 a 1400, 5,4; 1400 a 1800, 4,0; 1800 ou mais, 2,4.
 
 **Limites.** Só entram partidas que alguém revisou, e quase nenhuma tinha rating entre 600 e 1000. É uma aproximação do resultado: a fórmula CAPS do Chess.com continua fechada. A precisão nos diz pouco sobre as classes: a API não informa o rótulo de cada lance.
+
+### Segunda comparação: os dois lados, tabela completa
+
+Uma partida de 98 lances, com rating 348 contra 342. Partida e números do Chess.com vieram da revisão dele; o Virada usou o Stockfish 19 completo em profundidade 18:
+
+| Classe | Brancas: Chess.com | Antes | Agora | Pretas: Chess.com | Antes | Agora |
+|---|---:|---:|---:|---:|---:|---:|
+| Excelente (!) | 2 | 9 | 3 | 7 | 9 | 8 |
+| Melhor | 16 | 6 | 12 | 18 | 17 | 18 |
+| Ótimo (polegar) | 5 | 12 | 12 | 5 | 8 | 8 |
+| Bom | 7 | 8 | 8 | 7 | 4 | 4 |
+| Imprecisão | 2 | 1 | 1 | 3 | 2 | 2 |
+| Erro | 11 | 8 | 7 | 1 | 1 | 1 |
+| Chance perdida | 2 | 0 | 2 | 3 | 2 | 3 |
+| Erro grosseiro | 0 | 2 | 1 | 2 | 3 | 2 |
+| Precisão | 57,0 | | 64,1 | 71,2 | | 72,0 |
+
+Ao juntar as tabelas das duas partidas e testar milhares de combinações, a diferença total caiu de 52 para 34 lances com três regras: retomar peça nunca é "!", a Chance perdida olha os 3 últimos lances do adversário, e a posição ganha começa em 0,65 ponto.
+
+**O que não mudei de propósito:** baixar o limite do polegar de 0,02 para 0,012 melhorava só de 34 para 31 e contrariava a tabela pública. Com tão poucas partidas, isso seria encaixar números, não entender a regra. O polegar segue acima do Chess.com, e o Melhor, abaixo.
 
 ## O que este teste não prova
 
