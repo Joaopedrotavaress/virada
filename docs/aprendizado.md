@@ -89,7 +89,7 @@ Passei também cada linha das demonstrações pelo Stockfish. Isso achou erros r
 | Prioridade | O quê | Situação |
 |---|---|---|
 | 1 | Classificação por pontos esperados, com rating | Feito |
-| 2 | Ótimo e a nova Chance perdida | Feito |
+| 2 | O lance "!" e a nova Chance perdida | Feito |
 | 3 | Caminho em quatro níveis, com progresso | Feito |
 | 4 | Aulas em três partes, com demonstração | Feito |
 | 5 | 15 aulas novas, do zero ao cálculo | Feito |
@@ -99,4 +99,4 @@ Passei também cada linha das demonstrações pelo Stockfish. Isso achou erros r
 | 9 | Testar as aulas com um iniciante de verdade e reescrever o que travar | A fazer |
 | 10 | Mais exercícios nas aulas de estratégia, que têm poucos | A fazer |
 | 11 | Sugerir a próxima aula a partir dos erros das partidas (quem erra garfo vê a aula de garfo) | A fazer |
-| 12 | Calcular o Ótimo também no jogo contra bots | A fazer |
+| 12 | Calcular o "!" também no jogo contra bots | A fazer |

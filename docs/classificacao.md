@@ -2,6 +2,8 @@
 
 O objetivo é chegar o mais perto possível do Chess.com. O algoritmo deles é fechado, então este documento separa o que eles dizem publicamente do que precisou ser estimado.
 
+**Os nomes seguem o Chess.com em português:** lá, o lance "!" (Great, em inglês) se chama Excelente, e o do polegar (Excellent, em inglês) se chama Ótimo. Parece invertido, mas é o que aparece na tela deles.
+
 O código está em [`src/chess/classify.ts`](../src/chess/classify.ts), [`brilliant.ts`](../src/chess/brilliant.ts) e [`expectedPoints.ts`](../src/chess/expectedPoints.ts).
 
 ## O que é público e o que é estimado
@@ -9,15 +11,15 @@ O código está em [`src/chess/classify.ts`](../src/chess/classify.ts), [`brilli
 | Assunto | O que o Chess.com publica | O que o Virada faz | Origem |
 |---|---|---|---|
 | Medida | Pontos esperados de 0 a 1, a partir do rating e da avaliação do motor | Igual | Público |
-| Melhor | Perde 0,00 | Lance do motor, ou perda abaixo de 0,005 (arredonda para 0,00) | Público, com o arredondamento **estimado** |
-| Excelente | Até 0,02 | Igual | Público |
+| Melhor | Perde 0,00 | Só o primeiro lance do motor | Público |
+| Ótimo (polegar) | Até 0,02 | Igual | Público |
 | Bom | 0,02 a 0,05 | Igual | Público |
 | Imprecisão | 0,05 a 0,10 | Igual | Público |
 | Erro | 0,10 a 0,20 | Igual | Público |
 | Erro grosseiro | 0,20 a 1,00 | Igual | Público |
 | A curva de cada rating | Diz que existe, não publica | Medida em 157 mil partidas do Lichess | **Medido** por nós |
 | Escala de rating | Não se aplica | Rating do Chess.com convertido para a escala do Lichess | **Estimado**, com a tabela do ChessGoals |
-| Ótimo | De perdido para igual, de igual para ganho, ou o único lance bom. Mais generoso com rating baixo | Comparação com a segunda melhor linha | Ideia pública, números **estimados** |
+| Excelente (!) | De perdido para igual, de igual para ganho, ou o único lance bom. Mais generoso com rating baixo | Comparação com a segunda melhor linha | Ideia pública, números **estimados** |
 | Brilhante | Sempre o melhor ou quase, um bom sacrifício de peça, sem deixar a posição ruim, sem já estar ganho. Mais generoso com rating baixo | As mesmas condições | Ideia pública, números **estimados** |
 | Chance perdida | Não aproveitar o erro do adversário e perder a chance de posição ganha, em geral ficando igual ou pior | As mesmas condições | Ideia pública, números **estimados** |
 | Livro | O artigo citado não detalha | Base de aberturas: enquanto a posição estiver nela | **Estimado** |
@@ -55,7 +57,7 @@ Duas conferências: os valores do topo ficam perto do `0,00368` da fórmula púb
 1. **Livro:** a posição está na base de aberturas.
 2. **Forçado:** só existe um lance legal. É Melhor, com precisão 100.
 3. **Brilhante:** as regras abaixo.
-4. **Ótimo:** as regras abaixo.
+4. **Excelente (!):** as regras abaixo.
 5. **Tamanho da perda:** a tabela pública, com os casos de mate.
 6. **Chance perdida:** substitui a classe do passo 5, se as condições valerem.
 
@@ -70,17 +72,17 @@ Tudo isto precisa valer:
 - Depois do lance, quem jogou tem ao menos 0,50 ponto.
 - A alternativa (a segunda linha ou, se o lance não foi o do motor, o lance do motor) não dá mate e vale menos de 0,90.
 
-### Ótimo
+### Excelente (!)
 
 Tudo isto precisa valer:
 
 - É o lance do motor, e a segunda linha está medida.
-- A segunda linha fica atrás por 0,05 com rating até 1000, 0,08 com 1500 e 0,12 a partir de 2200.
-- Se os dois lances caem no mesmo estado (perdido, igual, ganho), a diferença precisa ser o dobro. É o caso do "único lance bom".
+- A segunda linha fica atrás por 0,045 com rating até 1000, 0,08 com 1500 e 0,12 a partir de 2200.
+- A partir de rating 1000, se os dois lances caem no mesmo estado (perdido, igual, ganho), a diferença precisa ser maior, até o dobro em 1800. É o caso do "único lance bom".
 - A segunda linha vale menos de 0,90, e a posição depois do lance vale mais de 0,30.
 - Não é mate no lance, não é promover a dama, nem saída de xeque com até 2 opções.
-- Não captura a peça que acabou de chegar, nem peça solta, nem troca de igual valor. Só vale a captura em que se entrega mais do que se leva.
 - O lance não se repete na partida: num xeque perpétuo, só a primeira vez conta.
+- A partir de rating 1200: não captura a peça que acabou de chegar, nem peça solta, nem troca de igual valor. Só vale a captura em que se entrega mais do que se leva. Abaixo disso, essas capturas contam, porque quem está começando pode não vê-las.
 
 Os estados valem: perdido até 0,30, ganho a partir de 0,70. Como saem dos pontos, mudam com o rating, como o Chess.com descreve.
 
@@ -95,11 +97,11 @@ Os estados valem: perdido até 0,30, ganho a partir de 0,70. Como saem dos ponto
 | Situação | Classe |
 |---|---|
 | Mantém o mate, no ritmo certo | Melhor |
-| Mantém, um lance mais longo | Excelente |
+| Mantém, um lance mais longo | Ótimo |
 | Mantém, até 5 lances mais longo | Bom |
 | Mantém, mais longo que isso | Imprecisão |
 | Largou o mate | Pela perda, tratando o mate como +10 |
-| Já ia levar mate: encurtar por 1, até 5, ou mais | Excelente, Bom ou Imprecisão |
+| Já ia levar mate: encurtar por 1, até 5, ou mais | Ótimo, Bom ou Imprecisão |
 | Permite mate numa posição já perdida | Erro, se em até 3 lances; senão, Imprecisão |
 
 ## Casos de teste
@@ -109,18 +111,18 @@ São mais de 90 casos em [`classify.cases.test.ts`](../src/chess/classify.cases.
 | Situação | Exemplo (rating 1500) | Resultado |
 |---|---|---|
 | Equilibrada | Lance do motor | Melhor |
-| Equilibrada | +0,2 para 0,0 | Excelente |
+| Equilibrada | +0,2 para 0,0 | Ótimo |
 | Equilibrada | +0,2 para −0,2 | Bom |
 | Equilibrada | +0,2 para −0,6 | Imprecisão |
 | Equilibrada | +0,2 para −1,5 | Erro |
 | Equilibrada | +0,2 para −5 | Erro grosseiro |
-| Vantagem grande | +28 para +24 | Melhor |
+| Vantagem grande | +28 para +24 | Ótimo |
 | Vantagem grande | +9 para +6 | Imprecisão |
 | Vantagem grande | +9 para 0 | Erro grosseiro |
-| Perdida | −12 para −15 | Melhor |
+| Perdida | −12 para −15 | Ótimo |
 | Tática | Adversário erra (0 para −5), o lance volta a −0,2 | Chance perdida |
-| Tática | A segunda linha dá +0,4 e o lance dá +4,5 | Ótimo |
-| Tática | Capturar peça solta, com a mesma diferença | Melhor |
+| Tática | A segunda linha dá +0,4 e o lance dá +4,5 | Excelente |
+| Tática | Capturar peça solta, com a mesma diferença: rating 1500 e 700 | Melhor e Excelente |
 | Sacrifício | Bispo em h7, posição boa | Brilhante |
 | Sacrifício | Dama de Morphy, com o Stockfish (Ópera, 1858) | Brilhante |
 | Sacrifício | O mesmo lance, com outro mate disponível | Não é Brilhante |
@@ -132,34 +134,49 @@ São mais de 90 casos em [`classify.cases.test.ts`](../src/chess/classify.cases.
 | Forçado | Único lance legal | Melhor |
 | Abertura | Dentro da teoria | Livro |
 | Final | Largar o empate ou a vitória | Erro grosseiro |
-| Final | +90 de base de finais para mate em 20 | Melhor |
+| Final | +90 de base de finais para mate em 20 | Ótimo |
 
 ### Em partidas reais
 
 36 partidas do Lichess, 12 por faixa, com o Stockfish em profundidade 12. Porcentagem de lances:
 
-| Rating | Brilhante | Ótimo | Livro | Melhor | Excelente | Bom | Imprecisão | Erro | Chance perdida | Erro grosseiro |
+| Rating | Brilhante | Excelente | Livro | Melhor | Ótimo | Bom | Imprecisão | Erro | Chance perdida | Erro grosseiro |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1000 | 0,1 | 1,3 | 4,6 | 45,5 | 9,7 | 17,0 | 11,6 | 5,8 | 1,2 | 3,2 |
-| 1500 | 0,0 | 0,9 | 7,6 | 44,2 | 13,6 | 14,6 | 9,1 | 4,7 | 1,7 | 3,6 |
-| 2000 | 0,1 | 1,3 | 12,0 | 42,3 | 10,1 | 13,4 | 9,8 | 6,5 | 0,9 | 3,5 |
+| 1000 | 0,1 | 7,5 | 4,6 | 25,3 | 23,5 | 17,0 | 11,5 | 6,0 | 1,2 | 3,2 |
+| 1500 | 0,0 | 1,0 | 7,6 | 31,9 | 25,7 | 14,6 | 9,3 | 4,6 | 1,7 | 3,7 |
+| 2000 | 0,1 | 1,3 | 12,0 | 35,4 | 17,1 | 13,4 | 9,8 | 6,5 | 0,9 | 3,5 |
 
-Isso dá 0,7 lance Ótimo por partida, somando os dois lados, e um Brilhante a cada 18 partidas. Essa medição foi feita antes do último ajuste fino da curva, que mudou o `k` em menos de 3%.
+Por partida, somando os dois lados, são 4,9 lances "!" na faixa de 1000 e 0,7 nas outras duas, e um Brilhante a cada 18 partidas. Esse salto vem da regra das capturas, que muda em 1200 e ainda é uma estimativa grossa. Os ratings dessa amostra são do Lichess.
+
+## Comparação com o Chess.com
+
+Uma partida real de 10 minutos, com rating 324 contra 294, comparada com o resumo do fim de partida do Chess.com, nas brancas:
+
+| Classe | Chess.com | Virada antes | Virada agora |
+|---|---:|---:|---:|
+| Excelente (!) | 4 | 0 | 5 |
+| Melhor | 11 | 21 | 10 |
+| Ótimo (polegar) | 6 | 5 | 11 |
+
+- **O que bateu:** Melhor mais "!" dá 15 lá e 15 aqui, e são os lances em que o jogador fez o primeiro do motor.
+- **O que levou à mudança:** antes, 6 lances fora do primeiro do motor apareciam como Melhor, e nenhuma captura decisiva ganhava "!".
+- **O que ainda não bate:** o polegar, com 11 aqui e 6 lá. Não sei a causa: pode ser o motor, a profundidade ou a curva.
+- **O limite desta comparação:** é uma partida só, e o resumo traz contagens, não quais lances foram. Os números do "!" foram ajustados com ela, então bater aqui não prova que vai bater em outras. A regressão está em [`classify.chesscom.test.ts`](../src/chess/classify.chesscom.test.ts).
 
 ## O que este teste não prova
 
-**A fidelidade ao Chess.com não foi medida lance a lance.** Eles não têm uma base pública com os rótulos da revisão, então não há como calcular a porcentagem de acerto. Para medir, é preciso comparar partidas suas com a revisão do Chess.com, lado a lado.
+**A fidelidade ao Chess.com não foi medida lance a lance.** Eles não têm uma base pública com os rótulos da revisão, então não há como calcular a porcentagem de acerto. Para medir, é preciso comparar mais partidas com a revisão do Chess.com, lado a lado.
 
 Outras diferenças que continuam existindo:
 
 - O motor e a profundidade são outros. No celular, o Stockfish roda bem mais raso que num servidor.
-- O Ótimo só é calculado na análise completa. No jogo contra bots e nos lances testados na revisão, não há segunda linha.
+- O "!" só é calculado na análise completa. No jogo contra bots e nos lances testados na revisão, não há segunda linha.
 - A base de aberturas é outra, então o ponto em que o Livro acaba pode mudar.
 - A precisão continua na fórmula pública do Lichess, não na CAPS do Chess.com.
 
 ## Partidas antigas
 
-Ao abrir uma análise antiga, os lances são reclassificados com as avaliações guardadas, sem chamar o motor. O Ótimo e o peso do rating dependem de dados novos: a aba Resumo oferece "Analisar de novo".
+Ao abrir uma análise antiga, os lances são reclassificados com as avaliações guardadas, sem chamar o motor. O "!" e o peso do rating dependem de dados novos: a aba Resumo oferece "Analisar de novo".
 
 ## Fontes
 
