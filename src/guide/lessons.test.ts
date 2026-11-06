@@ -15,7 +15,7 @@ describe('lições', () => {
       expect(ids.has(lesson.id), lesson.id).toBe(false)
       ids.add(lesson.id)
       expect(lesson.paragraphs.length, lesson.id).toBeGreaterThan(0)
-      expect(lesson.positions.length > 0 || Boolean(lesson.puzzleTheme), lesson.id).toBe(true)
+      expect(lesson.positions.length > 0 || Boolean(lesson.puzzleTheme) || Boolean(lesson.link), lesson.id).toBe(true)
     }
   })
 
@@ -27,6 +27,7 @@ describe('lições', () => {
         // Lance da pessoa nos índices pares: o exercício pede sempre o lado com a vez.
         const firstFen = chess.fen()
         for (const san of position.solution) chess.move(san)
+        if (position.goal === 'move') return
         if (position.goal === 'mate') {
           expect(chess.isCheckmate(), `${lesson.id}: ${chess.fen()}`).toBe(true)
           return

@@ -1,19 +1,19 @@
-export type LessonGroup = 'mates' | 'taticas' | 'finais'
+import { AULAS, type Frame, NEW_LESSONS, type Video } from './aulas'
 
-export const LESSON_GROUPS: { id: LessonGroup; title: string }[] = [
-  { id: 'mates', title: 'Mates básicos' },
-  { id: 'taticas', title: 'Táticas' },
-  { id: 'finais', title: 'Finais essenciais' },
-]
+export type LessonGroup = 'regras' | 'mates' | 'taticas' | 'finais' | 'estrategia' | 'calculo'
 
 export interface LessonPosition {
   fen: string
   prompt: string
   /** Lances em notação internacional: o da pessoa, a resposta, o da pessoa... */
   solution: string[]
-  /** O que a posição precisa alcançar. Conferido pelos testes. */
-  goal: 'mate' | 'win' | 'draw'
+  /** O que a posição precisa alcançar. Conferido pelos testes. "move" é só fazer o lance pedido. */
+  goal: 'mate' | 'win' | 'draw' | 'move'
   after: string
+  /** Só o lance pedido vale: é treino de movimento, sem o Stockfish conferir alternativas. */
+  strict?: boolean
+  /** Casas destacadas no tabuleiro: para onde ir. */
+  marks?: string[]
 }
 
 export interface Lesson {
@@ -24,9 +24,15 @@ export interface Lesson {
   positions: LessonPosition[]
   /** Tema dos puzzles para continuar praticando. */
   puzzleTheme?: string
+  /** A demonstração passo a passo. */
+  frames?: Frame[]
+  takeaway?: string
+  videos?: Video[]
+  /** Onde continuar, fora da aula. */
+  link?: { path: string; label: string }
 }
 
-export const LESSONS: Lesson[] = [
+const BASE_LESSONS: Lesson[] = [
   // ---------- Mates ----------
   {
     id: 'mate-do-pastor',
@@ -424,5 +430,11 @@ export const LESSONS: Lesson[] = [
     puzzleTheme: 'rookEndgame',
   },
 ]
+
+export const LESSONS: Lesson[] = [...BASE_LESSONS, ...NEW_LESSONS].map((lesson) => {
+  const aula = AULAS[lesson.id]
+  if (!aula) return lesson
+  return { ...lesson, frames: aula.frames, takeaway: aula.takeaway, videos: aula.videos, positions: [...lesson.positions, ...(aula.extraPositions ?? [])] }
+})
 
 export const lessonById = (id: string) => LESSONS.find((lesson) => lesson.id === id)
