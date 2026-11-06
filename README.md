@@ -28,13 +28,14 @@ O Virada acha esse lance, explica em português o que aconteceu, com a voz do Se
 |---|---|
 | **Acha a virada** | Classifica cada lance e, na revisão guiada, para nos momentos que decidiram a partida. |
 | **Abre com história** | A tela inicial mostra uma de 120 jogadas de partidas reais, da Imortal de 1851 aos dias de hoje, com o Seu Nonato comentando. Os lances vêm da base [PGN Mentor](https://www.pgnmentor.com). |
-| **Festeja o brilhante** | Quando você entrega material e a conta fecha, o lance vira Brilhante. A regra confere o sacrifício de verdade, então ele é raro. |
+| **Classifica como o Chess.com** | Brilhante, Ótimo, Melhor, Excelente, Bom, Livro, Imprecisão, Erro, Chance perdida e Erro grosseiro. Os pontos esperados dependem do rating, com uma curva medida em 157 mil partidas reais. [Como funciona](docs/classificacao.md). |
 | **Explica de verdade** | Peça sem defesa, garfo, cravada, mate perdido: o erro é explicado em português, com as linhas do Stockfish. |
 | **Revisão guiada** | Passa pela partida sozinho, em quatro velocidades, e para nos momentos decisivos. |
 | **Treina os seus erros** | Seus piores lances viram exercícios com repetição espaçada, numa sessão diária com sequência de dias. |
 | **Doze adversários** | Do Tio Beto ("Essa torre eu nem queria mesmo.") ao Stockfish sem limites, com treinador ao lado, dica, relógio opcional e início de qualquer posição. |
 | **Guia de aberturas** | 3.865 linhas no catálogo, 41 aberturas explicadas com planos e armadilhas, repertório e prática lance a lance. |
-| **Lições e puzzles** | 21 lições de mates, táticas e finais, puzzles aleatórios sem fim, puzzle do dia e 22 temas em quatro dificuldades. |
+| **Caminho de aulas** | 36 aulas em quatro níveis, do zero ao cálculo. O Seu Nonato mostra no tabuleiro, passo a passo, e você pratica em seguida. Com vídeos opcionais. [Como funciona](docs/aprendizado.md). |
+| **Puzzles** | Aleatórios sem fim, puzzle do dia e 22 temas em quatro dificuldades. |
 | **Seu progresso** | Rating, precisão e erros por período e ritmo, e o que se repete: "6 dos 9 erros graves foram garfos no meio-jogo". |
 | **Sem internet** | Instala como app e continua funcionando offline, inclusive a análise. |
 

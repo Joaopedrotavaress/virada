@@ -26,7 +26,7 @@ A sessão típica começa logo depois de uma partida online, com o celular na m�
 
 - Análise com Stockfish no navegador, classificação de lances, explicações e revisão guiada.
 - Importação de PGN e do chess.com, biblioteca de partidas, análise em lote e progresso.
-- Treino com repetição espaçada, puzzles, guia de 41 aberturas, 21 lições e 12 níveis de bots.
+- Treino com repetição espaçada, puzzles, guia de 41 aberturas, um caminho de 36 aulas em quatro níveis e 12 níveis de bots.
 - PWA instalável, com backup, sincronização opcional por gist e backend local opcional.
 - O rebrand muda só identidade, nome, textos e acabamento. Nenhuma funcionalidade, fluxo, cálculo ou dado pode mudar.
 - Não existe cadastro, servidor nem assinatura, e a identidade não pode sugerir o contrário.

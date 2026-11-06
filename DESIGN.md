@@ -40,6 +40,7 @@ colors:
   arrow-threat: "#d12d2d"
   fill-book: "#74747d"
   fill-brilliant: "#16c2bb"
+  fill-great: "#2a6fd1"
   fill-best: "#f4f4f6"
   fill-excellent: "#1f8a45"
   fill-good: "#6a6a73"
@@ -271,7 +272,7 @@ As classes aparecem como selo (fundo e símbolo fixos nos dois temas) e como tex
 
 **A Regra do Acerto.** A única exceção aceita é o acerto de exercício: a onda e o flash amarelos na casa do lance certo. Ela dura menos de um segundo e some sozinha. O código ainda tem barras de progresso e um aviso de análise em segundo plano em amarelo; eles divergem da regra e não servem de modelo.
 
-**A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Boa e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grave e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
+**A Regra da Cor com Motivo.** Lance comum é neutro: Melhor, Bom e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grosseiro e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.
 
 **A Regra do Fundo Fixo.** O símbolo e os retratos ficam sobre tons escuros fixos da escala, para lerem igual nos dois temas.
 
@@ -366,7 +367,7 @@ Botões retos e diretos, em que a cor diz qual é a próxima ação.
 ### Inputs / Fields
 - **Estilo:** fundo de superfície, borda de 1px, canto de 3px, texto de 1rem e 48px de altura.
 - **Foco:** contorno de 2px na cor do texto, afastado 1px.
-- **Erro:** mensagem em peso 500 na cor de texto de Erro grave, logo abaixo do campo.
+- **Erro:** mensagem em peso 500 na cor de texto de Erro grosseiro, logo abaixo do campo.
 
 ### Cartões
 - **Fundo:** superfície, sem sombra e sem borda, com canto de 3px e 16px a 20px de respiro interno.
@@ -374,7 +375,7 @@ Botões retos e diretos, em que a cor diz qual é a próxima ação.
 - **Cartão amarelo:** fundo amarelo e botões invertidos, para a partida em andamento.
 
 ### Navigation
-- **Celular:** cinco itens fixos embaixo (Início, Partidas, Treino, Guia, Progresso), com ícone de 24px sobre rótulo de 0.75rem. Item atual com traço amarelo de 3px no alto e texto comum; os demais em texto apagado, que fica comum ao passar o ponteiro.
+- **Celular:** cinco itens fixos embaixo (Início, Partidas, Treino, Aprender, Progresso), com ícone de 24px sobre rótulo de 0.75rem. Item atual com traço amarelo de 3px no alto e texto comum; os demais em texto apagado, que fica comum ao passar o ponteiro.
 - **Tela larga:** logotipo e itens em linha, com ícone de 20px ao lado do rótulo de 0.875rem e o traço de 3px embaixo.
 
 ### Classificações de lance
@@ -384,18 +385,26 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 |---|---|---|---|---|---|
 | Brilhante | #16c2bb | Sinal "!!" | #04201f | #0a7470 | #4fe3dc |
 | Melhor | #f4f4f6 | Ícone de estrela | #0b0b0d | Texto comum | Texto comum |
-| Excelente | #1f8a45 | Sinal "!" | #ffffff | #1f7a33 | #68d278 |
-| Boa | #6a6a73 | Ícone de visto | #ffffff | Texto comum | Texto comum |
+| Ótimo | #2a6fd1 | Sinal "!" | #ffffff | #1f5fb8 | #8dbcff |
+| Excelente | #1f8a45 | Ícone de polegar | #ffffff | #1f7a33 | #68d278 |
+| Bom | #6a6a73 | Ícone de visto | #ffffff | Texto comum | Texto comum |
 | Imprecisão | #c28a00 | Sinal "?!" | #0b0b0d | #7a5a00 | #e6ae3a |
 | Erro | #bd5206 | Sinal "?" | #ffffff | #ab4805 | #f5944c |
-| Erro grave | #a30f2e | Sinal "??" | #ffffff | #a30f2e | #f97f8c |
+| Erro grosseiro | #a30f2e | Sinal "??" | #ffffff | #a30f2e | #f97f8c |
 | Chance perdida | #8446dc | Ícone de X | #ffffff | #6c34bd | #bb99f7 |
 | Livro | #74747d | Ícone de livro aberto | #ffffff | Texto apagado | Texto apagado |
 
 - **Ícones:** desenhados em SVG, porque sinais de texto dependem da fonte de cada aparelho. Os sinais de notação ("!", "?!", "?", "??") são texto em Figtree 800.
-- **Brilhante:** entrega ao menos 2 pontos de material, já descontado o que capturou, é o melhor lance ou perde menos de 2%, e quem jogou não fica pior. Não vale em lance forçado, nem em partida já ganha, a não ser que force o mate. Ao chegar nele, uma onda na cor do selo sai da casa.
+- **Brilhante e Ótimo:** as regras estão em docs/classificacao.md. Ao chegar neles, uma onda na cor do selo sai da casa.
 - **No cartão do treinador:** o sinal aparece grande (3.75rem, ícones de 56px) na cor de texto da classe, ao lado do nome da classe. No celular, o selo tem 28px e divide a linha com o lance e a avaliação.
 - **Acessibilidade:** o selo tem o nome da classe como rótulo.
+
+### Aula
+Veja, faça, leve: o Seu Nonato mostra no tabuleiro, a pessoa pratica e sai com uma frase. O conteúdo e a pesquisa estão em docs/aprendizado.md.
+
+- **Marcas no tabuleiro:** verde para onde ir ou o que dá certo, vermelho para o que é proibido ou perigoso, azul para o que olhar. Nunca amarelo, que continua só para ação.
+- **Caminho:** cada nível tem a peça branca do tabuleiro (peão, cavalo, torre, dama) e uma fileira de casas sem canto, uma por aula. Verde para feita, amarelo para a próxima, zona 3 para o resto.
+- **Vídeo:** só carrega quando tocado, com o crédito do canal.
 
 ### Placa
 A resposta do app. Bloco amarelo sem canto, com o número gigante à esquerda, a frase ao lado e uma nota de 0.875rem em peso 600.
@@ -483,7 +492,7 @@ A tela inicial termina com "Feito com carinho no Brasil" em Barlow Condensed 700
 ### Don't:
 - **Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do lance em destaque na Revelação e do acerto de exercício.
 - **Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.
-- **Don't** dê cor forte a Melhor ou Boa.
+- **Don't** dê cor forte a Melhor ou Bom.
 - **Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.
 - **Don't** arredonde a placa.
 - **Don't** use Barlow Condensed em parágrafos.

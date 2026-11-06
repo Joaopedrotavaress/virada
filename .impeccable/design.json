@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T00:06:07.546Z",
+  "generatedAt": "2026-11-06T03:16:02.781Z",
   "title": "Design System: Virada",
   "extensions": {
     "colorMeta": {
@@ -673,6 +673,24 @@
           "#f4f4f6"
         ]
       },
+      "fill-great": {
+        "role": "neutral",
+        "displayName": "Selo Ótimo",
+        "canonical": "#2a6fd1",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#17171b",
+          "#26262c",
+          "#3a3a41",
+          "#4e4e57",
+          "#6a6a73",
+          "#868690",
+          "#a6a6ae",
+          "#b9b9c0",
+          "#d8d8de",
+          "#f4f4f6"
+        ]
+      },
       "fill-best": {
         "role": "neutral",
         "displayName": "Selo Melhor",
@@ -711,7 +729,7 @@
       },
       "fill-good": {
         "role": "neutral",
-        "displayName": "Selo Boa",
+        "displayName": "Selo Bom",
         "canonical": "#6a6a73",
         "tonalRamp": [
           "#0b0b0d",
@@ -1339,7 +1357,7 @@
       },
       {
         "name": "A Regra da Cor com Motivo",
-        "body": "Lance comum é neutro: Melhor, Boa e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grave e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.",
+        "body": "Lance comum é neutro: Melhor, Bom e Livro usam branco e cinzas. Cor forte aparece nos erros (Imprecisão, Erro, Erro grosseiro e Chance perdida) e nos dois lances que a pessoa quer conquistar: Excelente, em verde, e Brilhante, em verde-azulado. Nunca sozinha: o símbolo garante a leitura sem cor.",
         "section": "colors"
       },
       {
@@ -1382,7 +1400,7 @@
     "donts": [
       "**Don't** use amarelo em enfeite, em texto de leitura ou no tabuleiro, fora do lance em destaque na Revelação e do acerto de exercício.",
       "**Don't** use verde como cor de superfície ou de marca: o verde existe só no texto positivo e na seta do melhor lance.",
-      "**Don't** dê cor forte a Melhor ou Boa.",
+      "**Don't** dê cor forte a Melhor ou Bom.",
       "**Don't** use gradiente em superfícies nem sombra em cartões, botões e placas.",
       "**Don't** arredonde a placa.",
       "**Don't** use Barlow Condensed em parágrafos.",
