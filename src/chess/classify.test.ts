@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AnalyzedMove, AnalyzedPosition } from './analyze'
-import { classifyLoss, classifyMoves, moveAccuracy, summarize } from './classify'
+import { classifyMoves, moveAccuracy, summarize } from './classify'
 import { coachComment } from './comment'
 import { type Eval, formatEval, toWhitePov, whiteWinPercent, winPercentFor } from './evaluation'
 
@@ -40,19 +40,6 @@ describe('avaliação', () => {
 })
 
 describe('classificação', () => {
-  it('respeita os limites de perda', () => {
-    expect(classifyLoss(0)).toBe('excellent')
-    expect(classifyLoss(1.99)).toBe('excellent')
-    expect(classifyLoss(2)).toBe('good')
-    expect(classifyLoss(4.99)).toBe('good')
-    expect(classifyLoss(5)).toBe('inaccuracy')
-    expect(classifyLoss(9.99)).toBe('inaccuracy')
-    expect(classifyLoss(10)).toBe('mistake')
-    expect(classifyLoss(19.99)).toBe('mistake')
-    expect(classifyLoss(20)).toBe('blunder')
-    expect(classifyLoss(80)).toBe('blunder')
-  })
-
   it('calcula a precisão do lance dentro de 0 a 100', () => {
     expect(moveAccuracy(0)).toBeCloseTo(100, 2)
     expect(moveAccuracy(10)).toBeCloseTo(103.1668 * Math.exp(-0.4354) - 3.1669)
@@ -67,9 +54,9 @@ describe('classificação', () => {
         { uci: 'a', color: 'w' },
         { uci: 'b', color: 'b' },
       ],
-      [pos(cp(0)), pos(cp(-300)), pos(cp(0), null)],
+      [pos(cp(0)), pos(cp(-400)), pos(cp(0), null)],
     )
-    expect(white.loss).toBeCloseTo(whiteWinPercent(cp(0)) - whiteWinPercent(cp(-300)))
+    expect(white.loss).toBeCloseTo(whiteWinPercent(cp(0)) - whiteWinPercent(cp(-400)))
     expect(white.cls).toBe('blunder')
     // As pretas devolveram tudo: perderam a vantagem e não aproveitaram o erro.
     expect(black.loss).toBeCloseTo(white.loss)
@@ -94,7 +81,7 @@ describe('classificação', () => {
   it('não dá perda negativa quando a avaliação melhora', () => {
     const [move] = classifyMoves([{ uci: 'a', color: 'w' }], [pos(cp(0)), pos(cp(50), null)])
     expect(move.loss).toBe(0)
-    expect(move.cls).toBe('excellent')
+    expect(move.cls).toBe('best')
   })
 
   it('chance perdida exige perda ≥ 10 nos dois lances', () => {

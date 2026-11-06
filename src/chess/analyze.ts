@@ -1,15 +1,17 @@
 import { type EngineLike, EngineAbortError } from '../engine/stockfish'
-import { isBrilliant } from './brilliant'
 import { type OpeningInfo, findBookMoves, loadBook } from './book'
-import { type ClassifiedMove, type SideSummary, classifyMoves, summarize } from './classify'
+import { CLASS_VERSION, type ClassifiedMove, type Ratings, type SideSummary, classifyMoves, summarize } from './classify'
 import { type ClockData, computeClock } from './clock'
 import { type Color, type Eval, opposite } from './evaluation'
+import { DEFAULT_RATING, expectedPoints, toModelRating } from './expectedPoints'
 import type { GameMove, GamePosition, ParsedGame, TerminalState } from './pgn'
 
 export interface AnalyzedPosition extends GamePosition {
   eval: Eval
   bestUci: string | null
   pvUci: string[]
+  /** A segunda melhor linha, medida quando o lance jogado foi o primeiro do motor. */
+  secondEval?: Eval
 }
 
 export type AnalyzedMove = GameMove & ClassifiedMove
@@ -36,6 +38,10 @@ export interface GameAnalysis {
   link?: string
   /** Cor da pessoa quando o nome não basta para descobrir (partidas contra bots). */
   userColor?: Color
+  /** Rating de cada lado, já na escala da curva de pontos esperados. Ausente: sem rating no PGN. */
+  ratings?: Ratings
+  /** A versão das regras que classificou os lances. */
+  classVersion?: number
 }
 
 /** Só o que cabe mostrar (4–6 lances), para não inflar o localStorage. */
@@ -71,17 +77,25 @@ export interface AnalyzeGameOptions {
   signal?: AbortSignal
 }
 
-/** Partidas analisadas antes de existir o lance brilhante ganham a marca ao abrir, sem refazer a análise. */
-export function withBrilliantMoves(analysis: GameAnalysis): GameAnalysis {
-  let changed = analysis.summary.w.counts.brilliant === undefined
-  const moves = analysis.moves.map((move, index) => {
-    if (move.cls !== 'best' && move.cls !== 'excellent') return move
-    const { fen, eval: evalBefore } = analysis.positions[index]
-    if (!isBrilliant({ fen, uci: move.uci, color: move.color, loss: move.loss, winBefore: move.winBefore, winAfter: move.winAfter, evalBefore })) return move
-    changed = true
-    return { ...move, cls: 'brilliant' as const }
-  })
-  return changed ? { ...analysis, moves, summary: summarize(moves) } : analysis
+/**
+ * Análise guardada com regras antigas é reclassificada ao abrir, com as avaliações que já tem.
+ * O que depende da segunda melhor linha, como o lance Ótimo, só aparece analisando de novo.
+ */
+export function upgradeAnalysis(analysis: GameAnalysis): GameAnalysis {
+  if (analysis.classVersion === CLASS_VERSION) return analysis
+  const classified = classifyMoves(analysis.moves, analysis.positions, analysis.moves.map((move) => move.cls === 'book'), analysis.ratings)
+  const moves = analysis.moves.map((move, index) => ({ ...move, ...classified[index] }))
+  return { ...analysis, moves, summary: summarize(moves), classVersion: CLASS_VERSION }
+}
+
+/** O rating de cada lado, quando o PGN traz. */
+export function ratingsOf(headers: Record<string, string>): Ratings {
+  const fromChessCom = /chess\.com/i.test(headers.Site ?? '') || /chess\.com/i.test(headers.Link ?? '')
+  const read = (value: string | undefined) => {
+    const rating = Number(value)
+    return Number.isFinite(rating) && rating >= 100 ? toModelRating(rating, fromChessCom) : null
+  }
+  return { w: read(headers.WhiteElo), b: read(headers.BlackElo) }
 }
 
 export async function analyzeGame(
@@ -92,6 +106,9 @@ export async function analyzeGame(
 ): Promise<GameAnalysis> {
   await engine.newGame()
 
+  const book = await loadBook()
+  const ratings = ratingsOf(game.headers)
+  const { bookMoves: earlyBook } = findBookMoves(book, game.positions.slice(1).map((position) => position.fen))
   const positions: AnalyzedPosition[] = []
   const total = game.positions.length
   onProgress?.(0, total)
@@ -101,22 +118,29 @@ export async function analyzeGame(
       positions.push({ ...position, eval: terminalEval(position.terminal, position.fen), bestUci: null, pvUci: [] })
     } else {
       const result = await engine.analyze(position.fen, depth, { signal })
+      const index = positions.length
+      const move = game.moves[index]
+      // Ótimo e Brilhante dependem de saber o que a segunda melhor linha daria. Só vale buscar quando o lance
+      // jogado foi o primeiro do motor, fora do livro e numa posição que não esteja perdida.
+      const worthSecond = move && move.uci === result.bestUci && !earlyBook[index] && expectedPoints(result.eval, move.color, ratings[move.color] ?? DEFAULT_RATING) > 0.3
+      const second = worthSecond ? await engine.analyze(position.fen, depth, { signal, multiPv: 2 }) : null
       positions.push({
         ...position,
         eval: result.eval,
         bestUci: result.bestUci,
         pvUci: result.pvUci.slice(0, STORED_PV_LENGTH),
+        ...(second?.lines[1] ? { secondEval: second.lines[1].eval } : {}),
       })
     }
     onProgress?.(positions.length, total)
   }
 
-  const { bookMoves, opening } = findBookMoves(await loadBook(), positions.slice(1).map((position) => position.fen))
+  const { bookMoves, opening } = findBookMoves(book, positions.slice(1).map((position) => position.fen))
   // A base inclui armadilhas, como o mate do louco. Um lance que leva a mate forçado não é teoria a respeitar:
   // o livro termina ali, para o treinador poder avisar do erro.
   const firstMate = positions.slice(1).findIndex((position) => position.eval.kind === 'mate')
   if (firstMate !== -1) bookMoves.fill(false, firstMate)
-  const classified = classifyMoves(game.moves, positions, bookMoves)
+  const classified = classifyMoves(game.moves, positions, bookMoves, ratings)
   const moves: AnalyzedMove[] = game.moves.map((move, index) => ({ ...move, ...classified[index] }))
 
   return {
@@ -132,6 +156,8 @@ export async function analyzeGame(
     positions,
     moves,
     summary: summarize(moves),
+    ratings,
+    classVersion: CLASS_VERSION,
     opening,
     clock: computeClock(game.moves, game.moves.map((move) => move.clock), game.timeControl),
   }

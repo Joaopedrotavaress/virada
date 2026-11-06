@@ -1,31 +1,47 @@
-import { isBrilliant } from './brilliant'
+import { Chess } from 'chess.js'
+import { VALUES, exchangeGain, isBrilliant } from './brilliant'
 import { type Color, type Eval, winPercentFor } from './evaluation'
+import { DEFAULT_RATING, expectedPoints, isWinning, standingOf } from './expectedPoints'
+import { uciParts } from './notation'
 import type { GameMove } from './pgn'
 
-export type MoveClass = 'brilliant' | 'book' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
+export type MoveClass = 'brilliant' | 'great' | 'book' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
 
-export const MOVE_CLASSES: MoveClass[] = ['brilliant', 'book', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']
+export const MOVE_CLASSES: MoveClass[] = ['brilliant', 'great', 'book', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']
 
 export const CLASS_INFO: Record<MoveClass, { label: string; symbol: string }> = {
   brilliant: { label: 'Brilhante', symbol: '!!' },
+  great: { label: 'Ótimo', symbol: '!' },
   book: { label: 'Livro', symbol: '' },
   best: { label: 'Melhor', symbol: '★' },
-  excellent: { label: 'Excelente', symbol: '!' },
-  good: { label: 'Boa', symbol: '✓' },
+  excellent: { label: 'Excelente', symbol: '' },
+  good: { label: 'Bom', symbol: '✓' },
   inaccuracy: { label: 'Imprecisão', symbol: '?!' },
   mistake: { label: 'Erro', symbol: '?' },
-  blunder: { label: 'Erro grave', symbol: '??' },
+  blunder: { label: 'Erro grosseiro', symbol: '??' },
   miss: { label: 'Chance perdida', symbol: '✕' },
 }
 
 /** Categorias que recebem um ponto no gráfico de avaliação. */
 export const isErrorClass = (cls: MoveClass) => cls === 'inaccuracy' || cls === 'mistake' || cls === 'blunder' || cls === 'miss'
 
-const OPPORTUNITY_THRESHOLD = 10
+/** Lances que merecem festa: achar é o que importa neles. */
+export const isSpecialClass = (cls: MoveClass) => cls === 'brilliant' || cls === 'great'
+
+/** Melhor, Ótimo ou Brilhante: não há seta de "o melhor era" para mostrar. */
+export const isTopClass = (cls: MoveClass) => cls === 'best' || isSpecialClass(cls)
+
+/**
+ * Sobe sempre que as regras mudam: a análise guardada com outra versão é reclassificada ao abrir,
+ * com as avaliações que já tem, sem chamar o motor de novo.
+ */
+export const CLASS_VERSION = 2
 
 export interface PositionEval {
   eval: Eval
   bestUci: string | null
+  /** A avaliação da segunda melhor linha, medida quando o lance jogado foi o primeiro do motor. */
+  secondEval?: Eval
 }
 
 export interface ClassifiedMove {
@@ -34,17 +50,27 @@ export interface ClassifiedMove {
   loss: number
   cls: MoveClass
   accuracy: number
+  /** Pontos esperados perdidos, de 0 a 1. Ausente em análises antigas. */
+  pointsLost?: number
 }
 
 export function moveAccuracy(loss: number): number {
   return Math.min(100, Math.max(0, 103.1668 * Math.exp(-0.04354 * loss) - 3.1669))
 }
 
-export function classifyLoss(loss: number): MoveClass {
-  if (loss < 2) return 'excellent'
-  if (loss < 5) return 'good'
-  if (loss < 10) return 'inaccuracy'
-  if (loss < 20) return 'mistake'
+/** A tabela pública do Chess.com, em pontos esperados perdidos. Ela mostra duas casas: abaixo de 0,005 aparece como 0,00. */
+const SAME_AS_BEST = 0.005
+const EXCELLENT = 0.02
+const GOOD = 0.05
+const INACCURACY = 0.1
+const MISTAKE = 0.2
+
+export function classifyPointsLost(pointsLost: number): MoveClass {
+  if (pointsLost < SAME_AS_BEST) return 'best'
+  if (pointsLost < EXCELLENT) return 'excellent'
+  if (pointsLost < GOOD) return 'good'
+  if (pointsLost < INACCURACY) return 'inaccuracy'
+  if (pointsLost < MISTAKE) return 'mistake'
   return 'blunder'
 }
 
@@ -54,47 +80,183 @@ export interface GradedMove {
   loss: number
   isBest: boolean
   accuracy: number
+  pointsLost: number
 }
 
 /** Mede um lance comparando as avaliações antes e depois, do ponto de vista de quem jogou. */
-export function gradeMove(uci: string, color: Color, before: PositionEval, after: Pick<PositionEval, 'eval'>): GradedMove {
+export function gradeMove(uci: string, color: Color, before: PositionEval, after: Pick<PositionEval, 'eval'>, rating: number = DEFAULT_RATING): GradedMove {
   const winBefore = winPercentFor(before.eval, color)
   const winAfter = winPercentFor(after.eval, color)
   const isBest = before.bestUci === uci
   // As duas buscas têm horizontes diferentes. Jogar o lance do motor não pode custar precisão:
   // sem isso, o ruído viraria perda e até um falso "o adversário errou" para o lance seguinte.
   const loss = isBest ? 0 : Math.max(0, winBefore - winAfter)
-  return { winBefore, winAfter, loss, isBest, accuracy: moveAccuracy(loss) }
+  const pointsLost = isBest ? 0 : Math.max(0, expectedPoints(before.eval, color, rating) - expectedPoints(after.eval, color, rating))
+  return { winBefore, winAfter, loss, isBest, accuracy: moveAccuracy(loss), pointsLost }
+}
+
+type MateEval = Extract<Eval, { kind: 'mate' }>
+
+/** Em mate contra mate os pontos não mudam: o que conta é quantos lances a mais ou a menos ele levou. */
+function classOfMateDistance(extra: number): MoveClass {
+  if (extra <= 0) return 'best'
+  if (extra === 1) return 'excellent'
+  return extra <= 5 ? 'good' : 'inaccuracy'
+}
+
+/** Entregar um mate é sempre digno de nota, mesmo numa posição em que já quase não havia ponto a perder. */
+function classOfMateAllowed(after: MateEval, base: MoveClass, wasMated: MateEval | null): MoveClass {
+  if (wasMated) return classOfMateDistance(wasMated.moves - 1 - after.moves)
+  if (base === 'blunder' || base === 'mistake') return base
+  return after.moves <= 3 ? 'mistake' : 'inaccuracy'
+}
+
+/** A classe só pelo tamanho da perda, com os casos de mate. */
+function baseClass(color: Color, before: Eval, after: Eval, graded: GradedMove): MoveClass {
+  if (graded.isBest) return 'best'
+  const base = classifyPointsLost(graded.pointsLost)
+  if (after.kind !== 'mate' || after.moves === 0) return base
+  if (after.winner === color) return before.kind === 'mate' && before.winner === color ? classOfMateDistance(after.moves - (before.moves - 1)) : base
+  return classOfMateAllowed(after, base, before.kind === 'mate' && before.winner !== color ? before : null)
+}
+
+/** Quanto a segunda melhor linha precisa ficar atrás para o lance ser decisivo. Com rating baixo, é mais generoso. */
+const GREAT_GAP_LOW = 0.05
+const GREAT_GAP_MID = 0.08
+const GREAT_GAP_HIGH = 0.12
+/** Sem mudar de estado, a diferença precisa ser o dobro: é o caso do "único lance bom". */
+const ONLY_MOVE_FACTOR = 2
+/** Com a alternativa já ganhando com folga, achar o lance não decide nada. */
+const SECOND_ALREADY_WON = 0.9
+/** Melhor lance de uma posição que continua perdida não salva ninguém. */
+const STILL_LOST = 0.3
+
+export function greatGapFor(rating: number): number {
+  if (rating <= 1000) return GREAT_GAP_LOW
+  if (rating <= 1500) return GREAT_GAP_LOW + ((GREAT_GAP_MID - GREAT_GAP_LOW) * (rating - 1000)) / 500
+  if (rating >= 2200) return GREAT_GAP_HIGH
+  return GREAT_GAP_MID + ((GREAT_GAP_HIGH - GREAT_GAP_MID) * (rating - 1500)) / 700
+}
+
+export interface GreatInput {
+  fen: string
+  uci: string
+  color: Color
+  evalBefore: Eval
+  evalAfter: Eval
+  secondEval?: Eval
+  rating?: number
+  /** O adversário acabou de mexer nessa casa: pegar a peça dele é a resposta que qualquer um vê. */
+  lastMoveTo?: string
+}
+
+/**
+ * Ótimo: decisivo para o resultado. O Chess.com cita três casos: de perdido para igual, de igual para ganho,
+ * ou o único lance bom. Aqui isso é medido contra a segunda melhor linha.
+ */
+export function isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, rating = DEFAULT_RATING, lastMoveTo }: GreatInput): boolean {
+  if (!secondEval || uci.slice(2, 4) === lastMoveTo) return false
+  const points = expectedPoints(evalBefore, color, rating)
+  const second = expectedPoints(secondEval, color, rating)
+  const gap = points - second
+  const needed = greatGapFor(rating)
+  if (gap < needed || second >= SECOND_ALREADY_WON) return false
+  if (expectedPoints(evalAfter, color, rating) <= STILL_LOST) return false
+  if (standingOf(points) === standingOf(second) && gap < needed * ONLY_MOVE_FACTOR) return false
+  try {
+    const chess = new Chess(fen)
+    const legal = chess.moves().length
+    // Com uma ou duas saídas do xeque, achar o lance é quase obrigação.
+    if (legal <= 1 || (chess.inCheck() && legal <= 2)) return false
+    const gainOf = (square: Parameters<typeof exchangeGain>[1]) => exchangeGain(new Chess(fen), square)
+    const move = chess.move(uciParts(uci))
+    if (chess.isCheckmate() || move.promotion === 'q') return false
+    // Pegar o que ficou solto ou trocar peças também decide a partida, mas qualquer um vê.
+    // Só conta a captura em que se entrega mais do que se leva.
+    return !move.captured || (gainOf(move.to) === 0 && VALUES[move.piece] > VALUES[move.captured])
+  } catch {
+    return false
+  }
+}
+
+/** O erro do adversário precisa ser de verdade, e o lance jogado também, para valer como chance perdida. */
+const PUNISHABLE = INACCURACY
+const MISS_MIN_LOST = INACCURACY
+
+/**
+ * Chance perdida: o adversário acabou de errar, havia posição ganha na mesa e o lance jogado a deixou passar.
+ * É a definição pública do Chess.com, que acrescenta: em geral, a pessoa termina igual ou pior.
+ */
+function isMiss(previousLost: number, pointsBefore: number, pointsAfter: number, pointsLost: number): boolean {
+  return previousLost >= PUNISHABLE && pointsLost >= MISS_MIN_LOST && isWinning(pointsBefore) && !isWinning(pointsAfter)
+}
+
+export interface PlayedContext {
+  fen: string
+  uci: string
+  color: Color
+  evalBefore: Eval
+  evalAfter?: Eval
+  secondEval?: Eval
+  rating?: number
+  lastMoveTo?: string
 }
 
 /** Classificação de um lance testado fora da partida (sem o contexto do lance anterior). */
-export function classOf(graded: GradedMove, played?: { fen: string; uci: string; color: Color; evalBefore: Eval }): MoveClass {
-  if (played && isBrilliant({ ...played, loss: graded.loss, winBefore: graded.winBefore, winAfter: graded.winAfter })) return 'brilliant'
-  return graded.isBest ? 'best' : classifyLoss(graded.loss)
+export function classOf(graded: GradedMove, played?: PlayedContext): MoveClass {
+  if (!played) return graded.isBest ? 'best' : classifyPointsLost(graded.pointsLost)
+  const { fen, uci, color, evalBefore, secondEval, rating, lastMoveTo } = played
+  const evalAfter = played.evalAfter ?? evalBefore
+  if (isBrilliant({ fen, uci, color, pointsLost: graded.pointsLost, evalBefore, evalAfter, secondEval, isBest: graded.isBest, rating })) return 'brilliant'
+  if (graded.isBest && isGreat({ fen, uci, color, evalBefore, evalAfter, secondEval, rating, lastMoveTo })) return 'great'
+  return baseClass(color, evalBefore, evalAfter, graded)
+}
+
+const hasOneLegalMove = (fen: string | undefined) => {
+  if (!fen) return false
+  try {
+    return new Chess(fen).moves().length === 1
+  } catch {
+    return false
+  }
+}
+
+export interface Ratings {
+  w?: number | null
+  b?: number | null
 }
 
 /** positions tem moves.length + 1 itens: positions[i] é a posição antes de moves[i]. */
-export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], positions: (PositionEval & { fen?: string })[], bookMoves: boolean[] = []): ClassifiedMove[] {
+export function classifyMoves(moves: Pick<GameMove, 'uci' | 'color'>[], positions: (PositionEval & { fen?: string })[], bookMoves: boolean[] = [], ratings: Ratings = {}): ClassifiedMove[] {
   const classified: ClassifiedMove[] = []
   moves.forEach((move, index) => {
-    const { winBefore, winAfter, loss: rawLoss, isBest, accuracy } = gradeMove(move.uci, move.color, positions[index], positions[index + 1])
+    const before = positions[index]
+    const after = positions[index + 1]
+    const rating = ratings[move.color] ?? DEFAULT_RATING
+    const graded = gradeMove(move.uci, move.color, before, after, rating)
+    const { winBefore, winAfter, loss, accuracy, pointsLost } = graded
     // Teoria não se julga: um gambito pode "perder" avaliação sem ser erro de ninguém.
     if (bookMoves[index]) {
-      classified.push({ winBefore, winAfter, loss: 0, cls: 'book', accuracy: 100 })
+      classified.push({ winBefore, winAfter, loss: 0, cls: 'book', accuracy: 100, pointsLost: 0 })
       return
     }
-    const loss = rawLoss
-    const previousLoss = index > 0 ? classified[index - 1].loss : 0
+    // Sem escolha, não há o que julgar.
+    if (hasOneLegalMove(before.fen)) {
+      classified.push({ winBefore, winAfter, loss: 0, cls: 'best', accuracy: 100, pointsLost: 0 })
+      return
+    }
 
-    let cls: MoveClass
-    if (isBest) cls = 'best'
-    else if (previousLoss >= OPPORTUNITY_THRESHOLD && loss >= OPPORTUNITY_THRESHOLD) cls = 'miss'
-    else cls = classifyLoss(loss)
+    // Num xeque perpétuo, o mesmo lance se repete: só a primeira vez merece a festa.
+    const repeated = moves.slice(0, index).some((other) => other.color === move.color && other.uci === move.uci)
 
-    const { fen } = positions[index]
-    if (fen && isBrilliant({ fen, uci: move.uci, color: move.color, loss, winBefore, winAfter, evalBefore: positions[index].eval })) cls = 'brilliant'
+    let cls: MoveClass = before.fen
+      ? classOf(graded, { fen: before.fen, uci: move.uci, color: move.color, evalBefore: before.eval, evalAfter: after.eval, secondEval: repeated ? undefined : before.secondEval, rating, lastMoveTo: index > 0 ? moves[index - 1].uci.slice(2, 4) : undefined })
+      : baseClass(move.color, before.eval, after.eval, graded)
 
-    classified.push({ winBefore, winAfter, loss, cls, accuracy })
+    const previousLost = index > 0 ? (classified[index - 1].pointsLost ?? 0) : 0
+    if (!graded.isBest && isMiss(previousLost, expectedPoints(before.eval, move.color, rating), expectedPoints(after.eval, move.color, rating), pointsLost)) cls = 'miss'
+
+    classified.push({ winBefore, winAfter, loss, cls, accuracy, pointsLost })
   })
   return classified
 }
