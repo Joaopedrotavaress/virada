@@ -2,11 +2,15 @@ import { Chess } from 'chess.js'
 import { useMemo, useRef, useState } from 'react'
 import { BEST_ARROW_COLOR } from '../components/Board'
 import { BoardScreen, PlayableBoard } from '../components/PlayableBoard'
+import { Professor } from '../components/Professor'
 import { gradeMove } from '../chess/classify'
 import { evaluatePosition } from '../chess/evaluate'
 import { sanToPt } from '../chess/notation'
 import { useKv } from '../data/kv'
 import { getEngine } from '../engine/stockfish'
+import { DemoBoard, DemoPanel, orientationOf, useDemo } from '../learn/Demo'
+import { lessonAfter, levelOfLesson } from '../learn/roadmap'
+import { VideoCard } from '../learn/VideoCard'
 import { goBack, navigate } from '../route'
 import { type Lesson, type LessonPosition, lessonById } from './lessons'
 import { LESSONS_KEY } from './repertoire'
@@ -14,11 +18,12 @@ import { LESSONS_KEY } from './repertoire'
 const FOUND_LOSS = 2
 const REPLY_DELAY_MS = 450
 const LAST_MOVE_TINT = 'var(--board-last)'
+const TARGET_TINT = 'var(--mark-focus)'
 
 type Status = 'playing' | 'checking' | 'wrong' | 'solved' | 'other-solution'
 
 /** Exercício de solução conhecida. Um lance diferente é conferido pelo Stockfish: se for tão bom quanto, também vale. */
-export function useSolution(position: Pick<LessonPosition, 'fen' | 'solution'>, onSolved?: () => void) {
+export function useSolution(position: Pick<LessonPosition, 'fen' | 'solution' | 'strict'>, onSolved?: () => void) {
   const [fen, setFen] = useState(position.fen)
   const [cursor, setCursor] = useState(0)
   const [status, setStatus] = useState<Status>('playing')
@@ -78,6 +83,11 @@ export function useSolution(position: Pick<LessonPosition, 'fen' | 'solution'>, 
       solved()
       return true
     }
+    // Treino de movimento: só o lance pedido vale.
+    if (position.strict) {
+      setStatus('wrong')
+      return false
+    }
     // Outro caminho pode resolver igualmente.
     setStatus('checking')
     const before = fen
@@ -131,25 +141,26 @@ export function useSolution(position: Pick<LessonPosition, 'fen' | 'solution'>, 
 
 function PositionExercise({ lesson, position, index, onNext }: { lesson: Lesson; position: LessonPosition; index: number; onNext: () => void }) {
   const exercise = useSolution(position)
-  const styles = exercise.last ? { [exercise.last.from]: { backgroundColor: LAST_MOVE_TINT }, [exercise.last.to]: { backgroundColor: LAST_MOVE_TINT } } : undefined
+  const marks = Object.fromEntries((exercise.last ? [] : (position.marks ?? [])).map((square) => [square, { backgroundColor: TARGET_TINT }]))
+  const styles = exercise.last ? { [exercise.last.from]: { backgroundColor: LAST_MOVE_TINT }, [exercise.last.to]: { backgroundColor: LAST_MOVE_TINT } } : marks
   const arrows = exercise.expectedStep ? [{ startSquare: exercise.expectedStep.from, endSquare: exercise.expectedStep.to, color: BEST_ARROW_COLOR }] : []
   const done = exercise.status === 'solved' || exercise.status === 'other-solution'
-  const orientation = position.fen.split(' ')[1] === 'w' ? 'white' : 'black'
   const hasNext = index + 1 < lesson.positions.length
   return (
-    <BoardScreen title={lesson.title} status={lesson.positions.length > 1 ? `${index + 1} de ${lesson.positions.length}` : undefined} onBack={goBack} board={<PlayableBoard fen={exercise.fen} orientation={orientation} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} celebrate={done && exercise.last ? exercise.last.to : null} />}>
+    <BoardScreen title={lesson.title} status={lesson.positions.length > 1 ? `Exercício ${index + 1} de ${lesson.positions.length}` : 'Exercício'} onBack={goBack} board={<PlayableBoard fen={exercise.fen} orientation={orientationOf(position.fen)} canMove={exercise.userTurn} onMove={exercise.play} squareStyles={styles} arrows={arrows} celebrate={done && exercise.last ? exercise.last.to : null} />}>
       <section aria-live="polite" className="rounded-md bg-surface p-4">
         {done ? (
           <>
             <h2 className="font-display text-xl font-semibold text-(--positive)">{exercise.status === 'other-solution' ? 'Também resolve!' : 'Isso!'}</h2>
             <p className="mt-1 max-w-prose text-base leading-relaxed">{position.after}</p>
             <button type="button" autoFocus onClick={onNext} className="mt-3 min-h-11 w-full rounded-md bg-action px-4 font-semibold text-on-action">
-              {hasNext ? 'Próximo exercício' : 'Terminar a lição'}
+              {hasNext ? 'Próximo exercício' : 'Terminar a aula'}
             </button>
           </>
         ) : exercise.status === 'wrong' ? (
           <>
             <h2 className="font-display text-xl font-semibold text-(--text-mistake)">{exercise.tried} não resolve.</h2>
+            <p className="mt-1 max-w-prose text-base leading-relaxed">{position.prompt}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" autoFocus onClick={exercise.again} className="min-h-11 flex-1 rounded-md bg-action px-4 font-semibold whitespace-nowrap text-on-action">
                 Tentar de novo
@@ -176,17 +187,90 @@ function PositionExercise({ lesson, position, index, onNext }: { lesson: Lesson;
   )
 }
 
+function DemoStage({ lesson, onFinish }: { lesson: Lesson; onFinish: () => void }) {
+  const frames = lesson.frames ?? []
+  const demo = useDemo(frames)
+  const firstFen = frames[0].fen as string
+  const practices = lesson.positions.length
+  return (
+    <BoardScreen title={lesson.title} status="Veja" onBack={goBack} board={<DemoBoard demo={demo} orientation={orientationOf(firstFen)} />}>
+      <DemoPanel demo={demo} onFinish={onFinish} finishLabel={practices > 0 ? 'Agora é com você' : 'Terminar a aula'} />
+      {demo.atEnd && lesson.videos?.[0] && (
+        <div className="grid gap-2">
+          <h2 className="text-sm font-semibold text-muted">Prefere ver em vídeo?</h2>
+          {lesson.videos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </div>
+      )}
+    </BoardScreen>
+  )
+}
+
+function Finished({ lesson, onAgain }: { lesson: Lesson; onAgain: () => void }) {
+  const nextId = lessonAfter(lesson.id)
+  const nextLesson = nextId ? lessonById(nextId) : undefined
+  const level = levelOfLesson(lesson.id)
+  const nextLevel = nextId ? levelOfLesson(nextId) : undefined
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 pt-4 pb-10 lg:pt-8">
+      <p className="font-semibold text-(--positive)">Aula concluída</p>
+      <h1 className="font-display mt-1 text-3xl font-semibold">{lesson.title}</h1>
+      {lesson.takeaway && (
+        <div className="mt-4">
+          <Professor say={lesson.takeaway} mood="feliz" large>
+            <p className="rounded-md bg-surface p-3 text-lg leading-snug">{lesson.takeaway}</p>
+          </Professor>
+        </div>
+      )}
+      {level && nextLevel && level.id !== nextLevel.id && <p className="mt-4 rounded-md bg-surface p-3 font-semibold">Você terminou a última aula do nível {level.title}. Agora vem o {nextLevel.title}.</p>}
+      <div className="mt-5 flex flex-col gap-2">
+        {nextLesson && (
+          <button type="button" autoFocus onClick={() => navigate(`#/aprender/aula/${nextLesson.id}`, { replace: true })} className="min-h-12 rounded-md bg-action px-5 text-left font-semibold text-on-action">
+            Próxima aula: {nextLesson.title}
+          </button>
+        )}
+        {lesson.link && (
+          <button type="button" onClick={() => navigate((lesson.link as { path: string }).path)} className={`min-h-12 rounded-md px-5 text-left font-semibold ${nextLesson ? 'border border-line hover:bg-sunken' : 'bg-action text-on-action'}`}>
+            {lesson.link.label}
+          </button>
+        )}
+        {lesson.puzzleTheme && (
+          <button type="button" onClick={() => navigate(`#/puzzles/${lesson.puzzleTheme}`)} className="min-h-12 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
+            Praticar com puzzles deste tema
+          </button>
+        )}
+        <button type="button" onClick={onAgain} className="min-h-12 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
+          Ver a aula de novo
+        </button>
+        <button type="button" onClick={() => navigate('#/aprender')} className="min-h-12 rounded-md border border-line px-5 text-left font-semibold hover:bg-sunken">
+          Voltar ao caminho
+        </button>
+      </div>
+      {lesson.videos?.[0] && (
+        <section className="mt-6 grid gap-2">
+          <h2 className="font-display text-xl font-semibold">Para ver em vídeo</h2>
+          {lesson.videos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </section>
+      )}
+    </main>
+  )
+}
+
+/** Veja, faça, leve: primeiro o exemplo resolvido, depois a prática. */
 export function LessonScreen({ id }: { id: string }) {
   const lesson = lessonById(id)
-  const [step, setStep] = useState(-1)
+  const [stage, setStage] = useState<'demo' | number | 'finished'>('demo')
   const [done, setDone] = useKv<string[]>(LESSONS_KEY, [])
 
   if (!lesson) {
     return (
       <main className="mx-auto max-w-md p-6">
-        <h1 className="font-display text-3xl font-semibold">Lição não encontrada</h1>
-        <button type="button" onClick={() => navigate('#/guia', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
-          Abrir o guia
+        <h1 className="font-display text-3xl font-semibold">Aula não encontrada</h1>
+        <button type="button" onClick={() => navigate('#/aprender', { replace: true })} className="mt-4 min-h-12 w-full rounded-md bg-action font-semibold text-on-action">
+          Abrir o caminho
         </button>
       </main>
     )
@@ -194,48 +278,12 @@ export function LessonScreen({ id }: { id: string }) {
 
   const finish = () => {
     if (!done.includes(lesson.id)) setDone([...done, lesson.id])
-    setStep(lesson.positions.length)
-  }
-  const position = step >= 0 ? lesson.positions[step] : undefined
-  if (position) {
-    return <PositionExercise key={step} lesson={lesson} position={position} index={step} onNext={() => (step + 1 < lesson.positions.length ? setStep(step + 1) : finish())} />
+    setStage('finished')
   }
 
-  const finished = step >= lesson.positions.length && step !== -1
-  return (
-    <main className="mx-auto w-full max-w-2xl px-4 pt-2 pb-10 lg:pt-6">
-      <button type="button" onClick={goBack} className="-ml-1 flex min-h-11 items-center gap-1 rounded-md pr-3 pl-1 font-semibold hover:bg-sunken">
-        <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6" fill="currentColor">
-          <path d="M15.4 6.4 14 5l-7 7 7 7 1.4-1.4L9.8 12z" />
-        </svg>
-        Voltar
-      </button>
-      <h1 className="font-display mt-1 text-3xl font-semibold">{lesson.title}</h1>
-      {finished && <p className="mt-2 rounded-md bg-surface p-3 font-semibold text-(--positive)">Lição concluída.</p>}
-      {lesson.paragraphs.map((paragraph) => (
-        <p key={paragraph} className="mt-3 max-w-prose text-lg leading-relaxed">
-          {paragraph}
-        </p>
-      ))}
-      <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-        {lesson.positions.length > 0 && (
-          <button type="button" onClick={() => setStep(0)} className="min-h-12 rounded-md bg-action px-5 font-semibold text-on-action">
-            {finished ? 'Fazer de novo' : lesson.positions.length === 1 ? 'Fazer o exercício' : `Fazer os ${lesson.positions.length} exercícios`}
-          </button>
-        )}
-        {lesson.puzzleTheme && (
-          <button
-            type="button"
-            onClick={() => {
-              if (lesson.positions.length === 0 && !done.includes(lesson.id)) setDone([...done, lesson.id])
-              navigate(`#/puzzles/${lesson.puzzleTheme}`)
-            }}
-            className={`min-h-12 rounded-md px-5 font-semibold ${lesson.positions.length === 0 ? 'bg-action text-on-action' : 'border border-line hover:bg-sunken'}`}
-          >
-            Praticar com puzzles
-          </button>
-        )}
-      </div>
-    </main>
-  )
+  if (stage === 'finished') return <Finished lesson={lesson} onAgain={() => setStage('demo')} />
+  if (typeof stage === 'number') {
+    return <PositionExercise key={stage} lesson={lesson} position={lesson.positions[stage]} index={stage} onNext={() => (stage + 1 < lesson.positions.length ? setStage(stage + 1) : finish())} />
+  }
+  return <DemoStage lesson={lesson} onFinish={() => (lesson.positions.length > 0 ? setStage(0) : finish())} />
 }
