@@ -25,23 +25,21 @@ O servidor também roda outro serviço em produção. Por isso o motor fica à p
 - Teto de 3 núcleos e 1,5 GB, e prioridade de CPU menor que a dos outros containers.
 - Aceita só a origem do site e do `localhost`, valida cada posição, e limita a 2 análises simultâneas e 12 mil posições por hora para cada endereço.
 
-## O que falta: o endereço público
+## O endereço público
 
-O HTTPS do servidor pertence ao proxy da LordPets, em `/opt/lordpets/Caddyfile`. Para o site alcançar o motor, esse proxy precisa de um endereço a mais. Isso não mexe na rota da loja:
+O HTTPS do servidor pertence ao proxy da LordPets. O motor responde em `https://motor.169-58-241-29.sslip.io`, por um bloco a mais em `/opt/lordpets/Caddyfile`, que não mexe na rota da loja. O arquivo anterior está em `/opt/virada-motor/Caddyfile.antes`.
+
+**Cuidado com o arquivo do proxy.** O container pode continuar vendo uma versão antiga do `Caddyfile`, quando um deploy troca o arquivo sem reiniciar o proxy. Para aplicar sem derrubar a loja:
 
 ```bash
-ssh root@169.58.241.29
-cp -p /opt/lordpets/Caddyfile /opt/virada-motor/Caddyfile.antes
-docker network connect virada-motor-rede lordpets-caddy-1
-printf '\nmotor.169-58-241-29.sslip.io {\n\tencode zstd gzip\n\treverse_proxy virada-motor:8080 {\n\t\tflush_interval -1\n\t}\n}\n' >> /opt/lordpets/Caddyfile
-docker exec lordpets-caddy-1 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-docker exec lordpets-caddy-1 caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
-curl https://motor.169-58-241-29.sslip.io/saude
+docker cp /opt/lordpets/Caddyfile lordpets-caddy-1:/tmp/Caddyfile.atual
+docker exec lordpets-caddy-1 caddy validate --config /tmp/Caddyfile.atual --adapter caddyfile
+docker exec lordpets-caddy-1 caddy reload --config /tmp/Caddyfile.atual --adapter caddyfile
 ```
 
-Só rode o `reload` se o `validate` disser que está válido. Para desfazer: `cat /opt/virada-motor/Caddyfile.antes > /opt/lordpets/Caddyfile` e rode o `reload` de novo.
+**O que pode tirar o endereço do ar:** um deploy da loja pode sobrescrever o `Caddyfile`, e recriar o container do proxy tira ele da rede do motor (`docker network connect virada-motor-rede lordpets-caddy-1`). Nos dois casos, a loja segue normal e o site volta a analisar no aparelho.
 
-**Dois cuidados:** um deploy da loja pode sobrescrever o `Caddyfile`, e recriar o container do proxy tira ele da rede do motor. Nos dois casos, a loja segue normal e o site volta a analisar no aparelho. Basta repetir os passos.
+**Para desfazer:** volte o `Caddyfile` do backup, aplique como acima e rode `docker network disconnect virada-motor-rede lordpets-caddy-1`.
 
 ## Atualizar o motor
 
