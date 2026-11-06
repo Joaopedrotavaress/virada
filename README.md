@@ -35,6 +35,7 @@ O Virada acha esse lance, explica em português o que aconteceu, com a voz do Se
 | **Doze adversários** | Do Tio Beto ("Essa torre eu nem queria mesmo.") ao Stockfish sem limites, com treinador ao lado, dica, relógio opcional e início de qualquer posição. |
 | **Guia de aberturas** | 3.865 linhas no catálogo, 41 aberturas explicadas com planos e armadilhas, repertório e prática lance a lance. |
 | **Caminho de aulas** | 36 aulas em quatro níveis, do zero ao cálculo. O Seu Nonato mostra no tabuleiro, passo a passo, e você pratica em seguida. Com vídeos opcionais. [Como funciona](docs/aprendizado.md). |
+| **Motor no servidor** | A partida inteira é analisada com o Stockfish completo, e se ele não responder o aparelho assume. [Como funciona](docs/motor-servidor.md). |
 | **Puzzles** | Aleatórios sem fim, puzzle do dia e 22 temas em quatro dificuldades. |
 | **Seu progresso** | Rating, precisão e erros por período e ritmo, e o que se repete: "6 dos 9 erros graves foram garfos no meio-jogo". |
 | **Sem internet** | Instala como app e continua funcionando offline, inclusive a análise. |
