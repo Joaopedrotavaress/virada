@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T03:16:02.781Z",
+  "generatedAt": "2026-11-06T04:30:28.025Z",
   "title": "Design System: Virada",
   "extensions": {
     "colorMeta": {
@@ -675,7 +675,7 @@
       },
       "fill-great": {
         "role": "neutral",
-        "displayName": "Selo Ótimo",
+        "displayName": "Selo Excelente",
         "canonical": "#2a6fd1",
         "tonalRamp": [
           "#0b0b0d",
@@ -711,7 +711,7 @@
       },
       "fill-excellent": {
         "role": "neutral",
-        "displayName": "Selo Excelente",
+        "displayName": "Selo Ótimo",
         "canonical": "#1f8a45",
         "tonalRamp": [
           "#0b0b0d",

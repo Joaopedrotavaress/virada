@@ -578,7 +578,7 @@ export function AnalysisView({ analysis, userColor, notice, onBack, onPlayFrom, 
       <Summary analysis={analysis} showTitle={isDesktop} userColor={userColor} />
       {onReanalyze && analysis.ratings === undefined && (
         <section className="mt-3 rounded-md bg-surface p-4">
-          <p className="max-w-prose">Esta análise é de antes das regras novas. Os lances Ótimos e o peso do rating só aparecem analisando de novo.</p>
+          <p className="max-w-prose">Esta análise é de antes das regras novas. Os lances Excelentes (!) e o peso do rating só aparecem analisando de novo.</p>
           <button type="button" onClick={onReanalyze} className="mt-3 min-h-11 w-full rounded-md border border-line px-4 font-semibold hover:bg-sunken">
             Analisar de novo
           </button>

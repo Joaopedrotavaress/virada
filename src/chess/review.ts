@@ -65,7 +65,7 @@ export function findKeyMoments({ moves, positions }: ReviewInput, userColor: Col
     }
 
     if (move.cls === 'great') {
-      found.push({ ...base, kind: 'great', title: 'Ótimo lance', note: 'Era o lance que decidia, e os outros ficavam bem atrás.', importance: mine ? 70 : 25 })
+      found.push({ ...base, kind: 'great', title: 'Lance excelente', note: 'Era o lance que decidia, e os outros ficavam bem atrás.', importance: mine ? 70 : 25 })
       return
     }
 
@@ -196,8 +196,8 @@ export function gameInsights(analysis: InsightInput, userColor: Color | null): s
 
     const { brilliant = 0, great = 0, excellent = 0 } = summary[userColor].counts
     if (brilliant > 0) insights.unshift(brilliant === 1 ? 'Você achou um lance brilhante nesta partida!' : `Você achou ${brilliant} lances brilhantes nesta partida!`)
-    if (great > 0) insights.push(great === 1 ? 'Você achou 1 lance ótimo, daqueles que decidem.' : `Você achou ${great} lances ótimos, daqueles que decidem.`)
-    if (excellent > 0) insights.push(excellent === 1 ? 'Você teve 1 lance excelente.' : `Você teve ${excellent} lances excelentes.`)
+    if (great > 0) insights.push(great === 1 ? 'Você achou 1 lance excelente, daqueles que decidem.' : `Você achou ${great} lances excelentes, daqueles que decidem.`)
+    if (excellent > 0) insights.push(excellent === 1 ? 'Você teve 1 lance ótimo.' : `Você teve ${excellent} lances ótimos.`)
   }
 
   // 3. Mate perdido

@@ -385,8 +385,8 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 |---|---|---|---|---|---|
 | Brilhante | #16c2bb | Sinal "!!" | #04201f | #0a7470 | #4fe3dc |
 | Melhor | #f4f4f6 | Ícone de estrela | #0b0b0d | Texto comum | Texto comum |
-| Ótimo | #2a6fd1 | Sinal "!" | #ffffff | #1f5fb8 | #8dbcff |
-| Excelente | #1f8a45 | Ícone de polegar | #ffffff | #1f7a33 | #68d278 |
+| Excelente | #2a6fd1 | Sinal "!" | #ffffff | #1f5fb8 | #8dbcff |
+| Ótimo | #1f8a45 | Ícone de polegar | #ffffff | #1f7a33 | #68d278 |
 | Bom | #6a6a73 | Ícone de visto | #ffffff | Texto comum | Texto comum |
 | Imprecisão | #c28a00 | Sinal "?!" | #0b0b0d | #7a5a00 | #e6ae3a |
 | Erro | #bd5206 | Sinal "?" | #ffffff | #ab4805 | #f5944c |
@@ -395,7 +395,7 @@ Cada classe tem selo, símbolo e cor de texto. O selo é um quadrado desenhado c
 | Livro | #74747d | Ícone de livro aberto | #ffffff | Texto apagado | Texto apagado |
 
 - **Ícones:** desenhados em SVG, porque sinais de texto dependem da fonte de cada aparelho. Os sinais de notação ("!", "?!", "?", "??") são texto em Figtree 800.
-- **Brilhante e Ótimo:** as regras estão em docs/classificacao.md. Ao chegar neles, uma onda na cor do selo sai da casa.
+- **Brilhante e Excelente:** as regras estão em docs/classificacao.md. Ao chegar neles, uma onda na cor do selo sai da casa.
 - **No cartão do treinador:** o sinal aparece grande (3.75rem, ícones de 56px) na cor de texto da classe, ao lado do nome da classe. No celular, o selo tem 28px e divide a linha com o lance e a avaliação.
 - **Acessibilidade:** o selo tem o nome da classe como rótulo.
 
