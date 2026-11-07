@@ -10,6 +10,8 @@ export const ICON_PATHS = {
   previous: 'M16 5.6v12.8L7.6 12z',
   next: 'M8 5.6v12.8l8.4-6.4z',
   last: 'M16 5h2v14h-2zM6 5.6v12.8l8.4-6.4z',
+  play: 'M7 4.8v14.4L19 12z',
+  pause: 'M6 5h4v14H6zm8 0h4v14h-4z',
 }
 
 export function Icon({ name, className = 'size-5' }: { name: keyof typeof ICON_PATHS; className?: string }) {

@@ -41,9 +41,35 @@ function ProgressBar({ value, label }: { value: number; label: string }) {
 }
 
 /** Passeia por uma sequência de lances com os botões, sem precisar jogar. */
-function LineViewer({ moves, orientation, children }: { moves: string[]; orientation: 'white' | 'black'; children?: React.ReactNode }) {
-  const [cursor, setCursor] = useState(moves.length)
-  useEffect(() => setCursor(moves.length), [moves])
+const PLAY_STEP_MS = 1100
+
+function LineViewer({ moves, orientation, startAt = 'start', children }: { moves: string[]; orientation: 'white' | 'black'; startAt?: 'start' | 'end'; children?: React.ReactNode }) {
+  const initial = startAt === 'end' ? moves.length : 0
+  const [cursor, setCursor] = useState(initial)
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    setCursor(initial)
+    setPlaying(false)
+  }, [moves, initial])
+  // Reproduz um lance de cada vez; as peças deslizam de uma casa para a outra.
+  useEffect(() => {
+    if (!playing) return
+    if (cursor >= moves.length) {
+      setPlaying(false)
+      return
+    }
+    const timer = window.setTimeout(() => setCursor((value) => Math.min(moves.length, value + 1)), PLAY_STEP_MS)
+    return () => window.clearTimeout(timer)
+  }, [playing, cursor, moves.length])
+  const stepTo = (next: number) => {
+    setPlaying(false)
+    setCursor(Math.max(0, Math.min(moves.length, next)))
+  }
+  const togglePlay = () => {
+    if (playing) return setPlaying(false)
+    if (cursor >= moves.length) setCursor(0)
+    setPlaying(true)
+  }
   const steps = useMemo(() => {
     const chess = new Chess()
     return moves.map((san) => {
@@ -56,18 +82,38 @@ function LineViewer({ moves, orientation, children }: { moves: string[]; orienta
   const button = 'flex min-h-11 flex-1 items-center justify-center rounded-md bg-surface font-semibold hover:bg-sunken disabled:opacity-35'
   return (
     <div>
-      <Board fen={step?.fen ?? START_FEN} orientation={orientation} squareStyles={styles} />
+      <div
+        tabIndex={0}
+        role="group"
+        aria-label="Tabuleiro da linha. Use as setas do teclado para avançar e voltar."
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowRight') stepTo(cursor + 1)
+          else if (event.key === 'ArrowLeft') stepTo(cursor - 1)
+          else if (event.key === ' ') togglePlay()
+          else return
+          event.preventDefault()
+        }}
+        className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+      >
+        <Board fen={step?.fen ?? START_FEN} orientation={orientation} squareStyles={styles} animationMs={450} />
+      </div>
+      <p className="tabular mt-1.5 text-sm text-muted" aria-live="polite">
+        {cursor === 0 ? 'Posição inicial' : `Lance ${cursor} de ${moves.length}: ${sanToPt(moves[cursor - 1])}`}
+      </p>
       <div className="mt-1.5 flex gap-1.5">
-        <button type="button" className={button} onClick={() => setCursor(0)} disabled={cursor === 0} aria-label="Ir para o início">
+        <button type="button" className={button} onClick={() => stepTo(0)} disabled={cursor === 0} aria-label="Ir para o início">
           <Icon name="first" />
         </button>
-        <button type="button" className={button} onClick={() => setCursor((value) => Math.max(0, value - 1))} disabled={cursor === 0} aria-label="Lance anterior">
+        <button type="button" className={button} onClick={() => stepTo(cursor - 1)} disabled={cursor === 0} aria-label="Lance anterior">
           <Icon name="previous" />
         </button>
-        <button type="button" className={button} onClick={() => setCursor((value) => Math.min(moves.length, value + 1))} disabled={cursor === moves.length} aria-label="Próximo lance">
+        <button type="button" className={`${button} !bg-action !text-on-action hover:!opacity-90`} onClick={togglePlay} aria-label={playing ? 'Pausar' : 'Reproduzir lances'}>
+          <Icon name={playing ? 'pause' : 'play'} />
+        </button>
+        <button type="button" className={button} onClick={() => stepTo(cursor + 1)} disabled={cursor === moves.length} aria-label="Próximo lance">
           <Icon name="next" />
         </button>
-        <button type="button" className={button} onClick={() => setCursor(moves.length)} disabled={cursor === moves.length} aria-label="Ir para o fim">
+        <button type="button" className={button} onClick={() => stepTo(moves.length)} disabled={cursor === moves.length} aria-label="Ir para o fim">
           <Icon name="last" />
         </button>
       </div>
@@ -76,7 +122,7 @@ function LineViewer({ moves, orientation, children }: { moves: string[]; orienta
         {moves.map((san, index) => (
           <li key={index}>
             {index % 2 === 0 && <span className="tabular text-sm text-muted">{index / 2 + 1}.</span>}{' '}
-            <button type="button" onClick={() => setCursor(index + 1)} aria-current={cursor === index + 1 ? 'step' : undefined} className={`rounded-sm px-0.5 ${cursor === index + 1 ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}>
+            <button type="button" onClick={() => stepTo(index + 1)} aria-current={cursor === index + 1 ? 'step' : undefined} className={`rounded-sm px-0.5 ${cursor === index + 1 ? 'bg-ink text-bg' : 'hover:bg-sunken'}`}>
               {sanToPt(san)}
             </button>
           </li>
@@ -440,7 +486,7 @@ export function FamilyPage({ id, onPlayFrom }: { id: string; onPlayFrom: (start:
       <BackLink />
       <div className="mt-1 grid gap-x-8 gap-y-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
         <div className="mx-auto w-full max-w-md lg:sticky lg:top-4 lg:max-w-none lg:self-start">
-          <LineViewer moves={variant.moves} orientation="white" />
+          <LineViewer moves={variant.moves} orientation="white" startAt="end" />
           <button type="button" onClick={() => onPlayFrom({ label: variant.name, sans: variant.moves, color: side })} className="mt-3 min-h-11 w-full rounded-md border border-line px-4 font-semibold hover:bg-sunken">
             Jogar contra um bot daqui
           </button>
