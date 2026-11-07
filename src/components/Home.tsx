@@ -249,11 +249,13 @@ export function Home(props: HomeProps) {
   const { username, activeGame } = props
   const { mode: installMode, install } = useInstall()
   const [changingUser, setChangingUser] = useState(false)
+  // Na primeira visita, a primeira letra já preenche o usuário; sem isso a tela trocava de versão e o formulário sumia no meio da digitação.
+  const [typingFirst, setTypingFirst] = useState(false)
   const all = useAllRecords()
   const records = useMemo(() => recordsFor(all, username), [all, username])
   // Recentes: o que a pessoa já olhou ou jogou aqui. As demais partidas do chess.com ficam em Partidas.
   const recent = useMemo(() => records.filter((record) => record.digest || record.source !== 'chesscom').slice(0, RECENT_LIMIT), [records])
-  const returning = records.length > 0 || Boolean(username.trim())
+  const returning = records.length > 0 || changingUser || (Boolean(username.trim()) && !typingFirst)
   const activeBot = activeGame && BOTS.find((bot) => bot.id === activeGame.botId)
 
   const pgnForm = <PgnForm {...props} />
@@ -312,7 +314,7 @@ export function Home(props: HomeProps) {
           </div>
           <main className="flex min-w-0 flex-col px-5 pt-4 lg:px-0 lg:pt-0">
             <div className="order-1 lg:order-2 lg:mt-5">
-              <UserForm username={username} onChange={props.onUsernameChange} onSubmit={() => navigate('#/partidas')} submitLabel="Achar a virada" help="Suas partidas públicas, sem cadastro." />
+              <UserForm username={username} onChange={(name) => { setTypingFirst(true); props.onUsernameChange(name) }} onSubmit={() => navigate('#/partidas')} submitLabel="Achar a virada" help="Suas partidas públicas, sem cadastro." />
             </div>
             <div className="order-2 mt-4 lg:order-1 lg:mt-0">
               <h1 className="font-display text-3xl leading-none font-extrabold lg:text-6xl">
